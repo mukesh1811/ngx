@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget
       title: 'Retail Management System',
       theme: ThemeData(
         //textTheme: GoogleFonts.josefinSansTextTheme(Theme.of(context).textTheme),
-        primarySwatch: Colors.pink,
+        primarySwatch: Colors.deepOrange,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home: LoginPage(),

@@ -16,7 +16,8 @@ class Receipt extends StatelessWidget {
               title: Text(
                 "Retail Management System",
                 style: TextStyle(
-                  fontSize: 16,
+                  color: Colors.black,
+                  fontSize: 14,
                   fontWeight: FontWeight.bold,
                 ),
                 textAlign: TextAlign.left,
@@ -28,8 +29,9 @@ class Receipt extends StatelessWidget {
                     child: Text(
                       "Receipt",
                       style: TextStyle(
-                        fontSize: 15,
-
+                        color: Colors.black,
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
                       ),
                       textAlign: TextAlign.left,
                     ),
@@ -173,13 +175,7 @@ class Receipt extends StatelessWidget {
                                 Positioned.fill(
                                   child: Container(
                                     decoration: const BoxDecoration(
-                                      gradient: LinearGradient(
-                                        colors: <Color>[
-                                          Color(0xFF0D47A1),
-                                          Color(0xFF1976D2),
-                                          Color(0xFF42A5F5),
-                                        ],
-                                      ),
+                                        color: Colors.deepOrange
                                     ),
                                   ),
                                 ),
@@ -208,13 +204,7 @@ class Receipt extends StatelessWidget {
                                 Positioned.fill(
                                   child: Container(
                                     decoration: const BoxDecoration(
-                                      gradient: LinearGradient(
-                                        colors: <Color>[
-                                          Color(0xFF0D47A1),
-                                          Color(0xFF1976D2),
-                                          Color(0xFF42A5F5),
-                                        ],
-                                      ),
+                                        color: Colors.deepOrange
                                     ),
                                   ),
                                 ),
@@ -272,7 +262,7 @@ class Receipt extends StatelessWidget {
                                   child: TextFormField(
                                     obscureText: false,
                                     decoration: InputDecoration(
-                                      labelText: 'Receipt ID',
+                                      labelText: 'Existing Receipt',
                                       labelStyle: TextStyle(color: Colors.black),
                                       border: OutlineInputBorder(),
                                     ),
@@ -290,13 +280,7 @@ class Receipt extends StatelessWidget {
                                       Positioned.fill(
                                         child: Container(
                                           decoration: const BoxDecoration(
-                                            gradient: LinearGradient(
-                                              colors: <Color>[
-                                                Color(0xFF0D47A1),
-                                                Color(0xFF1976D2),
-                                                Color(0xFF42A5F5),
-                                              ],
-                                            ),
+                                              color: Colors.deepOrange
                                           ),
                                         ),
                                       ),
@@ -328,13 +312,7 @@ class Receipt extends StatelessWidget {
                                   Positioned.fill(
                                     child: Container(
                                       decoration: const BoxDecoration(
-                                        gradient: LinearGradient(
-                                          colors: <Color>[
-                                            Color(0xFF0D47A1),
-                                            Color(0xFF1976D2),
-                                            Color(0xFF42A5F5),
-                                          ],
-                                        ),
+                                          color: Colors.deepOrange
                                       ),
                                     ),
                                   ),
@@ -372,13 +350,7 @@ class Receipt extends StatelessWidget {
                                 Positioned.fill(
                                   child: Container(
                                     decoration: const BoxDecoration(
-                                      gradient: LinearGradient(
-                                        colors: <Color>[
-                                          Color(0xFF0D47A1),
-                                          Color(0xFF1976D2),
-                                          Color(0xFF42A5F5),
-                                        ],
-                                      ),
+                                        color: Colors.deepOrange
                                     ),
                                   ),
                                 ),
@@ -411,13 +383,7 @@ class Receipt extends StatelessWidget {
                                 Positioned.fill(
                                   child: Container(
                                     decoration: const BoxDecoration(
-                                      gradient: LinearGradient(
-                                        colors: <Color>[
-                                          Color(0xFF0D47A1),
-                                          Color(0xFF1976D2),
-                                          Color(0xFF42A5F5),
-                                        ],
-                                      ),
+                                        color: Colors.deepOrange
                                     ),
                                   ),
                                 ),
@@ -450,13 +416,7 @@ class Receipt extends StatelessWidget {
                                 Positioned.fill(
                                   child: Container(
                                     decoration: const BoxDecoration(
-                                      gradient: LinearGradient(
-                                        colors: <Color>[
-                                          Color(0xFF0D47A1),
-                                          Color(0xFF1976D2),
-                                          Color(0xFF42A5F5),
-                                        ],
-                                      ),
+                                        color: Colors.deepOrange
                                     ),
                                   ),
                                 ),

@@ -17,7 +17,8 @@ class Retail extends StatelessWidget {
               title: Text(
                 "Retail Management System",
                 style: TextStyle(
-                  fontSize: 16,
+                  color: Colors.black,
+                  fontSize: 14,
                   fontWeight: FontWeight.bold,
                 ),
                 textAlign: TextAlign.left,
@@ -29,8 +30,9 @@ class Retail extends StatelessWidget {
                   child: Text(
                     "RETAIL",
                     style: TextStyle(
-                      fontSize: 15,
-
+                      color: Colors.black,
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
                     ),
                     textAlign: TextAlign.left,
                   ),
@@ -269,13 +271,7 @@ class Retail extends StatelessWidget {
                                 Positioned.fill(
                                   child: Container(
                                     decoration: const BoxDecoration(
-                                      gradient: LinearGradient(
-                                        colors: <Color>[
-                                          Color(0xFF0D47A1),
-                                          Color(0xFF1976D2),
-                                          Color(0xFF42A5F5),
-                                        ],
-                                      ),
+                                        color: Colors.deepOrange
                                     ),
                                   ),
                                 ),
@@ -304,13 +300,7 @@ class Retail extends StatelessWidget {
                                 Positioned.fill(
                                   child: Container(
                                     decoration: const BoxDecoration(
-                                      gradient: LinearGradient(
-                                        colors: <Color>[
-                                          Color(0xFF0D47A1),
-                                          Color(0xFF1976D2),
-                                          Color(0xFF42A5F5),
-                                        ],
-                                      ),
+                                        color: Colors.deepOrange
                                     ),
                                   ),
                                 ),
@@ -369,13 +359,7 @@ class Retail extends StatelessWidget {
                                   Positioned.fill(
                                     child: Container(
                                       decoration: const BoxDecoration(
-                                        gradient: LinearGradient(
-                                          colors: <Color>[
-                                            Color(0xFF0D47A1),
-                                            Color(0xFF1976D2),
-                                            Color(0xFF42A5F5),
-                                          ],
-                                        ),
+                                          color: Colors.deepOrange
                                       ),
                                     ),
                                   ),
@@ -405,13 +389,7 @@ class Retail extends StatelessWidget {
                                   Positioned.fill(
                                     child: Container(
                                       decoration: const BoxDecoration(
-                                        gradient: LinearGradient(
-                                          colors: <Color>[
-                                            Color(0xFF0D47A1),
-                                            Color(0xFF1976D2),
-                                            Color(0xFF42A5F5),
-                                          ],
-                                        ),
+                                          color: Colors.deepOrange
                                       ),
                                     ),
                                   ),
@@ -452,13 +430,7 @@ class Retail extends StatelessWidget {
                                 Positioned.fill(
                                   child: Container(
                                     decoration: const BoxDecoration(
-                                      gradient: LinearGradient(
-                                        colors: <Color>[
-                                          Color(0xFF0D47A1),
-                                          Color(0xFF1976D2),
-                                          Color(0xFF42A5F5),
-                                        ],
-                                      ),
+                                        color: Colors.deepOrange
                                     ),
                                   ),
                                 ),
@@ -494,13 +466,7 @@ class Retail extends StatelessWidget {
                                 Positioned.fill(
                                   child: Container(
                                     decoration: const BoxDecoration(
-                                      gradient: LinearGradient(
-                                        colors: <Color>[
-                                          Color(0xFF0D47A1),
-                                          Color(0xFF1976D2),
-                                          Color(0xFF42A5F5),
-                                        ],
-                                      ),
+                                        color: Colors.deepOrange
                                     ),
                                   ),
                                 ),
@@ -536,13 +502,7 @@ class Retail extends StatelessWidget {
                                 Positioned.fill(
                                   child: Container(
                                     decoration: const BoxDecoration(
-                                      gradient: LinearGradient(
-                                        colors: <Color>[
-                                          Color(0xFF0D47A1),
-                                          Color(0xFF1976D2),
-                                          Color(0xFF42A5F5),
-                                        ],
-                                      ),
+                                        color: Colors.deepOrange
                                     ),
                                   ),
                                 ),

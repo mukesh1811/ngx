@@ -39,13 +39,7 @@ class LoginPage extends StatelessWidget {
                             Positioned.fill(
                               child: Container(
                                 decoration: const BoxDecoration(
-                                  gradient: LinearGradient(
-                                    colors: <Color>[
-                                      Color(0xFF0D47A1),
-                                      Color(0xFF1976D2),
-                                      Color(0xFF42A5F5),
-                                    ],
-                                  ),
+                                    color: Colors.deepOrange
                                 ),
                               ),
                             ),
@@ -80,13 +74,7 @@ class LoginPage extends StatelessWidget {
                             Positioned.fill(
                               child: Container(
                                 decoration: const BoxDecoration(
-                                  gradient: LinearGradient(
-                                    colors: <Color>[
-                                      Color(0xFF6E40FF),
-                                      Color(0xFF1976D2),
-                                      Color(0xFF42A5F5),
-                                    ],
-                                  ),
+                                  color: Colors.deepOrange
                                 ),
                               ),
                             ),

@@ -10,13 +10,15 @@ class Token extends StatelessWidget {
     return Stack(
       children: [
         Scaffold(
-          backgroundColor: Colors.grey,
+
           appBar: PreferredSize(
+
             preferredSize: Size.fromHeight(40.0),
             child: AppBar(
               title: Text(
                 "Retail Management System",
                 style: TextStyle(
+                  color: Colors.black,
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                 ),
@@ -28,6 +30,11 @@ class Token extends StatelessWidget {
                   padding: EdgeInsets.all(10.0),
                   child: Text(
                     "TOKEN",
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
                     textAlign: TextAlign.left,
                   ),
                 ))
@@ -367,13 +374,7 @@ class Token extends StatelessWidget {
                                   Positioned.fill(
                                     child: Container(
                                       decoration: const BoxDecoration(
-                                        gradient: LinearGradient(
-                                          colors: <Color>[
-                                            Color(0xFF0D47A1),
-                                            Color(0xFF1976D2),
-                                            Color(0xFF42A5F5),
-                                          ],
-                                        ),
+                                          color: Colors.deepOrange
                                       ),
                                     ),
                                   ),
@@ -402,13 +403,7 @@ class Token extends StatelessWidget {
                                   Positioned.fill(
                                     child: Container(
                                       decoration: const BoxDecoration(
-                                        gradient: LinearGradient(
-                                          colors: <Color>[
-                                            Color(0xFF0D47A1),
-                                            Color(0xFF1976D2),
-                                            Color(0xFF42A5F5),
-                                          ],
-                                        ),
+                                          color: Colors.deepOrange
                                       ),
                                     ),
                                   ),
@@ -475,13 +470,7 @@ class Token extends StatelessWidget {
                                     Positioned.fill(
                                       child: Container(
                                         decoration: const BoxDecoration(
-                                          gradient: LinearGradient(
-                                            colors: <Color>[
-                                              Color(0xFF0D47A1),
-                                              Color(0xFF1976D2),
-                                              Color(0xFF42A5F5),
-                                            ],
-                                          ),
+                                            color: Colors.deepOrange
                                         ),
                                       ),
                                     ),
@@ -509,13 +498,7 @@ class Token extends StatelessWidget {
                                     Positioned.fill(
                                       child: Container(
                                         decoration: const BoxDecoration(
-                                          gradient: LinearGradient(
-                                            colors: <Color>[
-                                              Color(0xFF0D47A1),
-                                              Color(0xFF1976D2),
-                                              Color(0xFF42A5F5),
-                                            ],
-                                          ),
+                                            color: Colors.deepOrange
                                         ),
                                       ),
                                     ),
@@ -554,13 +537,7 @@ class Token extends StatelessWidget {
                                   Positioned.fill(
                                     child: Container(
                                       decoration: const BoxDecoration(
-                                        gradient: LinearGradient(
-                                          colors: <Color>[
-                                            Color(0xFF0D47A1),
-                                            Color(0xFF1976D2),
-                                            Color(0xFF42A5F5),
-                                          ],
-                                        ),
+                                          color: Colors.deepOrange
                                       ),
                                     ),
                                   ),
@@ -594,13 +571,7 @@ class Token extends StatelessWidget {
                                   Positioned.fill(
                                     child: Container(
                                       decoration: const BoxDecoration(
-                                        gradient: LinearGradient(
-                                          colors: <Color>[
-                                            Color(0xFF0D47A1),
-                                            Color(0xFF1976D2),
-                                            Color(0xFF42A5F5),
-                                          ],
-                                        ),
+                                          color: Colors.deepOrange
                                       ),
                                     ),
                                   ),
@@ -634,13 +605,7 @@ class Token extends StatelessWidget {
                                   Positioned.fill(
                                     child: Container(
                                       decoration: const BoxDecoration(
-                                        gradient: LinearGradient(
-                                          colors: <Color>[
-                                            Color(0xFF0D47A1),
-                                            Color(0xFF1976D2),
-                                            Color(0xFF42A5F5),
-                                          ],
-                                        ),
+                                          color: Colors.deepOrange
                                       ),
                                     ),
                                   ),

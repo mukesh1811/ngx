@@ -17,19 +17,19 @@ class Homepage extends StatelessWidget {
               Container(
                 width: double.infinity,
                 height: 60,
-                color: Colors.pink[300],
+                color: Colors.deepOrange,
                 padding: EdgeInsets.all(20),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: const [
                     Text("Retail Management System",
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 14,
                         fontWeight: FontWeight.bold,
                       ) ),
                     Text("HOME",
                         style: TextStyle(
-                          fontSize: 20,
+                          fontSize: 14,
                           fontWeight: FontWeight.bold,
                         ))
                   ],
@@ -49,13 +49,7 @@ class Homepage extends StatelessWidget {
                         Positioned.fill(
                           child: Container(
                             decoration: const BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: <Color>[
-                                  Color(0xFF0D47A1),
-                                  Color(0xFF1976D2),
-                                  Color(0xFF42A5F5),
-                                ],
-                              ),
+                                color: Colors.deepOrange
                             ),
                           ),
                         ),
@@ -87,13 +81,7 @@ class Homepage extends StatelessWidget {
                         Positioned.fill(
                           child: Container(
                             decoration: const BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: <Color>[
-                                  Color(0xFF0D47A1),
-                                  Color(0xFF1976D2),
-                                  Color(0xFF42A5F5),
-                                ],
-                              ),
+                                color: Colors.deepOrange
                             ),
                           ),
                         ),
@@ -131,13 +119,7 @@ class Homepage extends StatelessWidget {
                         Positioned.fill(
                           child: Container(
                             decoration: const BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: <Color>[
-                                  Color(0xFF0D47A1),
-                                  Color(0xFF1976D2),
-                                  Color(0xFF42A5F5),
-                                ],
-                              ),
+                                color: Colors.deepOrange
                             ),
                           ),
                         ),
@@ -174,13 +156,7 @@ class Homepage extends StatelessWidget {
                         Positioned.fill(
                           child: Container(
                             decoration: const BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: <Color>[
-                                  Color(0xFF0D47A1),
-                                  Color(0xFF1976D2),
-                                  Color(0xFF42A5F5),
-                                ],
-                              ),
+                                color: Colors.deepOrange
                             ),
                           ),
                         ),
@@ -221,13 +197,7 @@ class Homepage extends StatelessWidget {
                       Positioned.fill(
                         child: Container(
                           decoration: const BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: <Color>[
-                                Color(0xFF0D47A1),
-                                Color(0xFF1976D2),
-                                Color(0xFF42A5F5),
-                              ],
-                            ),
+                              color: Colors.deepOrange
                           ),
                         ),
                       ),
@@ -258,7 +228,7 @@ class Homepage extends StatelessWidget {
               ),
               Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
                 Container(
-                  width: 150,
+                  width: 250,
                   height: 40,
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(30),
@@ -270,8 +240,8 @@ class Homepage extends StatelessWidget {
                               gradient: LinearGradient(
                                 colors: <Color>[
                                   Color(0xFFff0000),
-                                  Color(0xFFf20d0d),
-                                  Color(0xFFc63939),
+                                  Color(0xFFff0000),
+                                  Color(0xFFff0000),
                                 ],
                               ),
                             ),
@@ -289,6 +259,7 @@ class Homepage extends StatelessWidget {
                               MaterialPageRoute(
                                   builder: (context) => LoginPage()),
                             );
+
                           },
                           child: Center(
                               child: const Text(
@@ -296,62 +267,15 @@ class Homepage extends StatelessWidget {
                             textAlign: TextAlign.center,
                           )),
                         ),
-                      ],
-                    ),
-                  ),
-                ),
-                Container(
-                  width: 150,
-                  height: 40,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(30),
-                    child: Stack(
-                      children: <Widget>[
-                        Positioned.fill(
-                          child: Container(
-                            decoration: const BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: <Color>[
-                                  Color(0xFFff0000),
-                                  Color(0xFFf20d0d),
-                                  Color(0xFFc63939),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                        TextButton(
-                          style: TextButton.styleFrom(
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.all(10.0),
-                            textStyle: const TextStyle(fontSize: 15),
-                          ),
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => LoginPage()),
-                            );
-                          },
-                          child: Center(
-                              child: const Text(
-                            'EXIT',
-                            textAlign: TextAlign.center,
-                          )),
-                        ),
+                        IconButton(
+                            onPressed: null,
+                            icon: Icon(Icons.logout)),
                       ],
                     ),
                   ),
                 ),
               ]),
-              SizedBox(
-                height: 40,
-              ),
-              Text(
-                'Copyright 2023 Renuka Systems. All rights reserved.',
-                style: TextStyle(fontSize: 15, color: Colors.white),
-                textAlign: TextAlign.center,
-              ),
+
             ]),
           ),
         ),

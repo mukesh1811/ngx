@@ -15,8 +15,9 @@ class Balance extends StatelessWidget {
               title: Text(
                 "Retail Management System",
                 style: TextStyle(
-                  fontSize: 16,
-
+                  color: Colors.black,
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
                 ),
                 textAlign: TextAlign.left,
               ),
@@ -27,7 +28,8 @@ class Balance extends StatelessWidget {
                     child: Text(
                       "BALANCE",
                       style: TextStyle(
-                        fontSize: 15,
+                        color: Colors.black,
+                        fontSize: 14,
                         fontWeight: FontWeight.bold,
                       ),
                       textAlign: TextAlign.left,
@@ -55,7 +57,10 @@ class Balance extends StatelessWidget {
                       child: Text(
                         "Balance Detail",
                         style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.bold),
+                          color: Colors.black,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                     SizedBox(
@@ -111,13 +116,7 @@ class Balance extends StatelessWidget {
                                 Positioned.fill(
                                   child: Container(
                                     decoration: const BoxDecoration(
-                                      gradient: LinearGradient(
-                                        colors: <Color>[
-                                          Color(0xFF0D47A1),
-                                          Color(0xFF1976D2),
-                                          Color(0xFF42A5F5),
-                                        ],
-                                      ),
+                                        color: Colors.deepOrange
                                     ),
                                   ),
                                 ),
@@ -150,13 +149,7 @@ class Balance extends StatelessWidget {
                                 Positioned.fill(
                                   child: Container(
                                     decoration: const BoxDecoration(
-                                      gradient: LinearGradient(
-                                        colors: <Color>[
-                                          Color(0xFF0D47A1),
-                                          Color(0xFF1976D2),
-                                          Color(0xFF42A5F5),
-                                        ],
-                                      ),
+                                        color: Colors.deepOrange
                                     ),
                                   ),
                                 ),
@@ -189,13 +182,7 @@ class Balance extends StatelessWidget {
                                 Positioned.fill(
                                   child: Container(
                                     decoration: const BoxDecoration(
-                                      gradient: LinearGradient(
-                                        colors: <Color>[
-                                          Color(0xFF0D47A1),
-                                          Color(0xFF1976D2),
-                                          Color(0xFF42A5F5),
-                                        ],
-                                      ),
+                                        color: Colors.deepOrange
                                     ),
                                   ),
                                 ),
