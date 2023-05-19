@@ -4,15 +4,35 @@ import 'package:ngx/screens/loginpage.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/services.dart';
 
-class Token extends StatelessWidget {
+const List<String> consignor_names_list = <String>["CMBT", "Madhavaram"];
+const List<String> item_name_list = <String>["Potato", "Tomato"];
+const List<String> payment_type_list = <String>["Cash", "DC"];
+
+String consignor_name_value = "";
+String item_name_value = "";
+String payment_type_value = "";
+
+class Token extends StatefulWidget {
+  @override
+  State<Token> createState() => _TokenState();
+}
+
+class _TokenState extends State<Token> {
+  @override
+  void initState() {
+    super.initState();
+
+    consignor_name_value = consignor_names_list.first;
+    item_name_value = item_name_list.first;
+    payment_type_value = payment_type_list.first;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
         Scaffold(
-
           appBar: PreferredSize(
-
             preferredSize: Size.fromHeight(40.0),
             child: AppBar(
               title: Text(
@@ -48,8 +68,9 @@ class Token extends StatelessWidget {
                 color: Colors.black,
                 child: Container(
                   padding: EdgeInsets.all(10),
-
-                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(20),color:Colors.white),
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      color: Colors.white),
                   child: Column(
                     children: [
                       Row(
@@ -105,49 +126,142 @@ class Token extends StatelessWidget {
                               contentPadding: EdgeInsets.all(5),
                               border: OutlineInputBorder(),
                             ),
-                            style: TextStyle(color: Colors.black,
-                            fontSize:12),
+                            style: TextStyle(color: Colors.black, fontSize: 12),
                           ),
                         ),
                       ),
-                      const Padding(
+
+                      // ########## Consignor Name
+                      Padding(
                         padding: EdgeInsets.all(5.0),
                         child: SizedBox(
-                          width: 200,
-                          height: 30,
-                          child: TextField(
-                            obscureText: false,
-                            decoration: InputDecoration(
-                              labelText: 'Item Name',
-                              labelStyle: TextStyle(color: Colors.black,fontSize:12),
-                              contentPadding: EdgeInsets.all(5),
-                              border: OutlineInputBorder(),
+                          width: 300,
+                          height: 40,
+                          child: Container(
+                            decoration: ShapeDecoration(
+                                shape: RoundedRectangleBorder(
+                              side: BorderSide(
+                                  width: 0.5, style: BorderStyle.solid),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(5.0)),
+                            )),
+                            child: Container(
+                              padding: EdgeInsets.all(5),
+                              child: DropdownButtonFormField<String>(
+                                  decoration: InputDecoration(
+                                    enabledBorder: InputBorder.none,
+                                    labelText: "Consignor Name",
+                                  ),
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 12,
+                                  ),
+                                  value: consignor_name_value,
+                                  onChanged: (String? value) {
+                                    setState(() {
+                                      consignor_name_value = value!;
+                                    });
+                                  },
+                                  items: consignor_names_list
+                                      .map<DropdownMenuItem<String>>(
+                                          (String value) {
+                                    return DropdownMenuItem<String>(
+                                      value: value,
+                                      child: Text(value),
+                                    );
+                                  }).toList()),
                             ),
-                            style: TextStyle(color: Colors.black),
-                            textInputAction: TextInputAction.next,
                           ),
                         ),
                       ),
-                      const Padding(
+                      // Consignor Name
+
+                      // ########## ITEM NAME
+
+                      Padding(
                         padding: EdgeInsets.all(5.0),
                         child: SizedBox(
-                          width: 200,
-                          height: 30,
-                          child: TextField(
-                            obscureText: false,
-                            decoration: InputDecoration(
-                              labelText: 'Cash',
-                              labelStyle: TextStyle(color: Colors.black,fontSize:12),
-                              contentPadding: EdgeInsets.all(5),
-                              border: OutlineInputBorder(),
+                          width: 300,
+                          height: 40,
+                          child: Container(
+                            decoration: ShapeDecoration(
+                                shape: RoundedRectangleBorder(
+                              side: BorderSide(
+                                  width: 0.5, style: BorderStyle.solid),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(5.0)),
+                            )),
+                            child: Container(
+                              padding: EdgeInsets.all(5),
+                              child: DropdownButtonFormField<String>(
+                                  decoration: InputDecoration(
+                                    enabledBorder: InputBorder.none,
+                                    labelText: "Item Name",
+                                  ),
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 12,
+                                  ),
+                                  value: item_name_value,
+                                  onChanged: (String? value) {
+                                    setState(() {
+                                      item_name_value = value!;
+                                    });
+                                  },
+                                  items: item_name_list
+                                      .map<DropdownMenuItem<String>>(
+                                          (String value) {
+                                    return DropdownMenuItem<String>(
+                                      value: value,
+                                      child: Text(value),
+                                    );
+                                  }).toList()),
                             ),
-                            style: TextStyle(color: Colors.black),
-                            textInputAction: TextInputAction.next,
                           ),
                         ),
                       ),
-                      SizedBox(
-                        height: 5,
+
+                      // ITEM NAME ##########
+
+                      Padding(
+                        padding: EdgeInsets.all(5.0),
+                        child: SizedBox(
+                          width: 300,
+                          height: 40,
+                          child: Container(
+                            decoration: ShapeDecoration(
+                                shape: RoundedRectangleBorder(
+                              side: BorderSide(
+                                  width: 0.5, style: BorderStyle.solid),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(5.0)),
+                            )),
+                            child: DropdownButtonHideUnderline(
+                              child: Container(
+                                padding: EdgeInsets.all(5),
+                                child: DropdownButton<String>(
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 12,
+                                    ),
+                                    value: payment_type_value,
+                                    onChanged: (String? value) {
+                                      setState(() {
+                                        payment_type_value = value!;
+                                      });
+                                    },
+                                    items: payment_type_list
+                                        .map<DropdownMenuItem<String>>(
+                                            (String value) {
+                                      return DropdownMenuItem<String>(
+                                        value: value,
+                                        child: Text(value),
+                                      );
+                                    }).toList()),
+                              ),
+                            ),
+                          ),
+                        ),
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -161,19 +275,20 @@ class Token extends StatelessWidget {
                               width: 100,
                               height: 30,
                               child: TextField(
-                                obscureText: false,
-                                decoration: InputDecoration(
-                                  labelText: 'Lot no.',
-                                  labelStyle: TextStyle(color: Colors.black,fontSize:12),
-                                  contentPadding: EdgeInsets.all(5),
-                                  border: OutlineInputBorder(),
-                                ),
-                                style: TextStyle(color: Colors.black),
-                                textInputAction: TextInputAction.next,
+                                  obscureText: false,
+                                  decoration: InputDecoration(
+                                    labelText: 'Lot no.',
+                                    labelStyle: TextStyle(
+                                        color: Colors.black, fontSize: 12),
+                                    contentPadding: EdgeInsets.all(5),
+                                    border: OutlineInputBorder(),
+                                  ),
+                                  style: TextStyle(color: Colors.black),
+                                  textInputAction: TextInputAction.next,
                                   keyboardType: TextInputType.number,
                                   inputFormatters: <TextInputFormatter>[
-                                  FilteringTextInputFormatter.digitsOnly
-                              ]),
+                                    FilteringTextInputFormatter.digitsOnly
+                                  ]),
                             ),
                           )
                         ],
@@ -196,7 +311,8 @@ class Token extends StatelessWidget {
                                 obscureText: false,
                                 decoration: InputDecoration(
                                   labelText: 'Mark',
-                                  labelStyle: TextStyle(color: Colors.black,fontSize:12),
+                                  labelStyle: TextStyle(
+                                      color: Colors.black, fontSize: 12),
                                   border: OutlineInputBorder(),
                                   contentPadding: EdgeInsets.all(5),
                                 ),
@@ -222,20 +338,20 @@ class Token extends StatelessWidget {
                               width: 100,
                               height: 30,
                               child: TextField(
-                                obscureText: false,
-                                decoration: InputDecoration(
-                                  labelText: 'Units',
-                                  labelStyle: TextStyle(color: Colors.black,fontSize:12),
-                                  contentPadding: EdgeInsets.all(5),
-                                  border: OutlineInputBorder(),
-                                ),
-                                style: TextStyle(color: Colors.black),
-                                textInputAction: TextInputAction.next,
+                                  obscureText: false,
+                                  decoration: InputDecoration(
+                                    labelText: 'Units',
+                                    labelStyle: TextStyle(
+                                        color: Colors.black, fontSize: 12),
+                                    contentPadding: EdgeInsets.all(5),
+                                    border: OutlineInputBorder(),
+                                  ),
+                                  style: TextStyle(color: Colors.black),
+                                  textInputAction: TextInputAction.next,
                                   keyboardType: TextInputType.number,
                                   inputFormatters: <TextInputFormatter>[
                                     FilteringTextInputFormatter.digitsOnly
-                                  ]
-                              ),
+                                  ]),
                             ),
                           )
                         ],
@@ -255,20 +371,20 @@ class Token extends StatelessWidget {
                               width: 100,
                               height: 30,
                               child: TextField(
-                                obscureText: false,
-                                decoration: InputDecoration(
-                                  labelText: 'Weight',
-                                  labelStyle: TextStyle(color: Colors.black,fontSize:12),
-                                  contentPadding: EdgeInsets.all(5),
-                                  border: OutlineInputBorder(),
-                                ),
-                                style: TextStyle(color: Colors.black),
-                                textInputAction: TextInputAction.next,
+                                  obscureText: false,
+                                  decoration: InputDecoration(
+                                    labelText: 'Weight',
+                                    labelStyle: TextStyle(
+                                        color: Colors.black, fontSize: 12),
+                                    contentPadding: EdgeInsets.all(5),
+                                    border: OutlineInputBorder(),
+                                  ),
+                                  style: TextStyle(color: Colors.black),
+                                  textInputAction: TextInputAction.next,
                                   keyboardType: TextInputType.number,
                                   inputFormatters: <TextInputFormatter>[
                                     FilteringTextInputFormatter.digitsOnly
-                                  ]
-                              ),
+                                  ]),
                             ),
                           )
                         ],
@@ -287,21 +403,21 @@ class Token extends StatelessWidget {
                             child: SizedBox(
                               width: 100,
                               height: 30,
-                              child:  TextField(
-                                obscureText: false,
-                                decoration: InputDecoration(
-                                  labelText: 'Rate',
-                                  labelStyle: TextStyle(color: Colors.black,fontSize:12),
-                                  contentPadding: EdgeInsets.all(5),
-                                  border: OutlineInputBorder(),
-                                ),
-                                style: TextStyle(color: Colors.black),
-                                textInputAction: TextInputAction.next,
+                              child: TextField(
+                                  obscureText: false,
+                                  decoration: InputDecoration(
+                                    labelText: 'Rate',
+                                    labelStyle: TextStyle(
+                                        color: Colors.black, fontSize: 12),
+                                    contentPadding: EdgeInsets.all(5),
+                                    border: OutlineInputBorder(),
+                                  ),
+                                  style: TextStyle(color: Colors.black),
+                                  textInputAction: TextInputAction.next,
                                   keyboardType: TextInputType.number,
                                   inputFormatters: <TextInputFormatter>[
                                     FilteringTextInputFormatter.digitsOnly
-                                  ]
-                              ),
+                                  ]),
                             ),
                           ),
                         ],
@@ -324,7 +440,8 @@ class Token extends StatelessWidget {
                                 obscureText: false,
                                 decoration: InputDecoration(
                                   labelText: 'Amount',
-                                  labelStyle: TextStyle(color: Colors.black,fontSize:12),
+                                  labelStyle: TextStyle(
+                                      color: Colors.black, fontSize: 12),
                                   contentPadding: EdgeInsets.all(5),
                                   border: InputBorder.none,
                                 ),
@@ -347,21 +464,21 @@ class Token extends StatelessWidget {
                             child: SizedBox(
                               width: 40,
                               height: 40,
-                              child:  TextField(
-                                obscureText: false,
-                                decoration: InputDecoration(
-                                  labelText: 'copies',
-                                  labelStyle: TextStyle(color: Colors.black,fontSize:12),
-                                  contentPadding: EdgeInsets.all(5),
-                                  border: OutlineInputBorder(),
-                                ),
-                                style: TextStyle(color: Colors.black),
-                                textInputAction: TextInputAction.next,
+                              child: TextField(
+                                  obscureText: false,
+                                  decoration: InputDecoration(
+                                    labelText: 'copies',
+                                    labelStyle: TextStyle(
+                                        color: Colors.black, fontSize: 12),
+                                    contentPadding: EdgeInsets.all(5),
+                                    border: OutlineInputBorder(),
+                                  ),
+                                  style: TextStyle(color: Colors.black),
+                                  textInputAction: TextInputAction.next,
                                   keyboardType: TextInputType.number,
                                   inputFormatters: <TextInputFormatter>[
                                     FilteringTextInputFormatter.digitsOnly
-                                  ]
-                              ),
+                                  ]),
                             ),
                           ),
                           Container(
@@ -374,8 +491,7 @@ class Token extends StatelessWidget {
                                   Positioned.fill(
                                     child: Container(
                                       decoration: const BoxDecoration(
-                                          color: Colors.deepOrange
-                                      ),
+                                          color: Colors.deepOrange),
                                     ),
                                   ),
                                   TextButton(
@@ -403,8 +519,7 @@ class Token extends StatelessWidget {
                                   Positioned.fill(
                                     child: Container(
                                       decoration: const BoxDecoration(
-                                          color: Colors.deepOrange
-                                      ),
+                                          color: Colors.deepOrange),
                                     ),
                                   ),
                                   TextButton(
@@ -444,20 +559,20 @@ class Token extends StatelessWidget {
                                 width: 100,
                                 height: 40,
                                 child: TextField(
-                                  obscureText: false,
-                                  decoration: InputDecoration(
-                                    labelText: 'Existing Token ID',
-                                    labelStyle: TextStyle(color: Colors.black,fontSize:12),
-                                    contentPadding: EdgeInsets.all(5),
-                                    border: OutlineInputBorder(),
-                                  ),
-                                  style: TextStyle(color: Colors.black),
-                                  textInputAction: TextInputAction.next,
+                                    obscureText: false,
+                                    decoration: InputDecoration(
+                                      labelText: 'Existing Token ID',
+                                      labelStyle: TextStyle(
+                                          color: Colors.black, fontSize: 12),
+                                      contentPadding: EdgeInsets.all(5),
+                                      border: OutlineInputBorder(),
+                                    ),
+                                    style: TextStyle(color: Colors.black),
+                                    textInputAction: TextInputAction.next,
                                     keyboardType: TextInputType.number,
                                     inputFormatters: <TextInputFormatter>[
                                       FilteringTextInputFormatter.digitsOnly
-                                    ]
-                                ),
+                                    ]),
                               ),
                             ),
                             Container(
@@ -470,8 +585,7 @@ class Token extends StatelessWidget {
                                     Positioned.fill(
                                       child: Container(
                                         decoration: const BoxDecoration(
-                                            color: Colors.deepOrange
-                                        ),
+                                            color: Colors.deepOrange),
                                       ),
                                     ),
                                     TextButton(
@@ -498,8 +612,7 @@ class Token extends StatelessWidget {
                                     Positioned.fill(
                                       child: Container(
                                         decoration: const BoxDecoration(
-                                            color: Colors.deepOrange
-                                        ),
+                                            color: Colors.deepOrange),
                                       ),
                                     ),
                                     TextButton(
@@ -511,8 +624,8 @@ class Token extends StatelessWidget {
                                             fontWeight: FontWeight.bold),
                                       ),
                                       onPressed: () {},
-                                      child:
-                                          Center(child: const Text('NEW TOKEN')),
+                                      child: Center(
+                                          child: const Text('NEW TOKEN')),
                                     ),
                                   ],
                                 ),
@@ -537,8 +650,7 @@ class Token extends StatelessWidget {
                                   Positioned.fill(
                                     child: Container(
                                       decoration: const BoxDecoration(
-                                          color: Colors.deepOrange
-                                      ),
+                                          color: Colors.deepOrange),
                                     ),
                                   ),
                                   TextButton(
@@ -571,8 +683,7 @@ class Token extends StatelessWidget {
                                   Positioned.fill(
                                     child: Container(
                                       decoration: const BoxDecoration(
-                                          color: Colors.deepOrange
-                                      ),
+                                          color: Colors.deepOrange),
                                     ),
                                   ),
                                   TextButton(
@@ -605,8 +716,7 @@ class Token extends StatelessWidget {
                                   Positioned.fill(
                                     child: Container(
                                       decoration: const BoxDecoration(
-                                          color: Colors.deepOrange
-                                      ),
+                                          color: Colors.deepOrange),
                                     ),
                                   ),
                                   TextButton(
