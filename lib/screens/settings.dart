@@ -36,8 +36,6 @@ class _SettingsState extends State<Settings> {
 
       // Get database directory path
       Directory appDir = await getApplicationDocumentsDirectory();
-      print(appDir);
-
       // Move the CSV file to the database directory
       File csvFile = File(csvFilePath);
       String newCsvPath = join(appDir.path, basename(csvFilePath));
@@ -109,7 +107,7 @@ class _SettingsState extends State<Settings> {
                           ),
                         ],
                       ),
-                    )
+                    ),
                   ],
                 ),
               ),

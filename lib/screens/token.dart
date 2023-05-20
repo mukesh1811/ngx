@@ -5,12 +5,12 @@ import 'package:intl/intl.dart';
 import 'package:flutter/services.dart';
 
 const List<String> consignor_names_list = <String>["CMBT", "Madhavaram"];
-const List<String> item_name_list = <String>["Potato", "Tomato"];
+const List<String> item_name_list = <String>["Potato", "Tomato", "Beetroot"];
 const List<String> payment_type_list = <String>["Cash", "DC"];
 
-String consignor_name_value = "";
-String item_name_value = "";
-String payment_type_value = "";
+String? consignor_name_value;
+String? item_name_value;
+String? payment_type_value;
 
 class Token extends StatefulWidget {
   @override
@@ -18,15 +18,6 @@ class Token extends StatefulWidget {
 }
 
 class _TokenState extends State<Token> {
-  @override
-  void initState() {
-    super.initState();
-
-    consignor_name_value = consignor_names_list.first;
-    item_name_value = item_name_list.first;
-    payment_type_value = payment_type_list.first;
-  }
-
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -113,109 +104,90 @@ class _TokenState extends State<Token> {
                       SizedBox(
                         height: 10,
                       ),
-                      const Padding(
-                        padding: EdgeInsets.all(5.0),
-                        child: SizedBox(
-                          width: 200,
-                          height: 30,
-                          child: TextField(
-                            obscureText: false,
-                            decoration: InputDecoration(
-                              labelText: 'Consignor Name',
-                              labelStyle: TextStyle(color: Colors.black),
-                              contentPadding: EdgeInsets.all(5),
-                              border: OutlineInputBorder(),
-                            ),
-                            style: TextStyle(color: Colors.black, fontSize: 12),
-                          ),
-                        ),
-                      ),
 
                       // ########## Consignor Name
                       Padding(
-                        padding: EdgeInsets.all(5.0),
+                        padding: const EdgeInsets.all(5.0),
                         child: SizedBox(
                           width: 300,
                           height: 40,
                           child: Container(
-                            decoration: ShapeDecoration(
+                            decoration: const ShapeDecoration(
                                 shape: RoundedRectangleBorder(
                               side: BorderSide(
                                   width: 0.5, style: BorderStyle.solid),
                               borderRadius:
                                   BorderRadius.all(Radius.circular(5.0)),
                             )),
-                            child: Container(
-                              padding: EdgeInsets.all(5),
-                              child: DropdownButtonFormField<String>(
-                                  decoration: InputDecoration(
-                                    enabledBorder: InputBorder.none,
-                                    labelText: "Consignor Name",
-                                  ),
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 12,
-                                  ),
-                                  value: consignor_name_value,
-                                  onChanged: (String? value) {
-                                    setState(() {
-                                      consignor_name_value = value!;
-                                    });
-                                  },
-                                  items: consignor_names_list
-                                      .map<DropdownMenuItem<String>>(
-                                          (String value) {
-                                    return DropdownMenuItem<String>(
-                                      value: value,
-                                      child: Text(value),
-                                    );
-                                  }).toList()),
+                            child: DropdownButtonHideUnderline(
+                              child: Container(
+                                padding: const EdgeInsets.all(5),
+                                child: DropdownButton<String>(
+                                    hint: const Text("Consignor Name"),
+                                    style: const TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 12,
+                                    ),
+                                    value: consignor_name_value,
+                                    onChanged: (String? value) {
+                                      setState(() {
+                                        consignor_name_value = value ?? "";
+                                      });
+                                    },
+                                    items: consignor_names_list
+                                        .map<DropdownMenuItem<String>>(
+                                            (String consignor) {
+                                      return DropdownMenuItem<String>(
+                                        value: consignor,
+                                        child: Text(consignor),
+                                      );
+                                    }).toList()),
+                              ),
                             ),
                           ),
                         ),
                       ),
-                      // Consignor Name
+                      // Consignor Name ################
 
                       // ########## ITEM NAME
 
                       Padding(
-                        padding: EdgeInsets.all(5.0),
+                        padding: const EdgeInsets.all(5.0),
                         child: SizedBox(
                           width: 300,
                           height: 40,
                           child: Container(
-                            decoration: ShapeDecoration(
+                            decoration: const ShapeDecoration(
                                 shape: RoundedRectangleBorder(
                               side: BorderSide(
                                   width: 0.5, style: BorderStyle.solid),
                               borderRadius:
                                   BorderRadius.all(Radius.circular(5.0)),
                             )),
-                            child: Container(
-                              padding: EdgeInsets.all(5),
-                              child: DropdownButtonFormField<String>(
-                                  decoration: InputDecoration(
-                                    enabledBorder: InputBorder.none,
-                                    labelText: "Item Name",
-                                  ),
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 12,
-                                  ),
-                                  value: item_name_value,
-                                  onChanged: (String? value) {
-                                    setState(() {
-                                      item_name_value = value!;
-                                    });
-                                  },
-                                  items: item_name_list
-                                      .map<DropdownMenuItem<String>>(
-                                          (String value) {
-                                    return DropdownMenuItem<String>(
-                                      value: value,
-                                      child: Text(value),
-                                    );
-                                  }).toList()),
+                            child: DropdownButtonHideUnderline(
+                              child: Container(
+                                padding: const EdgeInsets.all(5),
+                                child: DropdownButton<String>(
+                                    hint: const Text("Item Name"),
+                                    style: const TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 12,
+                                    ),
+                                    value: item_name_value,
+                                    onChanged: (String? value) {
+                                      setState(() {
+                                        item_name_value = value ?? "";
+                                      });
+                                    },
+                                    items: item_name_list
+                                        .map<DropdownMenuItem<String>>(
+                                            (String item) {
+                                      return DropdownMenuItem<String>(
+                                        value: item,
+                                        child: Text(item),
+                                      );
+                                    }).toList()),
+                              ),
                             ),
                           ),
                         ),
@@ -240,6 +212,7 @@ class _TokenState extends State<Token> {
                               child: Container(
                                 padding: EdgeInsets.all(5),
                                 child: DropdownButton<String>(
+                                    hint: Text("Payment Type"),
                                     style: TextStyle(
                                       color: Colors.black,
                                       fontSize: 12,
@@ -247,15 +220,15 @@ class _TokenState extends State<Token> {
                                     value: payment_type_value,
                                     onChanged: (String? value) {
                                       setState(() {
-                                        payment_type_value = value!;
+                                        payment_type_value = value ?? "";
                                       });
                                     },
                                     items: payment_type_list
                                         .map<DropdownMenuItem<String>>(
-                                            (String value) {
+                                            (String paytypes) {
                                       return DropdownMenuItem<String>(
-                                        value: value,
-                                        child: Text(value),
+                                        value: paytypes,
+                                        child: Text(paytypes),
                                       );
                                     }).toList()),
                               ),
@@ -263,6 +236,7 @@ class _TokenState extends State<Token> {
                           ),
                         ),
                       ),
+
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
