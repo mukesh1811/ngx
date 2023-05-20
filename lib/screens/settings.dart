@@ -5,6 +5,7 @@ import 'package:csv/csv.dart';
 import 'dart:io';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:ngx/screens/ConfigHelper.dart';
 
 class Settings extends StatefulWidget {
   const Settings({Key? key}) : super(key: key);
@@ -108,6 +109,14 @@ class _SettingsState extends State<Settings> {
                         ],
                       ),
                     ),
+                    TextButton(
+                        onPressed: () {
+                          getList("consignor_name");
+                        },
+                        child: Text(
+                          "CSV Content",
+                          style: TextStyle(color: Colors.white),
+                        ))
                   ],
                 ),
               ),

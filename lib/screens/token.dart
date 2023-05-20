@@ -3,14 +3,7 @@ import 'package:ngx/screens/homepage.dart';
 import 'package:ngx/screens/loginpage.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/services.dart';
-
-const List<String> consignor_names_list = <String>["CMBT", "Madhavaram"];
-const List<String> item_name_list = <String>["Potato", "Tomato", "Beetroot"];
-const List<String> payment_type_list = <String>["Cash", "DC"];
-
-String? consignor_name_value;
-String? item_name_value;
-String? payment_type_value;
+import 'package:ngx/screens/ConfigHelper.dart';
 
 class Token extends StatefulWidget {
   @override
@@ -18,6 +11,39 @@ class Token extends StatefulWidget {
 }
 
 class _TokenState extends State<Token> {
+  String? consignor_name_value;
+  String? item_name_value;
+  String? payment_type_value;
+
+  var conslist;
+
+  late List<String> consignor_names_list;
+  late List<String> item_name_list;
+  late List<String> payment_type_list;
+
+  void _populateDropdown() async {
+    final conslist = await getList("consignor_name");
+    final itemlist = await getList("item_name");
+    final custlist = await getList("customer_name");
+
+    setState(() {
+      consignor_names_list = conslist!;
+      item_name_list = itemlist!;
+      payment_type_list = custlist!;
+    });
+  }
+
+  @override
+  initState() {
+    super.initState();
+
+    consignor_names_list = <String>["Mukesh", "Nithya"];
+    item_name_list = <String>["Potato", "Tomato", "Beetroot"];
+    payment_type_list = <String>["Cash", "DC"];
+
+    _populateDropdown();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
