@@ -4,6 +4,7 @@ import 'package:ngx/screens/loginpage.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/services.dart';
 import 'package:ngx/screens/ConfigHelper.dart';
+import 'DB_Helper.dart';
 
 class Token extends StatefulWidget {
   @override
@@ -15,33 +16,56 @@ class _TokenState extends State<Token> {
   String? item_name_value;
   String? payment_type_value;
 
-  var conslist;
+  int tokenNo = 0;
 
-  late List<String> consignor_names_list;
-  late List<String> item_name_list;
-  late List<String> payment_type_list;
+  bool canSave = true;
+
+  late List<String> consignor_names_list = [];
+  late List<String> item_name_list = [];
+  late List<String> payment_type_list = [];
+
+  final TextEditingController _lotNo = TextEditingController();
+  final TextEditingController _mark = TextEditingController();
+  final TextEditingController _units = TextEditingController();
+  final TextEditingController _wt = TextEditingController();
+  final TextEditingController _rate = TextEditingController();
+  final TextEditingController _amt = TextEditingController();
+  final TextEditingController _existing_tokenNo = TextEditingController();
 
   void _populateDropdown() async {
     final conslist = await getList("consignor_name");
     final itemlist = await getList("item_name");
-    final custlist = await getList("customer_name");
+    final custList = await getList("customer_name");
+    custList?.insert(0, "--- Cash ---");
 
     setState(() {
       consignor_names_list = conslist!;
       item_name_list = itemlist!;
-      payment_type_list = custlist!;
+      payment_type_list = custList!;
+    });
+  }
+
+  void _setTokenNo() async {
+    var maxTokenNo = await DB_Helper.getMaxTokenNo();
+
+    setState(() {
+      tokenNo = maxTokenNo;
     });
   }
 
   @override
   initState() {
     super.initState();
-
-    consignor_names_list = <String>["Mukesh", "Nithya"];
-    item_name_list = <String>["Potato", "Tomato", "Beetroot"];
-    payment_type_list = <String>["Cash", "DC"];
-
     _populateDropdown();
+
+    _lotNo.text = "";
+    _mark.text = "";
+    _units.text = "";
+    _wt.text = "";
+    _amt.text = "";
+    _rate.text = "";
+
+    _setTokenNo();
   }
 
   @override
@@ -102,7 +126,7 @@ class _TokenState extends State<Token> {
                                         fontSize: 12,
                                         fontWeight: FontWeight.bold,
                                       )),
-                                  Text("123456",
+                                  Text(tokenNo.toString(),
                                       style: TextStyle(
                                         fontSize: 12,
                                         fontWeight: FontWeight.bold,
@@ -154,12 +178,6 @@ class _TokenState extends State<Token> {
                                       color: Colors.black,
                                       fontSize: 12,
                                     ),
-                                    value: consignor_name_value,
-                                    onChanged: (String? value) {
-                                      setState(() {
-                                        consignor_name_value = value ?? "";
-                                      });
-                                    },
                                     items: consignor_names_list
                                         .map<DropdownMenuItem<String>>(
                                             (String consignor) {
@@ -167,7 +185,13 @@ class _TokenState extends State<Token> {
                                         value: consignor,
                                         child: Text(consignor),
                                       );
-                                    }).toList()),
+                                    }).toList(),
+                                    onChanged: (String? value) {
+                                      setState(() {
+                                        consignor_name_value = value ?? "";
+                                      });
+                                    },
+                                    value: consignor_name_value),
                               ),
                             ),
                           ),
@@ -275,6 +299,7 @@ class _TokenState extends State<Token> {
                               width: 100,
                               height: 30,
                               child: TextField(
+                                  controller: _lotNo,
                                   obscureText: false,
                                   decoration: InputDecoration(
                                     labelText: 'Lot no.',
@@ -307,7 +332,8 @@ class _TokenState extends State<Token> {
                             child: SizedBox(
                               width: 100,
                               height: 30,
-                              child: const TextField(
+                              child: TextField(
+                                controller: _mark,
                                 obscureText: false,
                                 decoration: InputDecoration(
                                   labelText: 'Mark',
@@ -338,6 +364,7 @@ class _TokenState extends State<Token> {
                               width: 100,
                               height: 30,
                               child: TextField(
+                                  controller: _units,
                                   obscureText: false,
                                   decoration: InputDecoration(
                                     labelText: 'Units',
@@ -371,6 +398,22 @@ class _TokenState extends State<Token> {
                               width: 100,
                               height: 30,
                               child: TextField(
+                                  controller: _wt,
+                                  onChanged: (txt) {
+                                    int wt = 0;
+                                    if (txt.isNotEmpty && txt != "") {
+                                      wt = int.parse(txt);
+                                    }
+
+                                    setState(() {
+                                      int rt = 0;
+                                      if (_rate.text.isNotEmpty) {
+                                        rt = int.parse(_rate.text);
+                                      }
+
+                                      _amt.text = (wt * rt).toString();
+                                    });
+                                  },
                                   obscureText: false,
                                   decoration: InputDecoration(
                                     labelText: 'Weight',
@@ -404,7 +447,24 @@ class _TokenState extends State<Token> {
                               width: 100,
                               height: 30,
                               child: TextField(
+                                  controller: _rate,
                                   obscureText: false,
+                                  onChanged: (txt) {
+                                    int rt = 0;
+
+                                    if (txt != "" || txt.isNotEmpty) {
+                                      rt = int.parse(txt);
+                                    }
+
+                                    setState(() {
+                                      int wt = 0;
+                                      if (_wt.text.isNotEmpty) {
+                                        wt = int.parse(_wt.text);
+                                      }
+
+                                      _amt.text = (rt * wt).toString();
+                                    });
+                                  },
                                   decoration: InputDecoration(
                                     labelText: 'Rate',
                                     labelStyle: TextStyle(
@@ -437,12 +497,14 @@ class _TokenState extends State<Token> {
                               width: 100,
                               height: 30,
                               child: TextField(
+                                enabled: false,
+                                controller: _amt,
                                 obscureText: false,
                                 decoration: InputDecoration(
-                                  labelText: 'Amount',
+                                  //labelText: 'Amount',
                                   labelStyle: TextStyle(
                                       color: Colors.black, fontSize: 12),
-                                  contentPadding: EdgeInsets.all(5),
+                                  //contentPadding: EdgeInsets.all(5),
                                   border: InputBorder.none,
                                 ),
                                 style: TextStyle(color: Colors.black),
@@ -502,7 +564,12 @@ class _TokenState extends State<Token> {
                                           fontSize: 12,
                                           fontWeight: FontWeight.bold),
                                     ),
-                                    onPressed: () {},
+                                    onPressed: () async {
+                                      var snackBar = await saveToDB();
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(snackBar);
+                                      _clearFields();
+                                    },
                                     child: Center(child: const Text('Print')),
                                   ),
                                 ],
@@ -530,7 +597,14 @@ class _TokenState extends State<Token> {
                                           fontSize: 12,
                                           fontWeight: FontWeight.bold),
                                     ),
-                                    onPressed: () {},
+                                    onPressed: canSave
+                                        ? () async {
+                                            var snackBar = await saveToDB();
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(snackBar);
+                                            _clearFields();
+                                          }
+                                        : null,
                                     child: Center(
                                         child: const Text(
                                       'SAVE',
@@ -559,6 +633,7 @@ class _TokenState extends State<Token> {
                                 width: 100,
                                 height: 40,
                                 child: TextField(
+                                    controller: _existing_tokenNo,
                                     obscureText: false,
                                     decoration: InputDecoration(
                                       labelText: 'Existing Token ID',
@@ -595,7 +670,9 @@ class _TokenState extends State<Token> {
                                             fontSize: 12,
                                             fontWeight: FontWeight.bold),
                                       ),
-                                      onPressed: () {},
+                                      onPressed: () {
+                                        _loadData();
+                                      },
                                       child: Center(child: const Text('GO')),
                                     ),
                                   ],
@@ -623,7 +700,13 @@ class _TokenState extends State<Token> {
                                             fontSize: 12,
                                             fontWeight: FontWeight.bold),
                                       ),
-                                      onPressed: () {},
+                                      onPressed: () {
+                                        _clearFields();
+                                        _setTokenNo();
+                                        setState(() {
+                                          canSave = true;
+                                        });
+                                      },
                                       child: Center(
                                           child: const Text('NEW TOKEN')),
                                     ),
@@ -750,5 +833,121 @@ class _TokenState extends State<Token> {
         )
       ],
     );
+  }
+
+  Future<SnackBar> saveToDB() async {
+    print("Save");
+
+    if (consignor_name_value == null) {
+      return const SnackBar(content: Text("Please select a consignor name"));
+    }
+
+    if (item_name_value == null) {
+      return const SnackBar(content: Text("Please select an item name"));
+    }
+
+    if (payment_type_value == null) {
+      return const SnackBar(content: Text("Please select payment type"));
+    }
+
+    if (_lotNo.text.trim() == "") {
+      return const SnackBar(content: Text("Please enter Lot No"));
+    }
+
+    if (_mark.text.trim() == "") {
+      return const SnackBar(content: Text("Please enter Mark"));
+    }
+
+    if (_units.text.trim() == "") {
+      return const SnackBar(content: Text("Please enter Units"));
+    }
+
+    if (_wt.text.trim() == "") {
+      return const SnackBar(content: Text("Please enter Weight"));
+    }
+
+    if (_rate.text.trim() == "") {
+      return const SnackBar(content: Text("Please enter Rate"));
+    }
+
+    final data = {
+      'consignor_name': consignor_name_value,
+      'item_name': item_name_value,
+      'payment_type': payment_type_value,
+      'lot_no': _lotNo.text,
+      'mark': _mark.text,
+      'units': int.parse(_units.text),
+      'weight': int.parse(_wt.text),
+      'rate': int.parse(_rate.text),
+      'amount': int.parse(_amt.text)
+    };
+
+    int id = await DB_Helper.createToken(data);
+
+    print("id");
+    print(id);
+
+    if (id == tokenNo) {
+      setState(() {
+        _setTokenNo();
+      });
+    }
+
+    // Navigator.push(
+    //   context,
+    //   MaterialPageRoute(builder: (context) => Token()),
+    // );
+    ;
+
+    return const SnackBar(content: Text("Token saved successfully!"));
+  }
+
+  Future<void> _loadData() async {
+    print(_existing_tokenNo.text);
+    if (_existing_tokenNo.text == "") {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Existing Token No is empty")));
+
+      return;
+    }
+
+    var res = await DB_Helper.getToken(int.parse(_existing_tokenNo.text));
+
+    print("returned token");
+    print(res);
+    print(res.toString());
+
+    setState(() {
+      consignor_name_value = res['consignor_name'] as String?;
+      item_name_value = res['item_name'] as String?;
+      payment_type_value = res['payment_type'] as String?;
+      _lotNo.text = (res['lot_no'] as String?)!;
+      _mark.text = (res['mark'] as String?)!;
+      _units.text = res['units'].toString();
+      _wt.text = res['weight'].toString();
+      _rate.text = res['rate'].toString();
+      _amt.text = res['amount'].toString();
+
+      tokenNo = int.parse(_existing_tokenNo.text);
+
+      canSave = false;
+    });
+  }
+
+  void _clearFields() {
+    setState(() {
+      consignor_name_value = null;
+      item_name_value = null;
+      payment_type_value = null;
+      _lotNo.text = "";
+      _mark.text = "";
+      _units.text = "";
+      _wt.text = "";
+      _rate.text = "";
+      _amt.text = "";
+      _existing_tokenNo.text = "";
+
+      print("cleared!");
+    });
   }
 }

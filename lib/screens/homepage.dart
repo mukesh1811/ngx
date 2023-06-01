@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ngx/screens/loginpage.dart';
+import 'package:ngx/screens/settingpage.dart';
 import 'package:ngx/screens/token.dart';
 import 'package:ngx/screens/receipt.dart';
 import 'package:ngx/screens/retail.dart';
@@ -269,12 +270,13 @@ class Homepage extends StatelessWidget {
                       ),
                     ),
                   ),
+
                   IconButton(
                       onPressed: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => const Settings()),
+                              builder: (context) => const settingpage()),
                         );
                       },
                       icon: Icon(
@@ -282,6 +284,20 @@ class Homepage extends StatelessWidget {
                         color: Colors.deepOrange,
                         size: 36,
                       ))
+
+                  // IconButton(
+                  //     onPressed: () {
+                  //       Navigator.push(
+                  //         context,
+                  //         MaterialPageRoute(
+                  //             builder: (context) => const Settings()),
+                  //       );
+                  //     },
+                  //     icon: Icon(
+                  //       Icons.storage,
+                  //       color: Colors.deepOrange,
+                  //       size: 36,
+                  //     ))
                 ],
               ),
             ]),

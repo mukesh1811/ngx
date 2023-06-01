@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:csv/csv.dart';
+import 'package:ngx/screens/token.dart';
 import 'dart:io';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
@@ -39,7 +40,7 @@ class _SettingsState extends State<Settings> {
       Directory appDir = await getApplicationDocumentsDirectory();
       // Move the CSV file to the database directory
       File csvFile = File(csvFilePath);
-      String newCsvPath = join(appDir.path, basename(csvFilePath));
+      String newCsvPath = join(appDir.path, 'pos_config.csv');
       print(newCsvPath);
       await csvFile.rename(newCsvPath);
     }
@@ -115,6 +116,17 @@ class _SettingsState extends State<Settings> {
                         },
                         child: Text(
                           "CSV Content",
+                          style: TextStyle(color: Colors.white),
+                        )),
+                    TextButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => Token()),
+                          );
+                        },
+                        child: Text(
+                          "pop_check",
                           style: TextStyle(color: Colors.white),
                         ))
                   ],

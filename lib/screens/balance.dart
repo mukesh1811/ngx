@@ -2,8 +2,41 @@ import 'package:flutter/material.dart';
 import 'package:ngx/screens/homepage.dart';
 import 'package:ngx/screens/loginpage.dart';
 
-class Balance extends StatelessWidget {
+import 'ConfigHelper.dart';
+
+class Balance extends StatefulWidget {
+  const Balance({Key? key}) : super(key: key);
+
   @override
+  State<Balance> createState() => _BalanceState();
+}
+
+class _BalanceState extends State<Balance> {
+  @override
+  String? customer_name_value;
+
+  int tokenNo = 0;
+
+  late List<String> customer_names_list = [];
+
+  final TextEditingController _amt = TextEditingController();
+
+  void _populateDropdown() async {
+    final custList = await getList("customer_name");
+
+    setState(() {
+      customer_names_list = custList!;
+    });
+  }
+
+  @override
+  initState() {
+    super.initState();
+    _populateDropdown();
+
+    _amt.text = "";
+  }
+
   Widget build(BuildContext context) {
     return Stack(
       children: [
@@ -80,14 +113,44 @@ class Balance extends StatelessWidget {
                       height: 5,
                     ),
                     Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: TextField(
-                        obscureText: false,
-                        decoration: InputDecoration(
-                          hintText: 'Search here..',
-                          border: OutlineInputBorder(),
+                      padding: const EdgeInsets.all(5.0),
+                      child: SizedBox(
+                        width: 400,
+                        height: 40,
+                        child: Container(
+                          decoration: const ShapeDecoration(
+                              shape: RoundedRectangleBorder(
+                            side: BorderSide(
+                                width: 0.5, style: BorderStyle.solid),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(5.0)),
+                          )),
+                          child: DropdownButtonHideUnderline(
+                            child: Container(
+                              padding: const EdgeInsets.all(5),
+                              child: DropdownButton<String>(
+                                  hint: const Text("Customer Name"),
+                                  style: const TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 12,
+                                  ),
+                                  value: customer_name_value,
+                                  onChanged: (String? value) {
+                                    setState(() {
+                                      customer_name_value = value ?? "";
+                                    });
+                                  },
+                                  items: customer_names_list
+                                      .map<DropdownMenuItem<String>>(
+                                          (String customer) {
+                                    return DropdownMenuItem<String>(
+                                      value: customer,
+                                      child: Text(customer),
+                                    );
+                                  }).toList()),
+                            ),
+                          ),
                         ),
-                        style: TextStyle(color: Colors.black),
                       ),
                     ),
                     SizedBox(
@@ -116,8 +179,7 @@ class Balance extends StatelessWidget {
                                 Positioned.fill(
                                   child: Container(
                                     decoration: const BoxDecoration(
-                                        color: Colors.deepOrange
-                                    ),
+                                        color: Colors.deepOrange),
                                   ),
                                 ),
                                 TextButton(
@@ -149,8 +211,7 @@ class Balance extends StatelessWidget {
                                 Positioned.fill(
                                   child: Container(
                                     decoration: const BoxDecoration(
-                                        color: Colors.deepOrange
-                                    ),
+                                        color: Colors.deepOrange),
                                   ),
                                 ),
                                 TextButton(
@@ -182,8 +243,7 @@ class Balance extends StatelessWidget {
                                 Positioned.fill(
                                   child: Container(
                                     decoration: const BoxDecoration(
-                                        color: Colors.deepOrange
-                                    ),
+                                        color: Colors.deepOrange),
                                   ),
                                 ),
                                 TextButton(

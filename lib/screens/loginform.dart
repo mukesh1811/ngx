@@ -7,8 +7,13 @@ Future<String> login_validate() async {
   return login_status;
 }
 
-final _uname = TextEditingController();
-final _pwd = TextEditingController();
+TextEditingController _uname = TextEditingController();
+TextEditingController _pwd = TextEditingController();
+
+void clearTextFields() {
+  _uname.clear();
+  _pwd.clear();
+}
 
 class loginform extends StatefulWidget {
   const loginform({Key? key}) : super(key: key);
@@ -20,6 +25,8 @@ class loginform extends StatefulWidget {
 class _loginformState extends State<loginform> {
   @override
   Widget build(BuildContext context) {
+    clearTextFields();
+
     return Stack(children: [
       Scaffold(
           backgroundColor: Colors.transparent,
@@ -49,7 +56,7 @@ class _loginformState extends State<loginform> {
                         ],
                       ),
                     ),
-                    SizedBox(height: 150),
+                    SizedBox(height: 50),
                     Padding(
                       padding: const EdgeInsets.fromLTRB(30, 10, 30, 10),
                       child: TextField(
@@ -115,6 +122,7 @@ class _loginformState extends State<loginform> {
                                     SnackBar(content: Text(login_status)));
 
                                 if (login_status == "Login Successfull!") {
+                                  clearTextFields();
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(

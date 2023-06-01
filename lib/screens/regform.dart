@@ -11,10 +11,35 @@ Future<SnackBar> doRegister() async {
   print(!(_pwd.text == _pwdConfirm.text));
   print('');
 
-  String res =
-      await DB_Helper.addUser(_uname.text, _pwd.text, int.parse(_phno.text));
+  String res = "";
+
+  if (_uname.text.trim() == "") {
+    return const SnackBar(content: Text("Username cannot be blank"));
+  }
+
+  if (_pwd.text.trim() == "") {
+    return const SnackBar(content: Text("Password cannot be blank"));
+  }
+
+  if (_phno.text.trim() == "") {
+    return const SnackBar(content: Text("Phone Number cannot be blank"));
+  }
+
+  if (_pwd.text.trim() != _pwdConfirm.text.trim()) {
+    return const SnackBar(content: Text("Passwords mismatch"));
+  }
+
+  if (_phno.text.length != 10) {
+    return const SnackBar(content: Text("Phone Number should be 10 digits"));
+  }
+
+  res = await DB_Helper.addUser(_uname.text, _pwd.text, int.parse(_phno.text));
 
   print(res);
+
+  if (res.contains("success")) {
+    clearTextFields();
+  }
 
   return SnackBar(content: Text(res));
 }
@@ -23,6 +48,13 @@ final _uname = TextEditingController();
 final _pwd = TextEditingController();
 final _pwdConfirm = TextEditingController();
 final _phno = TextEditingController();
+
+void clearTextFields() {
+  _uname.clear();
+  _pwd.clear();
+  _pwdConfirm.clear();
+  _phno.clear();
+}
 
 class regform extends StatefulWidget {
   const regform({Key? key}) : super(key: key);
@@ -34,6 +66,8 @@ class regform extends StatefulWidget {
 class _regformState extends State<regform> {
   @override
   Widget build(BuildContext context) {
+    clearTextFields();
+
     return Stack(children: [
       Scaffold(
           backgroundColor: Colors.transparent,

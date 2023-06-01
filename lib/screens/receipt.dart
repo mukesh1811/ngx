@@ -3,7 +3,40 @@ import 'package:ngx/screens/homepage.dart';
 import 'package:ngx/screens/loginpage.dart';
 import 'package:intl/intl.dart';
 
-class Receipt extends StatelessWidget {
+import 'ConfigHelper.dart';
+
+class Receipt extends StatefulWidget {
+  const Receipt({Key? key}) : super(key: key);
+
+  @override
+  State<Receipt> createState() => _ReceiptState();
+}
+
+class _ReceiptState extends State<Receipt> {
+  String? customer_name_value;
+
+  int receiptNo = 0;
+
+  late List<String> customer_names_list = [];
+
+  final TextEditingController _balance_txtcntrl = TextEditingController();
+
+  void _populateDropdown() async {
+    final custList = await getList("customer_name");
+
+    setState(() {
+      customer_names_list = custList!;
+    });
+  }
+
+  @override
+  initState() {
+    super.initState();
+    _populateDropdown();
+
+    _balance_txtcntrl.text = "";
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -66,7 +99,7 @@ class Receipt extends StatelessWidget {
                                       fontSize: 12,
                                       fontWeight: FontWeight.bold,
                                     )),
-                                Text("123456",
+                                Text(receiptNo.toString(),
                                     style: TextStyle(
                                       fontSize: 12,
                                       fontWeight: FontWeight.bold,
@@ -102,17 +135,44 @@ class Receipt extends StatelessWidget {
                     SizedBox(
                       height: 5,
                     ),
-                    const Padding(
-                      padding: EdgeInsets.all(8.0),
+                    Padding(
+                      padding: const EdgeInsets.all(5.0),
                       child: SizedBox(
+                        width: 300,
                         height: 40,
-                        child: TextField(
-                          obscureText: false,
-                          decoration: InputDecoration(
-                            hintText: 'Search here..',
-                            border: OutlineInputBorder(),
+                        child: Container(
+                          decoration: const ShapeDecoration(
+                              shape: RoundedRectangleBorder(
+                            side: BorderSide(
+                                width: 0.5, style: BorderStyle.solid),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(5.0)),
+                          )),
+                          child: DropdownButtonHideUnderline(
+                            child: Container(
+                              padding: const EdgeInsets.all(5),
+                              child: DropdownButton<String>(
+                                  hint: const Text("Customer Name"),
+                                  style: const TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 12,
+                                  ),
+                                  value: customer_name_value,
+                                  onChanged: (String? value) {
+                                    setState(() {
+                                      customer_name_value = value ?? "";
+                                    });
+                                  },
+                                  items: customer_names_list
+                                      .map<DropdownMenuItem<String>>(
+                                          (String customer) {
+                                    return DropdownMenuItem<String>(
+                                      value: customer,
+                                      child: Text(customer),
+                                    );
+                                  }).toList()),
+                            ),
                           ),
-                          style: TextStyle(color: Colors.black),
                         ),
                       ),
                     ),
@@ -128,11 +188,12 @@ class Receipt extends StatelessWidget {
                     SizedBox(
                       height: 5,
                     ),
-                     Padding(
+                    Padding(
                       padding: EdgeInsets.all(8.0),
                       child: SizedBox(
                         height: 40,
                         child: TextFormField(
+                          keyboardType: TextInputType.number,
                           obscureText: false,
                           decoration: InputDecoration(
                             hintText: "Amount",
@@ -175,8 +236,7 @@ class Receipt extends StatelessWidget {
                                 Positioned.fill(
                                   child: Container(
                                     decoration: const BoxDecoration(
-                                        color: Colors.deepOrange
-                                    ),
+                                        color: Colors.deepOrange),
                                   ),
                                 ),
                                 TextButton(
@@ -204,8 +264,7 @@ class Receipt extends StatelessWidget {
                                 Positioned.fill(
                                   child: Container(
                                     decoration: const BoxDecoration(
-                                        color: Colors.deepOrange
-                                    ),
+                                        color: Colors.deepOrange),
                                   ),
                                 ),
                                 TextButton(
@@ -263,7 +322,8 @@ class Receipt extends StatelessWidget {
                                     obscureText: false,
                                     decoration: InputDecoration(
                                       labelText: 'Existing Receipt',
-                                      labelStyle: TextStyle(color: Colors.black),
+                                      labelStyle:
+                                          TextStyle(color: Colors.black),
                                       border: OutlineInputBorder(),
                                     ),
                                     style: TextStyle(color: Colors.black),
@@ -280,8 +340,7 @@ class Receipt extends StatelessWidget {
                                       Positioned.fill(
                                         child: Container(
                                           decoration: const BoxDecoration(
-                                              color: Colors.deepOrange
-                                          ),
+                                              color: Colors.deepOrange),
                                         ),
                                       ),
                                       TextButton(
@@ -312,8 +371,7 @@ class Receipt extends StatelessWidget {
                                   Positioned.fill(
                                     child: Container(
                                       decoration: const BoxDecoration(
-                                          color: Colors.deepOrange
-                                      ),
+                                          color: Colors.deepOrange),
                                     ),
                                   ),
                                   TextButton(
@@ -350,8 +408,7 @@ class Receipt extends StatelessWidget {
                                 Positioned.fill(
                                   child: Container(
                                     decoration: const BoxDecoration(
-                                        color: Colors.deepOrange
-                                    ),
+                                        color: Colors.deepOrange),
                                   ),
                                 ),
                                 TextButton(
@@ -383,8 +440,7 @@ class Receipt extends StatelessWidget {
                                 Positioned.fill(
                                   child: Container(
                                     decoration: const BoxDecoration(
-                                        color: Colors.deepOrange
-                                    ),
+                                        color: Colors.deepOrange),
                                   ),
                                 ),
                                 TextButton(
@@ -401,7 +457,8 @@ class Receipt extends StatelessWidget {
                                           builder: (context) => Homepage()),
                                     );
                                   },
-                                  child: Center(child: const Text('HOME')),
+                                  child:
+                                      const Center(child: const Text('HOME')),
                                 ),
                               ],
                             ),
@@ -416,8 +473,7 @@ class Receipt extends StatelessWidget {
                                 Positioned.fill(
                                   child: Container(
                                     decoration: const BoxDecoration(
-                                        color: Colors.deepOrange
-                                    ),
+                                        color: Colors.deepOrange),
                                   ),
                                 ),
                                 TextButton(
@@ -435,7 +491,8 @@ class Receipt extends StatelessWidget {
                                           builder: (context) => LoginPage()),
                                     );
                                   },
-                                  child: Center(child: const Text('EXIT')),
+                                  child:
+                                      const Center(child: const Text('EXIT')),
                                 ),
                               ],
                             ),

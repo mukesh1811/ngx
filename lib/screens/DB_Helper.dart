@@ -21,14 +21,51 @@ class DB_Helper {
      )
       """);
 
-    // await database.execute("""CREATE TABLE items(
-    //     id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-    //     title TEXT,
-    //     description TEXT,
-    //     author TEXT,
-    //     createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-    //  )
-    //   """);
+    await database.execute("""CREATE TABLE tokens(
+        consignor_name TEXT,
+        item_name TEXT,
+        payment_type TEXT,
+        lot_no TEXT,
+        mark TEXT,
+        units INTEGER,
+        weight INTEGER,
+        rate INTEGER,
+        amount INTEGER
+     )
+      """);
+
+    await database.execute("""CREATE TABLE receipts(
+        customer_name TEXT,
+        balance INTEGER
+     )
+     )
+      """);
+  }
+
+  static Future<int> createToken(Map<String, dynamic> data) async {
+    final db = await DB_Helper.db();
+
+    final id = await db.insert('tokens', data,
+        conflictAlgorithm: ConflictAlgorithm.fail);
+
+    return id;
+  }
+
+  static Future<int> getMaxTokenNo() async {
+    final db = await DB_Helper.db();
+
+    var max_rowid =
+        await db.rawQuery("select max(_rowid_) as token_no from tokens");
+
+    print("max_rowid");
+    print(max_rowid);
+    print(max_rowid[0]['token_no']);
+
+    if (max_rowid[0]['token_no'] == null) {
+      return 1;
+    } else {
+      return int.parse(max_rowid[0]['token_no'].toString()) + 1;
+    }
   }
 
   static Future<String> addUser(
@@ -56,6 +93,17 @@ class DB_Helper {
     } else {
       return "User does not exist";
     }
+  }
+
+  static Future<Map<String, Object?>> getToken(int token_id) async {
+    final db = await DB_Helper.db();
+
+    var res =
+        await db.query('tokens', where: '_rowid_ = ?', whereArgs: [token_id]);
+
+    print('Token: ${res}');
+
+    return res[0];
   }
 
   static Future<String> getPwd(String username) async {
