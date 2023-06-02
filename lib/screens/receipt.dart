@@ -15,7 +15,7 @@ class Receipt extends StatefulWidget {
 class _ReceiptState extends State<Receipt> {
   String? customer_name_value;
 
-  int receiptNo = 0;
+  int receiptNo = 10;
 
   late List<String> customer_names_list = [];
 
