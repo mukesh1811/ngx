@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'package:ngx/screens/homepage.dart';
 import 'package:ngx/screens/loginpage.dart';
-import 'package:intl/intl.dart';
-import 'package:flutter/services.dart';
 
 import 'ConfigHelper.dart';
+import 'DB_Helper.dart';
 
 class Retail extends StatefulWidget {
   const Retail({Key? key}) : super(key: key);
@@ -17,7 +18,9 @@ class _RetailState extends State<Retail> {
   String? item_name_value;
   String? payment_type_value;
 
-  int tokenNo = 0;
+  int retailNo = 0;
+
+  bool canSave = true;
 
   late List<String> item_name_list = [];
   late List<String> payment_type_list = [];
@@ -26,6 +29,7 @@ class _RetailState extends State<Retail> {
   final TextEditingController _wt = TextEditingController();
   final TextEditingController _rate = TextEditingController();
   final TextEditingController _amt = TextEditingController();
+  final TextEditingController _existing_retailNo = TextEditingController();
 
   void _populateDropdown() async {
     final itemlist = await getList("item_name");
@@ -38,6 +42,14 @@ class _RetailState extends State<Retail> {
     });
   }
 
+  void _setRetailNo() async {
+    var maxTokenNo = await DB_Helper.getMaxRetailNo();
+
+    setState(() {
+      retailNo = maxTokenNo;
+    });
+  }
+
   @override
   initState() {
     super.initState();
@@ -47,6 +59,8 @@ class _RetailState extends State<Retail> {
     _wt.text = "";
     _amt.text = "";
     _rate.text = "";
+
+    _setRetailNo();
   }
 
   @override
@@ -72,7 +86,7 @@ class _RetailState extends State<Retail> {
                     child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Text(
-                    "RETAIL",
+                    "Retail",
                     style: TextStyle(
                       color: Colors.black,
                       fontSize: 14,
@@ -110,7 +124,7 @@ class _RetailState extends State<Retail> {
                                       fontSize: 15,
                                       fontWeight: FontWeight.bold,
                                     )),
-                                Text("123456",
+                                Text(retailNo.toString(),
                                     style: TextStyle(
                                       fontSize: 15,
                                       fontWeight: FontWeight.bold,
@@ -434,7 +448,11 @@ class _RetailState extends State<Retail> {
                                         fontSize: 15,
                                         fontWeight: FontWeight.bold),
                                   ),
-                                  onPressed: () {},
+                                  onPressed: () async {
+                                    var snackBar = await saveToDB();
+                                    ScaffoldMessenger.of(context)
+                                        .showSnackBar(snackBar);
+                                  },
                                   child: Center(child: const Text('Print')),
                                 ),
                               ],
@@ -462,7 +480,13 @@ class _RetailState extends State<Retail> {
                                         fontSize: 15,
                                         fontWeight: FontWeight.bold),
                                   ),
-                                  onPressed: () {},
+                                  onPressed: canSave
+                                      ? () async {
+                                          var snackBar = await saveToDB();
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(snackBar);
+                                        }
+                                      : null,
                                   child: Center(
                                       child: const Text(
                                     'SAVE',
@@ -489,15 +513,17 @@ class _RetailState extends State<Retail> {
                             child: SizedBox(
                               height: 40,
                               child: TextFormField(
+                                controller: _existing_retailNo,
                                 obscureText: false,
                                 decoration: InputDecoration(
-                                  labelText: 'Existing Token ID',
+                                  labelText: 'Existing Retail NO',
                                   labelStyle: TextStyle(
                                       color: Colors.black, fontSize: 12),
                                   border: OutlineInputBorder(),
                                 ),
                                 style: TextStyle(color: Colors.black),
                                 textInputAction: TextInputAction.next,
+                                keyboardType: TextInputType.number,
                               ),
                             ),
                           ),
@@ -522,7 +548,9 @@ class _RetailState extends State<Retail> {
                                             fontSize: 15,
                                             fontWeight: FontWeight.bold),
                                       ),
-                                      onPressed: () {},
+                                      onPressed: () {
+                                        _loadData();
+                                      },
                                       child: Center(child: const Text('GO')),
                                     ),
                                   ),
@@ -552,7 +580,13 @@ class _RetailState extends State<Retail> {
                                             fontSize: 15,
                                             fontWeight: FontWeight.bold),
                                       ),
-                                      onPressed: () {},
+                                      onPressed: () {
+                                        _clearFields();
+                                        _setRetailNo();
+                                        setState(() {
+                                          canSave = true;
+                                        });
+                                      },
                                       child: Center(
                                           child: const Text('NEW RETAIL')),
                                     ),
@@ -686,5 +720,102 @@ class _RetailState extends State<Retail> {
         )
       ],
     );
+  }
+
+  Future<SnackBar> saveToDB() async {
+    print("Save");
+
+    if (item_name_value == null) {
+      return const SnackBar(content: Text("Please select an item name"));
+    }
+
+    if (payment_type_value == null) {
+      return const SnackBar(content: Text("Please select payment type"));
+    }
+
+    if (_units.text.trim() == "") {
+      return const SnackBar(content: Text("Please enter Units"));
+    }
+
+    if (_wt.text.trim() == "") {
+      return const SnackBar(content: Text("Please enter Weight"));
+    }
+
+    if (_rate.text.trim() == "") {
+      return const SnackBar(content: Text("Please enter Rate"));
+    }
+
+    final data = {
+      'item_name': item_name_value,
+      'payment_type': payment_type_value,
+      'units': int.parse(_units.text),
+      'weight': int.parse(_wt.text),
+      'rate': int.parse(_rate.text),
+      'amount': int.parse(_amt.text)
+    };
+
+    int id = await DB_Helper.createRetail(data);
+
+    print("id");
+    print(id);
+
+    if (id == retailNo) {
+      setState(() {
+        _setRetailNo();
+      });
+    }
+
+    // Navigator.push(
+    //   context,
+    //   MaterialPageRoute(builder: (context) => Token()),
+    // );
+    ;
+
+    _clearFields();
+
+    return const SnackBar(content: Text("Retail info saved successfully!"));
+  }
+
+  Future<void> _loadData() async {
+    print(_existing_retailNo.text);
+
+    if (_existing_retailNo.text == "") {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Existing Token No is empty")));
+
+      return;
+    }
+
+    var res = await DB_Helper.getRetail(int.parse(_existing_retailNo.text));
+
+    print("returned token is");
+    print(res);
+
+    setState(() {
+      item_name_value = res['item_name'] as String?;
+      payment_type_value = res['payment_type'] as String?;
+      _units.text = res['units'].toString();
+      _wt.text = res['weight'].toString();
+      _rate.text = res['rate'].toString();
+      _amt.text = res['amount'].toString();
+
+      retailNo = int.parse(_existing_retailNo.text);
+
+      canSave = false;
+    });
+  }
+
+  void _clearFields() {
+    setState(() {
+      item_name_value = null;
+      payment_type_value = null;
+      _units.text = "";
+      _wt.text = "";
+      _rate.text = "";
+      _amt.text = "";
+      _existing_retailNo.text = "";
+
+      print("cleared!");
+    });
   }
 }

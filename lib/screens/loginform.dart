@@ -28,6 +28,14 @@ class _loginformState extends State<loginform> {
     clearTextFields();
 
     return Stack(children: [
+      Positioned.fill(
+        child: Image(
+          image: AssetImage("images/veg1.jpg"),
+          colorBlendMode: BlendMode.softLight,
+          fit: BoxFit.fill,
+          opacity: AlwaysStoppedAnimation(.5),
+        ),
+      ),
       Scaffold(
           backgroundColor: Colors.transparent,
           body: SingleChildScrollView(
@@ -48,7 +56,7 @@ class _loginformState extends State<loginform> {
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,
                               )),
-                          Text("REGISTER",
+                          Text("Login",
                               style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,
@@ -62,18 +70,18 @@ class _loginformState extends State<loginform> {
                       child: TextField(
                         controller: _uname,
                         cursorColor: Colors.white,
-                        style: TextStyle(color: Colors.grey, fontSize: 24),
+                        style: TextStyle(color: Colors.white, fontSize: 24),
 
                         //autofocus: true,
                         decoration: InputDecoration(
                             enabledBorder: OutlineInputBorder(
                                 borderRadius:
                                     BorderRadius.all(Radius.circular(25)),
-                                borderSide:
-                                    BorderSide(color: Colors.grey, width: 3.0)),
+                                borderSide: BorderSide(
+                                    color: Colors.white, width: 3.0)),
                             labelText: "Username",
                             labelStyle:
-                                TextStyle(color: Colors.grey, fontSize: 18)),
+                                TextStyle(color: Colors.white, fontSize: 18)),
                       ),
                     ),
                     Padding(
@@ -83,18 +91,18 @@ class _loginformState extends State<loginform> {
                         controller: _pwd,
                         obscureText: true,
                         cursorColor: Colors.white,
-                        style: TextStyle(color: Colors.grey, fontSize: 24),
+                        style: TextStyle(color: Colors.white, fontSize: 24),
 
                         //autofocus: true,
                         decoration: InputDecoration(
                             enabledBorder: OutlineInputBorder(
                                 borderRadius:
                                     BorderRadius.all(Radius.circular(25)),
-                                borderSide:
-                                    BorderSide(color: Colors.grey, width: 3.0)),
+                                borderSide: BorderSide(
+                                    color: Colors.white, width: 3.0)),
                             labelText: "Password",
                             labelStyle:
-                                TextStyle(color: Colors.grey, fontSize: 18)),
+                                TextStyle(color: Colors.white, fontSize: 18)),
                       ),
                     ),
                     Padding(
@@ -121,7 +129,7 @@ class _loginformState extends State<loginform> {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(content: Text(login_status)));
 
-                                if (login_status == "Login Successfull!") {
+                                if (login_status == "Login Successful!") {
                                   clearTextFields();
                                   Navigator.push(
                                     context,

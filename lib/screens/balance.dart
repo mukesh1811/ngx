@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ngx/screens/DB_Helper.dart';
 import 'package:ngx/screens/homepage.dart';
 import 'package:ngx/screens/loginpage.dart';
 
@@ -15,11 +16,9 @@ class _BalanceState extends State<Balance> {
   @override
   String? customer_name_value;
 
-  int tokenNo = 0;
-
   late List<String> customer_names_list = [];
 
-  final TextEditingController _amt = TextEditingController();
+  int balance = 0;
 
   void _populateDropdown() async {
     final custList = await getList("customer_name");
@@ -33,8 +32,6 @@ class _BalanceState extends State<Balance> {
   initState() {
     super.initState();
     _populateDropdown();
-
-    _amt.text = "";
   }
 
   Widget build(BuildContext context) {
@@ -59,7 +56,7 @@ class _BalanceState extends State<Balance> {
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Text(
-                      "BALANCE",
+                      "Balance",
                       style: TextStyle(
                         color: Colors.black,
                         fontSize: 14,
@@ -138,6 +135,7 @@ class _BalanceState extends State<Balance> {
                                   onChanged: (String? value) {
                                     setState(() {
                                       customer_name_value = value ?? "";
+                                      setBalance();
                                     });
                                   },
                                   items: customer_names_list
@@ -156,16 +154,25 @@ class _BalanceState extends State<Balance> {
                     SizedBox(
                       height: 5,
                     ),
-                    Container(
-                        padding: EdgeInsets.all(10),
-                        margin: EdgeInsets.all(20),
-                        height: 200,
-                        decoration: BoxDecoration(
-                          color: Colors.grey,
-                          borderRadius: BorderRadius.circular(20),
-                        )),
+                    SizedBox(height: 20),
+                    Text("Customer Name:"),
+                    Text(customer_name_value ?? "",
+                        style: TextStyle(fontWeight: FontWeight.bold)),
+                    SizedBox(height: 10),
+                    Text("Balance: "),
+                    Text(balance.toString(),
+                        style: TextStyle(fontWeight: FontWeight.bold)),
+                    // Container(
+                    //     padding: EdgeInsets.all(10),
+                    //     margin: EdgeInsets.all(20),
+                    //     height: 200,
+                    //     // child: Text(customer_name_value ?? ""),
+                    //     decoration: BoxDecoration(
+                    //       color: Colors.grey,
+                    //       borderRadius: BorderRadius.circular(20),
+                    //     )),
                     SizedBox(
-                      height: 10,
+                      height: 30,
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -277,5 +284,17 @@ class _BalanceState extends State<Balance> {
         )
       ],
     );
+  }
+
+  Future<void> setBalance() async {
+    var balVal = 0;
+
+    if (customer_name_value != null) {
+      balVal = await DB_Helper.getBalance(customer_name_value!);
+    }
+
+    setState(() {
+      balance = balVal;
+    });
   }
 }

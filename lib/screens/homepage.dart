@@ -1,16 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:ngx/screens/SettingsLogin.dart';
+import 'package:ngx/screens/balance.dart';
 import 'package:ngx/screens/loginpage.dart';
-import 'package:ngx/screens/settingpage.dart';
-import 'package:ngx/screens/token.dart';
 import 'package:ngx/screens/receipt.dart';
 import 'package:ngx/screens/retail.dart';
-import 'package:ngx/screens/balance.dart';
-import 'package:ngx/screens/settings.dart';
+import 'package:ngx/screens/token.dart';
 
 class Homepage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Stack(children: [
+      const Positioned.fill(
+        child: Image(
+          image: AssetImage("images/veg1.jpg"),
+          colorBlendMode: BlendMode.softLight,
+          fit: BoxFit.fill,
+          opacity: AlwaysStoppedAnimation(.5),
+        ),
+      ),
       Scaffold(
         backgroundColor: Colors.transparent,
         body: SingleChildScrollView(
@@ -29,7 +36,7 @@ class Homepage extends StatelessWidget {
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
                         )),
-                    Text("HOME",
+                    Text("Home",
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
@@ -276,7 +283,7 @@ class Homepage extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => const settingpage()),
+                              builder: (context) => const SettingsLogin()),
                         );
                       },
                       icon: Icon(

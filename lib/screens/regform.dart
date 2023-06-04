@@ -69,6 +69,14 @@ class _regformState extends State<regform> {
     clearTextFields();
 
     return Stack(children: [
+      Positioned.fill(
+        child: Image(
+          image: AssetImage("images/veg1.jpg"),
+          colorBlendMode: BlendMode.softLight,
+          fit: BoxFit.fill,
+          opacity: AlwaysStoppedAnimation(.5),
+        ),
+      ),
       Scaffold(
           backgroundColor: Colors.transparent,
           body: SingleChildScrollView(
@@ -89,7 +97,7 @@ class _regformState extends State<regform> {
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,
                               )),
-                          Text("REGISTER",
+                          Text("Register",
                               style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,
@@ -103,18 +111,18 @@ class _regformState extends State<regform> {
                       child: TextField(
                         controller: _uname,
                         cursorColor: Colors.white,
-                        style: TextStyle(color: Colors.grey, fontSize: 24),
+                        style: TextStyle(color: Colors.white, fontSize: 24),
 
                         //autofocus: true,
                         decoration: InputDecoration(
                             enabledBorder: OutlineInputBorder(
                                 borderRadius:
                                     BorderRadius.all(Radius.circular(25)),
-                                borderSide:
-                                    BorderSide(color: Colors.grey, width: 3.0)),
+                                borderSide: BorderSide(
+                                    color: Colors.white, width: 3.0)),
                             labelText: "Username",
                             labelStyle:
-                                TextStyle(color: Colors.grey, fontSize: 18)),
+                                TextStyle(color: Colors.white, fontSize: 18)),
                       ),
                     ),
                     Padding(
@@ -124,18 +132,18 @@ class _regformState extends State<regform> {
                         controller: _pwd,
                         obscureText: true,
                         cursorColor: Colors.white,
-                        style: TextStyle(color: Colors.grey, fontSize: 24),
+                        style: TextStyle(color: Colors.white, fontSize: 24),
 
                         //autofocus: true,
                         decoration: InputDecoration(
                             enabledBorder: OutlineInputBorder(
                                 borderRadius:
                                     BorderRadius.all(Radius.circular(25)),
-                                borderSide:
-                                    BorderSide(color: Colors.grey, width: 3.0)),
+                                borderSide: BorderSide(
+                                    color: Colors.white, width: 3.0)),
                             labelText: "Password",
                             labelStyle:
-                                TextStyle(color: Colors.grey, fontSize: 18)),
+                                TextStyle(color: Colors.white, fontSize: 18)),
                       ),
                     ),
                     Padding(
@@ -144,18 +152,18 @@ class _regformState extends State<regform> {
                         controller: _pwdConfirm,
                         obscureText: true,
                         cursorColor: Colors.white,
-                        style: TextStyle(color: Colors.grey, fontSize: 24),
+                        style: TextStyle(color: Colors.white, fontSize: 24),
 
                         //autofocus: true,
                         decoration: InputDecoration(
                             enabledBorder: OutlineInputBorder(
                                 borderRadius:
                                     BorderRadius.all(Radius.circular(25)),
-                                borderSide:
-                                    BorderSide(color: Colors.grey, width: 3.0)),
+                                borderSide: BorderSide(
+                                    color: Colors.white, width: 3.0)),
                             labelText: "Confirm Password",
                             labelStyle:
-                                TextStyle(color: Colors.grey, fontSize: 18)),
+                                TextStyle(color: Colors.white, fontSize: 18)),
                       ),
                     ),
                     Padding(
@@ -163,7 +171,7 @@ class _regformState extends State<regform> {
                       child: TextField(
                         controller: _phno,
                         cursorColor: Colors.white,
-                        style: TextStyle(color: Colors.grey, fontSize: 24),
+                        style: TextStyle(color: Colors.white, fontSize: 24),
                         keyboardType: TextInputType.number,
 
                         //autofocus: true,
@@ -171,11 +179,11 @@ class _regformState extends State<regform> {
                             enabledBorder: OutlineInputBorder(
                                 borderRadius:
                                     BorderRadius.all(Radius.circular(25)),
-                                borderSide:
-                                    BorderSide(color: Colors.grey, width: 3.0)),
+                                borderSide: BorderSide(
+                                    color: Colors.white, width: 3.0)),
                             labelText: "Phone Number",
                             labelStyle:
-                                TextStyle(color: Colors.grey, fontSize: 18)),
+                                TextStyle(color: Colors.white, fontSize: 18)),
                       ),
                     ),
                     Padding(

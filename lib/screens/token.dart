@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
+import 'package:ngx/screens/ConfigHelper.dart';
 import 'package:ngx/screens/homepage.dart';
 import 'package:ngx/screens/loginpage.dart';
-import 'package:intl/intl.dart';
-import 'package:flutter/services.dart';
-import 'package:ngx/screens/ConfigHelper.dart';
+
 import 'DB_Helper.dart';
 
 class Token extends StatefulWidget {
@@ -90,7 +91,7 @@ class _TokenState extends State<Token> {
                     child: Padding(
                   padding: EdgeInsets.all(10.0),
                   child: Text(
-                    "TOKEN",
+                    "Token",
                     style: TextStyle(
                       color: Colors.black,
                       fontSize: 16,
@@ -110,8 +111,9 @@ class _TokenState extends State<Token> {
                 child: Container(
                   padding: EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                      color: Colors.white),
+                    borderRadius: BorderRadius.circular(20),
+                    color: Colors.white,
+                  ),
                   child: Column(
                     children: [
                       Row(
@@ -568,7 +570,6 @@ class _TokenState extends State<Token> {
                                       var snackBar = await saveToDB();
                                       ScaffoldMessenger.of(context)
                                           .showSnackBar(snackBar);
-                                      _clearFields();
                                     },
                                     child: Center(child: const Text('Print')),
                                   ),
@@ -602,7 +603,6 @@ class _TokenState extends State<Token> {
                                             var snackBar = await saveToDB();
                                             ScaffoldMessenger.of(context)
                                                 .showSnackBar(snackBar);
-                                            _clearFields();
                                           }
                                         : null,
                                     child: Center(
@@ -899,11 +899,14 @@ class _TokenState extends State<Token> {
     // );
     ;
 
+    _clearFields();
+
     return const SnackBar(content: Text("Token saved successfully!"));
   }
 
   Future<void> _loadData() async {
     print(_existing_tokenNo.text);
+
     if (_existing_tokenNo.text == "") {
       ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Existing Token No is empty")));
@@ -913,9 +916,8 @@ class _TokenState extends State<Token> {
 
     var res = await DB_Helper.getToken(int.parse(_existing_tokenNo.text));
 
-    print("returned token");
+    print("returned token is");
     print(res);
-    print(res.toString());
 
     setState(() {
       consignor_name_value = res['consignor_name'] as String?;

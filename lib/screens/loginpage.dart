@@ -6,6 +6,14 @@ class LoginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Stack(children: [
+      Positioned.fill(
+        child: Image(
+          image: AssetImage("images/veg1.jpg"),
+          colorBlendMode: BlendMode.softLight,
+          fit: BoxFit.fill,
+          opacity: AlwaysStoppedAnimation(.5),
+        ),
+      ),
       Scaffold(
         backgroundColor: Colors.transparent,
         body: SingleChildScrollView(

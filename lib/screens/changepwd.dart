@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ngx/screens/DB_Helper.dart';
 
 class Changepwd extends StatefulWidget {
   const Changepwd({Key? key}) : super(key: key);
@@ -8,26 +9,50 @@ class Changepwd extends StatefulWidget {
 }
 
 class _ChangepwdState extends State<Changepwd> {
-  TextEditingController _pwd = TextEditingController();
+  TextEditingController _old_pwd = TextEditingController();
+  TextEditingController _new_pwd = TextEditingController();
+  TextEditingController _confirm_pwd = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Stack(children: [
+      Positioned.fill(
+        child: Image(
+          image: AssetImage("images/veg1.jpg"),
+          colorBlendMode: BlendMode.softLight,
+          fit: BoxFit.fill,
+          opacity: AlwaysStoppedAnimation(.5),
+        ),
+      ),
       Scaffold(
         backgroundColor: Colors.transparent,
         appBar: PreferredSize(
           preferredSize: Size.fromHeight(40.0),
           child: AppBar(
-            title: Text(
-              "Retail Management System",
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
+              title: Text(
+                "Retail Management System",
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.left,
               ),
-              textAlign: TextAlign.left,
-            ),
-          ),
+              actions: const [
+                Center(
+                    child: Padding(
+                  padding: EdgeInsets.all(10.0),
+                  child: Text(
+                    "Settings",
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.left,
+                  ),
+                ))
+              ]),
         ),
         body: SingleChildScrollView(
           child: SafeArea(
@@ -40,60 +65,60 @@ class _ChangepwdState extends State<Changepwd> {
                   padding: const EdgeInsets.fromLTRB(30, 10, 30, 10),
                   //padding: const EdgeInsets.all(30.0),
                   child: TextField(
-                    controller: _pwd,
+                    controller: _old_pwd,
                     obscureText: true,
                     cursorColor: Colors.white,
-                    style: TextStyle(color: Colors.grey, fontSize: 24),
+                    style: TextStyle(color: Colors.white, fontSize: 24),
 
                     //autofocus: true,
                     decoration: InputDecoration(
                         enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.all(Radius.circular(25)),
                             borderSide:
-                                BorderSide(color: Colors.grey, width: 3.0)),
+                                BorderSide(color: Colors.white, width: 3.0)),
                         labelText: "Old Password",
                         labelStyle:
-                            TextStyle(color: Colors.grey, fontSize: 18)),
+                            TextStyle(color: Colors.white, fontSize: 18)),
                   ),
                 ),
                 Container(
                   padding: const EdgeInsets.fromLTRB(30, 10, 30, 10),
                   //padding: const EdgeInsets.all(30.0),
                   child: TextField(
-                    controller: _pwd,
+                    controller: _new_pwd,
                     obscureText: true,
                     cursorColor: Colors.white,
-                    style: TextStyle(color: Colors.grey, fontSize: 24),
+                    style: TextStyle(color: Colors.white, fontSize: 24),
 
                     //autofocus: true,
                     decoration: InputDecoration(
                         enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.all(Radius.circular(25)),
                             borderSide:
-                                BorderSide(color: Colors.grey, width: 3.0)),
+                                BorderSide(color: Colors.white, width: 3.0)),
                         labelText: "New Password",
                         labelStyle:
-                            TextStyle(color: Colors.grey, fontSize: 18)),
+                            TextStyle(color: Colors.white, fontSize: 18)),
                   ),
                 ),
                 Container(
                   padding: const EdgeInsets.fromLTRB(30, 10, 30, 10),
                   //padding: const EdgeInsets.all(30.0),
                   child: TextField(
-                    controller: _pwd,
+                    controller: _confirm_pwd,
                     obscureText: true,
                     cursorColor: Colors.white,
-                    style: TextStyle(color: Colors.grey, fontSize: 24),
+                    style: TextStyle(color: Colors.white, fontSize: 24),
 
                     //autofocus: true,
                     decoration: InputDecoration(
                         enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.all(Radius.circular(25)),
                             borderSide:
-                                BorderSide(color: Colors.grey, width: 3.0)),
+                                BorderSide(color: Colors.white, width: 3.0)),
                         labelText: "Confirm New Password",
                         labelStyle:
-                            TextStyle(color: Colors.grey, fontSize: 18)),
+                            TextStyle(color: Colors.white, fontSize: 18)),
                   ),
                 ),
                 Row(
@@ -118,7 +143,11 @@ class _ChangepwdState extends State<Changepwd> {
                                     const EdgeInsets.fromLTRB(30, 10, 30, 10),
                                 textStyle: const TextStyle(fontSize: 14),
                               ),
-                              onPressed: () async {},
+                              onPressed: () async {
+                                var snackBar = await change_pwd();
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(snackBar);
+                              },
                               child: Center(child: const Text('Submit')),
                             ),
                           ],
@@ -133,5 +162,33 @@ class _ChangepwdState extends State<Changepwd> {
         ),
       )
     ]);
+  }
+
+  Future<SnackBar> change_pwd() async {
+    if (_old_pwd.text.trim() == "") {
+      return const SnackBar(content: Text("Please enter old password"));
+    }
+
+    if (_new_pwd.text.trim() == "") {
+      return const SnackBar(content: Text("Please enter new password"));
+    }
+
+    if (_confirm_pwd.text.trim() == "") {
+      return const SnackBar(content: Text("Please confirm new password"));
+    }
+
+    if (_confirm_pwd.text.trim() != _new_pwd.text.trim()) {
+      return const SnackBar(content: Text("Password mismatch"));
+    }
+
+    String pwd_from_db = await DB_Helper.getPwd('admin');
+
+    if (pwd_from_db != _old_pwd.text.trim()) {
+      return const SnackBar(content: Text("Incorrect password"));
+    }
+
+    DB_Helper.updateAdminPwd(_new_pwd.text.trim());
+
+    return const SnackBar(content: Text("Password updated successfully!"));
   }
 }

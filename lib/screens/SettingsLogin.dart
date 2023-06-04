@@ -1,55 +1,75 @@
 import 'package:flutter/material.dart';
+import 'package:ngx/screens/settings.dart';
 
 import 'DB_Helper.dart';
 import 'changepwd.dart';
-import 'homepage.dart';
 
 Future<String> login_validate() async {
-  String login_status = await DB_Helper.auth(_uname.text, _pwd.text);
+  String login_status = await DB_Helper.auth("admin", _pwd.text);
   return login_status;
 }
 
-TextEditingController _uname = TextEditingController();
 TextEditingController _pwd = TextEditingController();
 
 void clearTextFields() {
-  _uname.clear();
   _pwd.clear();
 }
 
-class settingpage extends StatefulWidget {
-  const settingpage({Key? key}) : super(key: key);
+class SettingsLogin extends StatefulWidget {
+  const SettingsLogin({Key? key}) : super(key: key);
 
   @override
-  State<settingpage> createState() => _settingpageState();
+  State<SettingsLogin> createState() => _SettingsLoginState();
 }
 
-class _settingpageState extends State<settingpage> {
+class _SettingsLoginState extends State<SettingsLogin> {
   @override
   Widget build(BuildContext context) {
     return Stack(children: [
+      Positioned.fill(
+        child: Image(
+          image: AssetImage("images/veg1.jpg"),
+          colorBlendMode: BlendMode.softLight,
+          fit: BoxFit.fill,
+          opacity: AlwaysStoppedAnimation(.5),
+        ),
+      ),
       Scaffold(
         backgroundColor: Colors.transparent,
         appBar: PreferredSize(
           preferredSize: Size.fromHeight(40.0),
           child: AppBar(
-            title: Text(
-              "Retail Management System",
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
+              title: Text(
+                "Retail Management System",
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.left,
               ),
-              textAlign: TextAlign.left,
-            ),
-          ),
+              actions: const [
+                Center(
+                    child: Padding(
+                  padding: EdgeInsets.all(10.0),
+                  child: Text(
+                    "Settings",
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.left,
+                  ),
+                ))
+              ]),
         ),
         body: SingleChildScrollView(
           child: SafeArea(
             child: Center(
               child: Column(children: [
                 SizedBox(
-                  height: 100,
+                  height: 75,
                 ),
                 Container(
                   padding: const EdgeInsets.fromLTRB(30, 10, 30, 10),
@@ -58,24 +78,25 @@ class _settingpageState extends State<settingpage> {
                     controller: _pwd,
                     obscureText: true,
                     cursorColor: Colors.white,
-                    style: TextStyle(color: Colors.grey, fontSize: 24),
+                    style: TextStyle(color: Colors.white, fontSize: 24),
+                    onTapOutside: (event) {},
 
                     //autofocus: true,
                     decoration: InputDecoration(
                         enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.all(Radius.circular(25)),
                             borderSide:
-                                BorderSide(color: Colors.grey, width: 3.0)),
+                                BorderSide(color: Colors.white, width: 3.0)),
                         labelText: "Password",
                         labelStyle:
-                            TextStyle(color: Colors.grey, fontSize: 18)),
+                            TextStyle(color: Colors.white, fontSize: 18)),
                   ),
                 ),
-                Row(
+                Column(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     Padding(
-                      padding: const EdgeInsets.fromLTRB(30, 10, 50, 10),
+                      padding: const EdgeInsets.fromLTRB(30, 10, 30, 10),
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(20),
                         child: Stack(
@@ -98,12 +119,12 @@ class _settingpageState extends State<settingpage> {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(content: Text(login_status)));
 
-                                if (login_status == "Login Successfull!") {
+                                if (login_status == "Login Successful!") {
                                   clearTextFields();
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) => Homepage()),
+                                        builder: (context) => Settings()),
                                   );
                                 } else {}
                               },
