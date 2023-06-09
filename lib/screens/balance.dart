@@ -14,6 +14,20 @@ class Balance extends StatefulWidget {
 }
 
 class _BalanceState extends State<Balance> {
+  static const platform = MethodChannel('ngx.print.channel');
+
+  Future<void> _printName() async {
+    try {
+      var args = {
+        'customer_name': customer_name_value,
+        'balance': balance.toString()
+      };
+      final int result = await platform.invokeMethod('print', args);
+    } on PlatformException catch (e) {
+      print("Failed to get battery level: '${e.message}'.");
+    }
+  }
+
   @override
   String? customer_name_value;
 
@@ -118,16 +132,16 @@ class _BalanceState extends State<Balance> {
                         child: Container(
                           decoration: const ShapeDecoration(
                               shape: RoundedRectangleBorder(
-                            side: BorderSide(
-                                width: 0.5, style: BorderStyle.solid),
-                            borderRadius:
+                                side: BorderSide(
+                                    width: 0.5, style: BorderStyle.solid),
+                                borderRadius:
                                 BorderRadius.all(Radius.circular(5.0)),
-                          )),
+                              )),
                           child: DropdownButtonHideUnderline(
                             child: Container(
                               padding: const EdgeInsets.all(5),
                               child: DropdownButton<String>(
-                                  hint: const Text("Customer Name"),
+                                  hint: const Text("Customer NName"),
                                   style: const TextStyle(
                                     color: Colors.black,
                                     fontSize: 12,
@@ -142,11 +156,11 @@ class _BalanceState extends State<Balance> {
                                   items: customer_names_list
                                       .map<DropdownMenuItem<String>>(
                                           (String customer) {
-                                    return DropdownMenuItem<String>(
-                                      value: customer,
-                                      child: Text(customer),
-                                    );
-                                  }).toList()),
+                                        return DropdownMenuItem<String>(
+                                          value: customer,
+                                          child: Text(customer),
+                                        );
+                                      }).toList()),
                             ),
                           ),
                         ),
@@ -221,13 +235,7 @@ class _BalanceState extends State<Balance> {
                                         fontSize: 15,
                                         fontWeight: FontWeight.bold),
                                   ),
-                                  onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => LoginPage()),
-                                    );
-                                  },
+                                  onPressed: _printName,
                                   child: Center(child: const Text('PRINT')),
                                 ),
                               ],
