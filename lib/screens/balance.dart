@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:ngx/screens/DB_Helper.dart';
 import 'package:ngx/screens/homepage.dart';
 import 'package:ngx/screens/loginpage.dart';
@@ -171,6 +172,71 @@ class _BalanceState extends State<Balance> {
                     //       color: Colors.grey,
                     //       borderRadius: BorderRadius.circular(20),
                     //     )),
+                    SizedBox(
+                      height: 30,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        SizedBox(width: 30),
+                        Container(
+                          width: 80,
+                          height: 45,
+                          child: SizedBox(
+                            width: 140,
+                            height: 40,
+                            child: TextField(
+                                obscureText: false,
+                                decoration: InputDecoration(
+                                  labelText: 'copies',
+                                  labelStyle: TextStyle(
+                                      color: Colors.black, fontSize: 12),
+                                  contentPadding: EdgeInsets.all(20),
+                                  border: OutlineInputBorder(),
+                                ),
+                                style: TextStyle(color: Colors.black),
+                                textInputAction: TextInputAction.next,
+                                keyboardType: TextInputType.number,
+                                inputFormatters: <TextInputFormatter>[
+                                  FilteringTextInputFormatter.digitsOnly
+                                ]),
+                          ),
+                        ),
+                        Container(
+                          width: 80,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(20),
+                            child: Stack(
+                              children: <Widget>[
+                                Positioned.fill(
+                                  child: Container(
+                                    decoration: const BoxDecoration(
+                                        color: Colors.deepOrange),
+                                  ),
+                                ),
+                                TextButton(
+                                  style: TextButton.styleFrom(
+                                    foregroundColor: Colors.white,
+                                    textStyle: const TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => LoginPage()),
+                                    );
+                                  },
+                                  child: Center(child: const Text('PRINT')),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 30),
+                      ],
+                    ),
                     SizedBox(
                       height: 30,
                     ),
