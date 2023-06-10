@@ -132,16 +132,16 @@ class _BalanceState extends State<Balance> {
                         child: Container(
                           decoration: const ShapeDecoration(
                               shape: RoundedRectangleBorder(
-                                side: BorderSide(
-                                    width: 0.5, style: BorderStyle.solid),
-                                borderRadius:
+                            side: BorderSide(
+                                width: 0.5, style: BorderStyle.solid),
+                            borderRadius:
                                 BorderRadius.all(Radius.circular(5.0)),
-                              )),
+                          )),
                           child: DropdownButtonHideUnderline(
                             child: Container(
                               padding: const EdgeInsets.all(5),
                               child: DropdownButton<String>(
-                                  hint: const Text("Customer NName"),
+                                  hint: const Text("Customer Name"),
                                   style: const TextStyle(
                                     color: Colors.black,
                                     fontSize: 12,
@@ -156,11 +156,11 @@ class _BalanceState extends State<Balance> {
                                   items: customer_names_list
                                       .map<DropdownMenuItem<String>>(
                                           (String customer) {
-                                        return DropdownMenuItem<String>(
-                                          value: customer,
-                                          child: Text(customer),
-                                        );
-                                      }).toList()),
+                                    return DropdownMenuItem<String>(
+                                      value: customer,
+                                      child: Text(customer),
+                                    );
+                                  }).toList()),
                             ),
                           ),
                         ),
