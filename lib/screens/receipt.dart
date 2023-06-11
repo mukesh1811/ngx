@@ -1,9 +1,56 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:ngx/screens/homepage.dart';
 import 'package:ngx/screens/loginpage.dart';
-import 'package:intl/intl.dart';
 
-class Receipt extends StatelessWidget {
+import 'ConfigHelper.dart';
+import 'DB_Helper.dart';
+
+class Receipt extends StatefulWidget {
+  const Receipt({Key? key}) : super(key: key);
+
+  @override
+  State<Receipt> createState() => _ReceiptState();
+}
+
+class _ReceiptState extends State<Receipt> {
+  String? customer_name_value;
+
+  int receiptNo = 0;
+
+  bool canSave = true;
+
+  late List<String> customer_names_list = [];
+
+  final TextEditingController _balance_txtcntrl = TextEditingController();
+  final TextEditingController _existing_receiptNo = TextEditingController();
+
+  void _populateDropdown() async {
+    final custList = await getList("customer_name");
+
+    setState(() {
+      customer_names_list = custList!;
+    });
+  }
+
+  void _setReceiptNo() async {
+    var maxTokenNo = await DB_Helper.getMaxReceiptNo();
+
+    setState(() {
+      receiptNo = maxTokenNo;
+    });
+  }
+
+  @override
+  initState() {
+    super.initState();
+    _populateDropdown();
+
+    _balance_txtcntrl.text = "";
+
+    _setReceiptNo();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -66,7 +113,7 @@ class Receipt extends StatelessWidget {
                                       fontSize: 12,
                                       fontWeight: FontWeight.bold,
                                     )),
-                                Text("123456",
+                                Text(receiptNo.toString(),
                                     style: TextStyle(
                                       fontSize: 12,
                                       fontWeight: FontWeight.bold,
@@ -102,17 +149,44 @@ class Receipt extends StatelessWidget {
                     SizedBox(
                       height: 5,
                     ),
-                    const Padding(
-                      padding: EdgeInsets.all(8.0),
+                    Padding(
+                      padding: const EdgeInsets.all(5.0),
                       child: SizedBox(
+                        width: 300,
                         height: 40,
-                        child: TextField(
-                          obscureText: false,
-                          decoration: InputDecoration(
-                            hintText: 'Search here..',
-                            border: OutlineInputBorder(),
+                        child: Container(
+                          decoration: const ShapeDecoration(
+                              shape: RoundedRectangleBorder(
+                            side: BorderSide(
+                                width: 0.5, style: BorderStyle.solid),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(5.0)),
+                          )),
+                          child: DropdownButtonHideUnderline(
+                            child: Container(
+                              padding: const EdgeInsets.all(5),
+                              child: DropdownButton<String>(
+                                  hint: const Text("Customer Name"),
+                                  style: const TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 12,
+                                  ),
+                                  value: customer_name_value,
+                                  onChanged: (String? value) {
+                                    setState(() {
+                                      customer_name_value = value ?? "";
+                                    });
+                                  },
+                                  items: customer_names_list
+                                      .map<DropdownMenuItem<String>>(
+                                          (String customer) {
+                                    return DropdownMenuItem<String>(
+                                      value: customer,
+                                      child: Text(customer),
+                                    );
+                                  }).toList()),
+                            ),
                           ),
-                          style: TextStyle(color: Colors.black),
                         ),
                       ),
                     ),
@@ -128,11 +202,13 @@ class Receipt extends StatelessWidget {
                     SizedBox(
                       height: 5,
                     ),
-                     Padding(
+                    Padding(
                       padding: EdgeInsets.all(8.0),
                       child: SizedBox(
                         height: 40,
                         child: TextFormField(
+                          controller: _balance_txtcntrl,
+                          keyboardType: TextInputType.number,
                           obscureText: false,
                           decoration: InputDecoration(
                             hintText: "Amount",
@@ -175,8 +251,7 @@ class Receipt extends StatelessWidget {
                                 Positioned.fill(
                                   child: Container(
                                     decoration: const BoxDecoration(
-                                        color: Colors.deepOrange
-                                    ),
+                                        color: Colors.deepOrange),
                                   ),
                                 ),
                                 TextButton(
@@ -187,7 +262,11 @@ class Receipt extends StatelessWidget {
                                         fontSize: 15,
                                         fontWeight: FontWeight.bold),
                                   ),
-                                  onPressed: () {},
+                                  onPressed: () async {
+                                    var snackBar = await saveToDB();
+                                    ScaffoldMessenger.of(context)
+                                        .showSnackBar(snackBar);
+                                  },
                                   child: Center(child: const Text('Print')),
                                 ),
                               ],
@@ -204,8 +283,7 @@ class Receipt extends StatelessWidget {
                                 Positioned.fill(
                                   child: Container(
                                     decoration: const BoxDecoration(
-                                        color: Colors.deepOrange
-                                    ),
+                                        color: Colors.deepOrange),
                                   ),
                                 ),
                                 TextButton(
@@ -216,7 +294,13 @@ class Receipt extends StatelessWidget {
                                         fontSize: 15,
                                         fontWeight: FontWeight.bold),
                                   ),
-                                  onPressed: () {},
+                                  onPressed: canSave
+                                      ? () async {
+                                          var snackBar = await saveToDB();
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(snackBar);
+                                        }
+                                      : null,
                                   child: Center(
                                       child: const Text(
                                     'SAVE',
@@ -233,78 +317,32 @@ class Receipt extends StatelessWidget {
                     ),
                     Container(
                       width: double.infinity,
-                      padding: EdgeInsets.all(10),
+                      padding: EdgeInsets.all(5),
                       decoration: BoxDecoration(border: Border.all()),
-                      child: Column(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              Row(
-                                children: [
-                                  Container(
-                                    width: 60,
-                                    child: Text("Existing Receipt",
-                                        style: TextStyle(
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.bold)),
-                                  ),
-                                  Text(":",
-                                      style: TextStyle(
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.bold)),
-                                ],
-                              ),
-                              Container(
-                                width: 120,
-                                child: SizedBox(
-                                  height: 50,
-                                  child: TextFormField(
-                                    obscureText: false,
-                                    decoration: InputDecoration(
-                                      labelText: 'Existing Receipt',
-                                      labelStyle: TextStyle(color: Colors.black),
-                                      border: OutlineInputBorder(),
-                                    ),
-                                    style: TextStyle(color: Colors.black),
-                                    textInputAction: TextInputAction.next,
-                                  ),
+                          Container(
+                            width: 120,
+                            child: SizedBox(
+                              height: 40,
+                              child: TextFormField(
+                                controller: _existing_receiptNo,
+                                obscureText: false,
+                                decoration: InputDecoration(
+                                  labelText: 'Existing Receipt NO',
+                                  labelStyle: TextStyle(
+                                      color: Colors.black, fontSize: 12),
+                                  border: OutlineInputBorder(),
                                 ),
+                                style: TextStyle(color: Colors.black),
+                                textInputAction: TextInputAction.next,
+                                keyboardType: TextInputType.number,
                               ),
-                              Container(
-                                width: 40,
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(10),
-                                  child: Stack(
-                                    children: <Widget>[
-                                      Positioned.fill(
-                                        child: Container(
-                                          decoration: const BoxDecoration(
-                                              color: Colors.deepOrange
-                                          ),
-                                        ),
-                                      ),
-                                      TextButton(
-                                        style: TextButton.styleFrom(
-                                          foregroundColor: Colors.white,
-                                          textStyle: const TextStyle(
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                        onPressed: () {},
-                                        child: Center(child: const Text('GO')),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(
-                            height: 10,
+                            ),
                           ),
                           Container(
-                            width: 150,
+                            width: 45,
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(20),
                               child: Stack(
@@ -312,21 +350,60 @@ class Receipt extends StatelessWidget {
                                   Positioned.fill(
                                     child: Container(
                                       decoration: const BoxDecoration(
-                                          color: Colors.deepOrange
-                                      ),
+                                          color: Colors.deepOrange),
                                     ),
                                   ),
-                                  TextButton(
-                                    style: TextButton.styleFrom(
-                                      foregroundColor: Colors.white,
-                                      padding: const EdgeInsets.all(5.0),
-                                      textStyle: const TextStyle(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.bold),
+                                  SizedBox(
+                                    height: 40,
+                                    child: TextButton(
+                                      style: TextButton.styleFrom(
+                                        foregroundColor: Colors.white,
+                                        textStyle: const TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      onPressed: () {
+                                        _loadData();
+                                      },
+                                      child: Center(child: const Text('GO')),
                                     ),
-                                    onPressed: () {},
-                                    child: Center(
-                                        child: const Text('NEW RECEIPT')),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          Container(
+                            width: 120,
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(20),
+                              child: Stack(
+                                children: <Widget>[
+                                  Positioned.fill(
+                                    child: Container(
+                                      decoration: const BoxDecoration(
+                                          color: Colors.deepOrange),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    height: 40,
+                                    child: TextButton(
+                                      style: TextButton.styleFrom(
+                                        foregroundColor: Colors.white,
+                                        padding: const EdgeInsets.all(8.0),
+                                        textStyle: const TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      onPressed: () {
+                                        _clearFields();
+                                        _setReceiptNo();
+                                        setState(() {
+                                          canSave = true;
+                                        });
+                                      },
+                                      child: Center(
+                                          child: const Text('NEW RECEIPT')),
+                                    ),
                                   ),
                                 ],
                               ),
@@ -350,8 +427,7 @@ class Receipt extends StatelessWidget {
                                 Positioned.fill(
                                   child: Container(
                                     decoration: const BoxDecoration(
-                                        color: Colors.deepOrange
-                                    ),
+                                        color: Colors.deepOrange),
                                   ),
                                 ),
                                 TextButton(
@@ -383,8 +459,7 @@ class Receipt extends StatelessWidget {
                                 Positioned.fill(
                                   child: Container(
                                     decoration: const BoxDecoration(
-                                        color: Colors.deepOrange
-                                    ),
+                                        color: Colors.deepOrange),
                                   ),
                                 ),
                                 TextButton(
@@ -401,7 +476,8 @@ class Receipt extends StatelessWidget {
                                           builder: (context) => Homepage()),
                                     );
                                   },
-                                  child: Center(child: const Text('HOME')),
+                                  child:
+                                      const Center(child: const Text('HOME')),
                                 ),
                               ],
                             ),
@@ -416,8 +492,7 @@ class Receipt extends StatelessWidget {
                                 Positioned.fill(
                                   child: Container(
                                     decoration: const BoxDecoration(
-                                        color: Colors.deepOrange
-                                    ),
+                                        color: Colors.deepOrange),
                                   ),
                                 ),
                                 TextButton(
@@ -435,7 +510,8 @@ class Receipt extends StatelessWidget {
                                           builder: (context) => LoginPage()),
                                     );
                                   },
-                                  child: Center(child: const Text('EXIT')),
+                                  child:
+                                      const Center(child: const Text('EXIT')),
                                 ),
                               ],
                             ),
@@ -451,5 +527,72 @@ class Receipt extends StatelessWidget {
         )
       ],
     );
+  }
+
+  Future<SnackBar> saveToDB() async {
+    print("Save");
+
+    if (customer_name_value == null) {
+      return const SnackBar(content: Text("Please select a customer name"));
+    }
+
+    if (_balance_txtcntrl.text.trim() == "") {
+      return const SnackBar(content: Text("Please enter balance amount"));
+    }
+
+    final data = {
+      'customer_name': customer_name_value,
+      'balance': _balance_txtcntrl.text
+    };
+
+    int id = await DB_Helper.createReceipt(data);
+
+    print("id");
+    print(id);
+
+    if (id == receiptNo) {
+      setState(() {
+        _setReceiptNo();
+      });
+    }
+
+    _clearFields();
+
+    return const SnackBar(content: Text("Receipt saved successfully!"));
+  }
+
+  Future<void> _loadData() async {
+    print(_existing_receiptNo.text);
+
+    if (_existing_receiptNo.text == "") {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Existing Receipt No is empty")));
+
+      return;
+    }
+
+    var res = await DB_Helper.getReceipts(int.parse(_existing_receiptNo.text));
+
+    print("returned receipt no is");
+    print(res);
+
+    setState(() {
+      customer_name_value = res['customer_name'] as String?;
+      _balance_txtcntrl.text = res['balance'].toString();
+
+      receiptNo = int.parse(_existing_receiptNo.text);
+
+      canSave = false;
+    });
+  }
+
+  void _clearFields() {
+    setState(() {
+      customer_name_value = null;
+      _balance_txtcntrl.text = "";
+      _existing_receiptNo.text = "";
+
+      print("cleared!");
+    });
   }
 }

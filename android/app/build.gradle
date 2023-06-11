@@ -51,6 +51,12 @@ android {
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
+
+        ndk {
+            moduleName "serial_port"
+        }
+
+        sourceSets.main.jniLibs.srcDir 'src/main/jniLibs'
     }
 
     buildTypes {
@@ -68,4 +74,6 @@ flutter {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation files("libs/NGX_Ashwa_SDK_1.0.6.jar")
+    implementation files("libs/zxing_3.2.0.jar")
 }

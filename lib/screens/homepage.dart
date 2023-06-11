@@ -1,14 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:ngx/screens/SettingsLogin.dart';
+import 'package:ngx/screens/balance.dart';
 import 'package:ngx/screens/loginpage.dart';
-import 'package:ngx/screens/token.dart';
 import 'package:ngx/screens/receipt.dart';
 import 'package:ngx/screens/retail.dart';
-import 'package:ngx/screens/balance.dart';
+import 'package:ngx/screens/token.dart';
 
 class Homepage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Stack(children: [
+      const Positioned.fill(
+        child: Image(
+          image: AssetImage("images/veg1.jpg"),
+          colorBlendMode: BlendMode.softLight,
+          fit: BoxFit.fill,
+          opacity: AlwaysStoppedAnimation(.5),
+        ),
+      ),
       Scaffold(
         backgroundColor: Colors.transparent,
         body: SingleChildScrollView(
@@ -23,11 +32,11 @@ class Homepage extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: const [
                     Text("Retail Management System",
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                      ) ),
-                    Text("HOME",
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        )),
+                    Text("Home",
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
@@ -48,9 +57,8 @@ class Homepage extends StatelessWidget {
                       children: <Widget>[
                         Positioned.fill(
                           child: Container(
-                            decoration: const BoxDecoration(
-                                color: Colors.deepOrange
-                            ),
+                            decoration:
+                                const BoxDecoration(color: Colors.deepOrange),
                           ),
                         ),
                         TextButton(
@@ -80,9 +88,8 @@ class Homepage extends StatelessWidget {
                       children: <Widget>[
                         Positioned.fill(
                           child: Container(
-                            decoration: const BoxDecoration(
-                                color: Colors.deepOrange
-                            ),
+                            decoration:
+                                const BoxDecoration(color: Colors.deepOrange),
                           ),
                         ),
                         TextButton(
@@ -118,9 +125,8 @@ class Homepage extends StatelessWidget {
                       children: <Widget>[
                         Positioned.fill(
                           child: Container(
-                            decoration: const BoxDecoration(
-                                color: Colors.deepOrange
-                            ),
+                            decoration:
+                                const BoxDecoration(color: Colors.deepOrange),
                           ),
                         ),
                         TextButton(
@@ -155,9 +161,8 @@ class Homepage extends StatelessWidget {
                       children: <Widget>[
                         Positioned.fill(
                           child: Container(
-                            decoration: const BoxDecoration(
-                                color: Colors.deepOrange
-                            ),
+                            decoration:
+                                const BoxDecoration(color: Colors.deepOrange),
                           ),
                         ),
                         TextButton(
@@ -196,9 +201,8 @@ class Homepage extends StatelessWidget {
                     children: <Widget>[
                       Positioned.fill(
                         child: Container(
-                          decoration: const BoxDecoration(
-                              color: Colors.deepOrange
-                          ),
+                          decoration:
+                              const BoxDecoration(color: Colors.deepOrange),
                         ),
                       ),
                       TextButton(
@@ -226,56 +230,83 @@ class Homepage extends StatelessWidget {
               SizedBox(
                 height: 30,
               ),
-              Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
-                Container(
-                  width: 250,
-                  height: 40,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(30),
-                    child: Stack(
-                      children: <Widget>[
-                        Positioned.fill(
-                          child: Container(
-                            decoration: const BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: <Color>[
-                                  Color(0xFFff0000),
-                                  Color(0xFFff0000),
-                                  Color(0xFFff0000),
-                                ],
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Container(
+                    width: 250,
+                    height: 40,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(30),
+                      child: Stack(
+                        children: <Widget>[
+                          Positioned.fill(
+                            child: Container(
+                              decoration: const BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: <Color>[
+                                    Color(0xFFff0000),
+                                    Color(0xFFff0000),
+                                    Color(0xFFff0000),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                        TextButton(
-                          style: TextButton.styleFrom(
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.all(10.0),
-                            textStyle: const TextStyle(fontSize: 15),
+                          TextButton(
+                            style: TextButton.styleFrom(
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.all(10.0),
+                              textStyle: const TextStyle(fontSize: 15),
+                            ),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => LoginPage()),
+                              );
+                            },
+                            child: Center(
+                                child: const Text(
+                              'LOGOUT',
+                              textAlign: TextAlign.center,
+                            )),
                           ),
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => LoginPage()),
-                            );
-
-                          },
-                          child: Center(
-                              child: const Text(
-                            'LOGOUT',
-                            textAlign: TextAlign.center,
-                          )),
-                        ),
-                        IconButton(
-                            onPressed: null,
-                            icon: Icon(Icons.logout)),
-                      ],
+                          IconButton(onPressed: null, icon: Icon(Icons.logout)),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              ]),
 
+                  IconButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const SettingsLogin()),
+                        );
+                      },
+                      icon: Icon(
+                        Icons.storage,
+                        color: Colors.deepOrange,
+                        size: 36,
+                      ))
+
+                  // IconButton(
+                  //     onPressed: () {
+                  //       Navigator.push(
+                  //         context,
+                  //         MaterialPageRoute(
+                  //             builder: (context) => const Settings()),
+                  //       );
+                  //     },
+                  //     icon: Icon(
+                  //       Icons.storage,
+                  //       color: Colors.deepOrange,
+                  //       size: 36,
+                  //     ))
+                ],
+              ),
             ]),
           ),
         ),

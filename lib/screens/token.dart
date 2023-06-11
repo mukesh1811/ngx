@@ -1,18 +1,80 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
+import 'package:ngx/screens/ConfigHelper.dart';
 import 'package:ngx/screens/homepage.dart';
 import 'package:ngx/screens/loginpage.dart';
-import 'package:intl/intl.dart';
-import 'package:flutter/services.dart';
 
-class Token extends StatelessWidget {
+import 'DB_Helper.dart';
+
+class Token extends StatefulWidget {
+  @override
+  State<Token> createState() => _TokenState();
+}
+
+class _TokenState extends State<Token> {
+  String? consignor_name_value;
+  String? item_name_value;
+  String? payment_type_value;
+
+  int tokenNo = 0;
+
+  bool canSave = true;
+
+  late List<String> consignor_names_list = [];
+  late List<String> item_name_list = [];
+  late List<String> payment_type_list = [];
+
+  final TextEditingController _lotNo = TextEditingController();
+  final TextEditingController _mark = TextEditingController();
+  final TextEditingController _units = TextEditingController();
+  final TextEditingController _wt = TextEditingController();
+  final TextEditingController _rate = TextEditingController();
+  final TextEditingController _amt = TextEditingController();
+  final TextEditingController _existing_tokenNo = TextEditingController();
+
+  void _populateDropdown() async {
+    final conslist = await getList("consignor_name");
+    final itemlist = await getList("item_name");
+    final custList = await getList("customer_name");
+    custList?.insert(0, "--- Cash ---");
+
+    setState(() {
+      consignor_names_list = conslist!;
+      item_name_list = itemlist!;
+      payment_type_list = custList!;
+    });
+  }
+
+  void _setTokenNo() async {
+    var maxTokenNo = await DB_Helper.getMaxTokenNo();
+
+    setState(() {
+      tokenNo = maxTokenNo;
+    });
+  }
+
+  @override
+  initState() {
+    super.initState();
+    _populateDropdown();
+
+    _lotNo.text = "";
+    _mark.text = "";
+    _units.text = "";
+    _wt.text = "";
+    _amt.text = "";
+    _rate.text = "";
+
+    _setTokenNo();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
         Scaffold(
-
           appBar: PreferredSize(
-
             preferredSize: Size.fromHeight(40.0),
             child: AppBar(
               title: Text(
@@ -29,7 +91,7 @@ class Token extends StatelessWidget {
                     child: Padding(
                   padding: EdgeInsets.all(10.0),
                   child: Text(
-                    "TOKEN",
+                    "Token",
                     style: TextStyle(
                       color: Colors.black,
                       fontSize: 16,
@@ -48,8 +110,10 @@ class Token extends StatelessWidget {
                 color: Colors.black,
                 child: Container(
                   padding: EdgeInsets.all(10),
-
-                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(20),color:Colors.white),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    color: Colors.white,
+                  ),
                   child: Column(
                     children: [
                       Row(
@@ -64,7 +128,7 @@ class Token extends StatelessWidget {
                                         fontSize: 12,
                                         fontWeight: FontWeight.bold,
                                       )),
-                                  Text("123456",
+                                  Text(tokenNo.toString(),
                                       style: TextStyle(
                                         fontSize: 12,
                                         fontWeight: FontWeight.bold,
@@ -92,63 +156,139 @@ class Token extends StatelessWidget {
                       SizedBox(
                         height: 10,
                       ),
-                      const Padding(
-                        padding: EdgeInsets.all(5.0),
+
+                      // ########## Consignor Name
+                      Padding(
+                        padding: const EdgeInsets.all(5.0),
                         child: SizedBox(
-                          width: 200,
-                          height: 30,
-                          child: TextField(
-                            obscureText: false,
-                            decoration: InputDecoration(
-                              labelText: 'Consignor Name',
-                              labelStyle: TextStyle(color: Colors.black),
-                              contentPadding: EdgeInsets.all(5),
-                              border: OutlineInputBorder(),
+                          width: 300,
+                          height: 40,
+                          child: Container(
+                            decoration: const ShapeDecoration(
+                                shape: RoundedRectangleBorder(
+                              side: BorderSide(
+                                  width: 0.5, style: BorderStyle.solid),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(5.0)),
+                            )),
+                            child: DropdownButtonHideUnderline(
+                              child: Container(
+                                padding: const EdgeInsets.all(5),
+                                child: DropdownButton<String>(
+                                    hint: const Text("Consignor Name"),
+                                    style: const TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 12,
+                                    ),
+                                    items: consignor_names_list
+                                        .map<DropdownMenuItem<String>>(
+                                            (String consignor) {
+                                      return DropdownMenuItem<String>(
+                                        value: consignor,
+                                        child: Text(consignor),
+                                      );
+                                    }).toList(),
+                                    onChanged: (String? value) {
+                                      setState(() {
+                                        consignor_name_value = value ?? "";
+                                      });
+                                    },
+                                    value: consignor_name_value),
+                              ),
                             ),
-                            style: TextStyle(color: Colors.black,
-                            fontSize:12),
                           ),
                         ),
                       ),
-                      const Padding(
-                        padding: EdgeInsets.all(5.0),
+                      // Consignor Name ################
+
+                      // ########## ITEM NAME
+
+                      Padding(
+                        padding: const EdgeInsets.all(5.0),
                         child: SizedBox(
-                          width: 200,
-                          height: 30,
-                          child: TextField(
-                            obscureText: false,
-                            decoration: InputDecoration(
-                              labelText: 'Item Name',
-                              labelStyle: TextStyle(color: Colors.black,fontSize:12),
-                              contentPadding: EdgeInsets.all(5),
-                              border: OutlineInputBorder(),
+                          width: 300,
+                          height: 40,
+                          child: Container(
+                            decoration: const ShapeDecoration(
+                                shape: RoundedRectangleBorder(
+                              side: BorderSide(
+                                  width: 0.5, style: BorderStyle.solid),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(5.0)),
+                            )),
+                            child: DropdownButtonHideUnderline(
+                              child: Container(
+                                padding: const EdgeInsets.all(5),
+                                child: DropdownButton<String>(
+                                    hint: const Text("Item Name"),
+                                    style: const TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 12,
+                                    ),
+                                    value: item_name_value,
+                                    onChanged: (String? value) {
+                                      setState(() {
+                                        item_name_value = value ?? "";
+                                      });
+                                    },
+                                    items: item_name_list
+                                        .map<DropdownMenuItem<String>>(
+                                            (String item) {
+                                      return DropdownMenuItem<String>(
+                                        value: item,
+                                        child: Text(item),
+                                      );
+                                    }).toList()),
+                              ),
                             ),
-                            style: TextStyle(color: Colors.black),
-                            textInputAction: TextInputAction.next,
                           ),
                         ),
                       ),
-                      const Padding(
+
+                      // ITEM NAME ##########
+
+                      Padding(
                         padding: EdgeInsets.all(5.0),
                         child: SizedBox(
-                          width: 200,
-                          height: 30,
-                          child: TextField(
-                            obscureText: false,
-                            decoration: InputDecoration(
-                              labelText: 'Cash',
-                              labelStyle: TextStyle(color: Colors.black,fontSize:12),
-                              contentPadding: EdgeInsets.all(5),
-                              border: OutlineInputBorder(),
+                          width: 300,
+                          height: 40,
+                          child: Container(
+                            decoration: ShapeDecoration(
+                                shape: RoundedRectangleBorder(
+                              side: BorderSide(
+                                  width: 0.5, style: BorderStyle.solid),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(5.0)),
+                            )),
+                            child: DropdownButtonHideUnderline(
+                              child: Container(
+                                padding: EdgeInsets.all(5),
+                                child: DropdownButton<String>(
+                                    hint: Text("Payment Type"),
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 12,
+                                    ),
+                                    value: payment_type_value,
+                                    onChanged: (String? value) {
+                                      setState(() {
+                                        payment_type_value = value ?? "";
+                                      });
+                                    },
+                                    items: payment_type_list
+                                        .map<DropdownMenuItem<String>>(
+                                            (String paytypes) {
+                                      return DropdownMenuItem<String>(
+                                        value: paytypes,
+                                        child: Text(paytypes),
+                                      );
+                                    }).toList()),
+                              ),
                             ),
-                            style: TextStyle(color: Colors.black),
-                            textInputAction: TextInputAction.next,
                           ),
                         ),
                       ),
-                      SizedBox(
-                        height: 5,
-                      ),
+
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
@@ -161,19 +301,21 @@ class Token extends StatelessWidget {
                               width: 100,
                               height: 30,
                               child: TextField(
-                                obscureText: false,
-                                decoration: InputDecoration(
-                                  labelText: 'Lot no.',
-                                  labelStyle: TextStyle(color: Colors.black,fontSize:12),
-                                  contentPadding: EdgeInsets.all(5),
-                                  border: OutlineInputBorder(),
-                                ),
-                                style: TextStyle(color: Colors.black),
-                                textInputAction: TextInputAction.next,
+                                  controller: _lotNo,
+                                  obscureText: false,
+                                  decoration: InputDecoration(
+                                    labelText: 'Lot no.',
+                                    labelStyle: TextStyle(
+                                        color: Colors.black, fontSize: 12),
+                                    contentPadding: EdgeInsets.all(5),
+                                    border: OutlineInputBorder(),
+                                  ),
+                                  style: TextStyle(color: Colors.black),
+                                  textInputAction: TextInputAction.next,
                                   keyboardType: TextInputType.number,
                                   inputFormatters: <TextInputFormatter>[
-                                  FilteringTextInputFormatter.digitsOnly
-                              ]),
+                                    FilteringTextInputFormatter.digitsOnly
+                                  ]),
                             ),
                           )
                         ],
@@ -192,11 +334,13 @@ class Token extends StatelessWidget {
                             child: SizedBox(
                               width: 100,
                               height: 30,
-                              child: const TextField(
+                              child: TextField(
+                                controller: _mark,
                                 obscureText: false,
                                 decoration: InputDecoration(
                                   labelText: 'Mark',
-                                  labelStyle: TextStyle(color: Colors.black,fontSize:12),
+                                  labelStyle: TextStyle(
+                                      color: Colors.black, fontSize: 12),
                                   border: OutlineInputBorder(),
                                   contentPadding: EdgeInsets.all(5),
                                 ),
@@ -222,20 +366,21 @@ class Token extends StatelessWidget {
                               width: 100,
                               height: 30,
                               child: TextField(
-                                obscureText: false,
-                                decoration: InputDecoration(
-                                  labelText: 'Units',
-                                  labelStyle: TextStyle(color: Colors.black,fontSize:12),
-                                  contentPadding: EdgeInsets.all(5),
-                                  border: OutlineInputBorder(),
-                                ),
-                                style: TextStyle(color: Colors.black),
-                                textInputAction: TextInputAction.next,
+                                  controller: _units,
+                                  obscureText: false,
+                                  decoration: InputDecoration(
+                                    labelText: 'Units',
+                                    labelStyle: TextStyle(
+                                        color: Colors.black, fontSize: 12),
+                                    contentPadding: EdgeInsets.all(5),
+                                    border: OutlineInputBorder(),
+                                  ),
+                                  style: TextStyle(color: Colors.black),
+                                  textInputAction: TextInputAction.next,
                                   keyboardType: TextInputType.number,
                                   inputFormatters: <TextInputFormatter>[
                                     FilteringTextInputFormatter.digitsOnly
-                                  ]
-                              ),
+                                  ]),
                             ),
                           )
                         ],
@@ -255,20 +400,36 @@ class Token extends StatelessWidget {
                               width: 100,
                               height: 30,
                               child: TextField(
-                                obscureText: false,
-                                decoration: InputDecoration(
-                                  labelText: 'Weight',
-                                  labelStyle: TextStyle(color: Colors.black,fontSize:12),
-                                  contentPadding: EdgeInsets.all(5),
-                                  border: OutlineInputBorder(),
-                                ),
-                                style: TextStyle(color: Colors.black),
-                                textInputAction: TextInputAction.next,
+                                  controller: _wt,
+                                  onChanged: (txt) {
+                                    int wt = 0;
+                                    if (txt.isNotEmpty && txt != "") {
+                                      wt = int.parse(txt);
+                                    }
+
+                                    setState(() {
+                                      int rt = 0;
+                                      if (_rate.text.isNotEmpty) {
+                                        rt = int.parse(_rate.text);
+                                      }
+
+                                      _amt.text = (wt * rt).toString();
+                                    });
+                                  },
+                                  obscureText: false,
+                                  decoration: InputDecoration(
+                                    labelText: 'Weight',
+                                    labelStyle: TextStyle(
+                                        color: Colors.black, fontSize: 12),
+                                    contentPadding: EdgeInsets.all(5),
+                                    border: OutlineInputBorder(),
+                                  ),
+                                  style: TextStyle(color: Colors.black),
+                                  textInputAction: TextInputAction.next,
                                   keyboardType: TextInputType.number,
                                   inputFormatters: <TextInputFormatter>[
                                     FilteringTextInputFormatter.digitsOnly
-                                  ]
-                              ),
+                                  ]),
                             ),
                           )
                         ],
@@ -287,21 +448,38 @@ class Token extends StatelessWidget {
                             child: SizedBox(
                               width: 100,
                               height: 30,
-                              child:  TextField(
-                                obscureText: false,
-                                decoration: InputDecoration(
-                                  labelText: 'Rate',
-                                  labelStyle: TextStyle(color: Colors.black,fontSize:12),
-                                  contentPadding: EdgeInsets.all(5),
-                                  border: OutlineInputBorder(),
-                                ),
-                                style: TextStyle(color: Colors.black),
-                                textInputAction: TextInputAction.next,
+                              child: TextField(
+                                  controller: _rate,
+                                  obscureText: false,
+                                  onChanged: (txt) {
+                                    int rt = 0;
+
+                                    if (txt != "" || txt.isNotEmpty) {
+                                      rt = int.parse(txt);
+                                    }
+
+                                    setState(() {
+                                      int wt = 0;
+                                      if (_wt.text.isNotEmpty) {
+                                        wt = int.parse(_wt.text);
+                                      }
+
+                                      _amt.text = (rt * wt).toString();
+                                    });
+                                  },
+                                  decoration: InputDecoration(
+                                    labelText: 'Rate',
+                                    labelStyle: TextStyle(
+                                        color: Colors.black, fontSize: 12),
+                                    contentPadding: EdgeInsets.all(5),
+                                    border: OutlineInputBorder(),
+                                  ),
+                                  style: TextStyle(color: Colors.black),
+                                  textInputAction: TextInputAction.next,
                                   keyboardType: TextInputType.number,
                                   inputFormatters: <TextInputFormatter>[
                                     FilteringTextInputFormatter.digitsOnly
-                                  ]
-                              ),
+                                  ]),
                             ),
                           ),
                         ],
@@ -321,11 +499,14 @@ class Token extends StatelessWidget {
                               width: 100,
                               height: 30,
                               child: TextField(
+                                enabled: false,
+                                controller: _amt,
                                 obscureText: false,
                                 decoration: InputDecoration(
-                                  labelText: 'Amount',
-                                  labelStyle: TextStyle(color: Colors.black,fontSize:12),
-                                  contentPadding: EdgeInsets.all(5),
+                                  //labelText: 'Amount',
+                                  labelStyle: TextStyle(
+                                      color: Colors.black, fontSize: 12),
+                                  //contentPadding: EdgeInsets.all(5),
                                   border: InputBorder.none,
                                 ),
                                 style: TextStyle(color: Colors.black),
@@ -347,21 +528,21 @@ class Token extends StatelessWidget {
                             child: SizedBox(
                               width: 40,
                               height: 40,
-                              child:  TextField(
-                                obscureText: false,
-                                decoration: InputDecoration(
-                                  labelText: 'copies',
-                                  labelStyle: TextStyle(color: Colors.black,fontSize:12),
-                                  contentPadding: EdgeInsets.all(5),
-                                  border: OutlineInputBorder(),
-                                ),
-                                style: TextStyle(color: Colors.black),
-                                textInputAction: TextInputAction.next,
+                              child: TextField(
+                                  obscureText: false,
+                                  decoration: InputDecoration(
+                                    labelText: 'copies',
+                                    labelStyle: TextStyle(
+                                        color: Colors.black, fontSize: 12),
+                                    contentPadding: EdgeInsets.all(5),
+                                    border: OutlineInputBorder(),
+                                  ),
+                                  style: TextStyle(color: Colors.black),
+                                  textInputAction: TextInputAction.next,
                                   keyboardType: TextInputType.number,
                                   inputFormatters: <TextInputFormatter>[
                                     FilteringTextInputFormatter.digitsOnly
-                                  ]
-                              ),
+                                  ]),
                             ),
                           ),
                           Container(
@@ -374,8 +555,7 @@ class Token extends StatelessWidget {
                                   Positioned.fill(
                                     child: Container(
                                       decoration: const BoxDecoration(
-                                          color: Colors.deepOrange
-                                      ),
+                                          color: Colors.deepOrange),
                                     ),
                                   ),
                                   TextButton(
@@ -386,7 +566,11 @@ class Token extends StatelessWidget {
                                           fontSize: 12,
                                           fontWeight: FontWeight.bold),
                                     ),
-                                    onPressed: () {},
+                                    onPressed: () async {
+                                      var snackBar = await saveToDB();
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(snackBar);
+                                    },
                                     child: Center(child: const Text('Print')),
                                   ),
                                 ],
@@ -403,8 +587,7 @@ class Token extends StatelessWidget {
                                   Positioned.fill(
                                     child: Container(
                                       decoration: const BoxDecoration(
-                                          color: Colors.deepOrange
-                                      ),
+                                          color: Colors.deepOrange),
                                     ),
                                   ),
                                   TextButton(
@@ -415,7 +598,13 @@ class Token extends StatelessWidget {
                                           fontSize: 12,
                                           fontWeight: FontWeight.bold),
                                     ),
-                                    onPressed: () {},
+                                    onPressed: canSave
+                                        ? () async {
+                                            var snackBar = await saveToDB();
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(snackBar);
+                                          }
+                                        : null,
                                     child: Center(
                                         child: const Text(
                                       'SAVE',
@@ -444,20 +633,21 @@ class Token extends StatelessWidget {
                                 width: 100,
                                 height: 40,
                                 child: TextField(
-                                  obscureText: false,
-                                  decoration: InputDecoration(
-                                    labelText: 'Existing Token ID',
-                                    labelStyle: TextStyle(color: Colors.black,fontSize:12),
-                                    contentPadding: EdgeInsets.all(5),
-                                    border: OutlineInputBorder(),
-                                  ),
-                                  style: TextStyle(color: Colors.black),
-                                  textInputAction: TextInputAction.next,
+                                    controller: _existing_tokenNo,
+                                    obscureText: false,
+                                    decoration: InputDecoration(
+                                      labelText: 'Existing Token ID',
+                                      labelStyle: TextStyle(
+                                          color: Colors.black, fontSize: 12),
+                                      contentPadding: EdgeInsets.all(5),
+                                      border: OutlineInputBorder(),
+                                    ),
+                                    style: TextStyle(color: Colors.black),
+                                    textInputAction: TextInputAction.next,
                                     keyboardType: TextInputType.number,
                                     inputFormatters: <TextInputFormatter>[
                                       FilteringTextInputFormatter.digitsOnly
-                                    ]
-                                ),
+                                    ]),
                               ),
                             ),
                             Container(
@@ -470,8 +660,7 @@ class Token extends StatelessWidget {
                                     Positioned.fill(
                                       child: Container(
                                         decoration: const BoxDecoration(
-                                            color: Colors.deepOrange
-                                        ),
+                                            color: Colors.deepOrange),
                                       ),
                                     ),
                                     TextButton(
@@ -481,7 +670,9 @@ class Token extends StatelessWidget {
                                             fontSize: 12,
                                             fontWeight: FontWeight.bold),
                                       ),
-                                      onPressed: () {},
+                                      onPressed: () {
+                                        _loadData();
+                                      },
                                       child: Center(child: const Text('GO')),
                                     ),
                                   ],
@@ -498,8 +689,7 @@ class Token extends StatelessWidget {
                                     Positioned.fill(
                                       child: Container(
                                         decoration: const BoxDecoration(
-                                            color: Colors.deepOrange
-                                        ),
+                                            color: Colors.deepOrange),
                                       ),
                                     ),
                                     TextButton(
@@ -510,9 +700,15 @@ class Token extends StatelessWidget {
                                             fontSize: 12,
                                             fontWeight: FontWeight.bold),
                                       ),
-                                      onPressed: () {},
-                                      child:
-                                          Center(child: const Text('NEW TOKEN')),
+                                      onPressed: () {
+                                        _clearFields();
+                                        _setTokenNo();
+                                        setState(() {
+                                          canSave = true;
+                                        });
+                                      },
+                                      child: Center(
+                                          child: const Text('NEW TOKEN')),
                                     ),
                                   ],
                                 ),
@@ -537,8 +733,7 @@ class Token extends StatelessWidget {
                                   Positioned.fill(
                                     child: Container(
                                       decoration: const BoxDecoration(
-                                          color: Colors.deepOrange
-                                      ),
+                                          color: Colors.deepOrange),
                                     ),
                                   ),
                                   TextButton(
@@ -571,8 +766,7 @@ class Token extends StatelessWidget {
                                   Positioned.fill(
                                     child: Container(
                                       decoration: const BoxDecoration(
-                                          color: Colors.deepOrange
-                                      ),
+                                          color: Colors.deepOrange),
                                     ),
                                   ),
                                   TextButton(
@@ -605,8 +799,7 @@ class Token extends StatelessWidget {
                                   Positioned.fill(
                                     child: Container(
                                       decoration: const BoxDecoration(
-                                          color: Colors.deepOrange
-                                      ),
+                                          color: Colors.deepOrange),
                                     ),
                                   ),
                                   TextButton(
@@ -640,5 +833,123 @@ class Token extends StatelessWidget {
         )
       ],
     );
+  }
+
+  Future<SnackBar> saveToDB() async {
+    print("Save");
+
+    if (consignor_name_value == null) {
+      return const SnackBar(content: Text("Please select a consignor name"));
+    }
+
+    if (item_name_value == null) {
+      return const SnackBar(content: Text("Please select an item name"));
+    }
+
+    if (payment_type_value == null) {
+      return const SnackBar(content: Text("Please select payment type"));
+    }
+
+    if (_lotNo.text.trim() == "") {
+      return const SnackBar(content: Text("Please enter Lot No"));
+    }
+
+    if (_mark.text.trim() == "") {
+      return const SnackBar(content: Text("Please enter Mark"));
+    }
+
+    if (_units.text.trim() == "") {
+      return const SnackBar(content: Text("Please enter Units"));
+    }
+
+    if (_wt.text.trim() == "") {
+      return const SnackBar(content: Text("Please enter Weight"));
+    }
+
+    if (_rate.text.trim() == "") {
+      return const SnackBar(content: Text("Please enter Rate"));
+    }
+
+    final data = {
+      'consignor_name': consignor_name_value,
+      'item_name': item_name_value,
+      'payment_type': payment_type_value,
+      'lot_no': _lotNo.text,
+      'mark': _mark.text,
+      'units': int.parse(_units.text),
+      'weight': int.parse(_wt.text),
+      'rate': int.parse(_rate.text),
+      'amount': int.parse(_amt.text)
+    };
+
+    int id = await DB_Helper.createToken(data);
+
+    print("id");
+    print(id);
+
+    if (id == tokenNo) {
+      setState(() {
+        _setTokenNo();
+      });
+    }
+
+    // Navigator.push(
+    //   context,
+    //   MaterialPageRoute(builder: (context) => Token()),
+    // );
+    ;
+
+    _clearFields();
+
+    return const SnackBar(content: Text("Token saved successfully!"));
+  }
+
+  Future<void> _loadData() async {
+    print(_existing_tokenNo.text);
+
+    if (_existing_tokenNo.text == "") {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Existing Token No is empty")));
+
+      return;
+    }
+
+    var res = await DB_Helper.getToken(int.parse(_existing_tokenNo.text));
+
+    print("returned token is");
+    print(res);
+
+    setState(() {
+      consignor_name_value = res['consignor_name'] as String?;
+      item_name_value = res['item_name'] as String?;
+      payment_type_value = res['payment_type'] as String?;
+      _lotNo.text = (res['lot_no'] as String?)!;
+      _mark.text = (res['mark'] as String?)!;
+      _units.text = res['units'].toString();
+      _wt.text = res['weight'].toString();
+      _rate.text = res['rate'].toString();
+      _amt.text = res['amount'].toString();
+
+      tokenNo = int.parse(_existing_tokenNo.text);
+
+      canSave = false;
+    });
+  }
+
+  void _clearFields() {
+    setState(() {
+      consignor_name_value = null;
+      item_name_value = null;
+      payment_type_value = null;
+      _lotNo.text = "";
+      _mark.text = "";
+      _units.text = "";
+      _wt.text = "";
+      _rate.text = "";
+      _amt.text = "";
+      _existing_tokenNo.text = "";
+
+      print("cleared!");
+    });
   }
 }

@@ -1,11 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:ngx/screens/homepage.dart';
-import '../widgets/widgets.dart';
+import 'package:ngx/screens/loginform.dart';
+import 'package:ngx/screens/regform.dart';
 
 class LoginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Stack(children: [
+      Positioned.fill(
+        child: Image(
+          image: AssetImage("images/veg1.jpg"),
+          colorBlendMode: BlendMode.softLight,
+          fit: BoxFit.fill,
+          opacity: AlwaysStoppedAnimation(.5),
+        ),
+      ),
       Scaffold(
         backgroundColor: Colors.transparent,
         body: SingleChildScrollView(
@@ -13,7 +21,6 @@ class LoginPage extends StatelessWidget {
             child: Column(
               children: [
                 Container(
-
                   child: Center(
                     child: Text(
                       'Retail Management Systems',
@@ -39,8 +46,7 @@ class LoginPage extends StatelessWidget {
                             Positioned.fill(
                               child: Container(
                                 decoration: const BoxDecoration(
-                                    color: Colors.deepOrange
-                                ),
+                                    color: Colors.deepOrange),
                               ),
                             ),
                             TextButton(
@@ -53,7 +59,7 @@ class LoginPage extends StatelessWidget {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => Homepage()),
+                                      builder: (context) => loginform()),
                                 );
                               },
                               child: Center(child: const Text('Login')),
@@ -74,8 +80,7 @@ class LoginPage extends StatelessWidget {
                             Positioned.fill(
                               child: Container(
                                 decoration: const BoxDecoration(
-                                  color: Colors.deepOrange
-                                ),
+                                    color: Colors.deepOrange),
                               ),
                             ),
                             TextButton(
@@ -84,7 +89,13 @@ class LoginPage extends StatelessWidget {
                                 padding: const EdgeInsets.all(10.0),
                                 textStyle: const TextStyle(fontSize: 18),
                               ),
-                              onPressed: () {},
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => regform()),
+                                );
+                              },
                               child: Center(child: const Text('Register')),
                             ),
                           ],
