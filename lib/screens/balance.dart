@@ -24,7 +24,7 @@ class _BalanceState extends State<Balance> {
       };
       final int result = await platform.invokeMethod('print', args);
     } on PlatformException catch (e) {
-      print("Failed to get battery level: '${e.message}'.");
+      print("ERROR: '${e.message}'.");
     }
   }
 
