@@ -16,6 +16,7 @@ class _TokenState extends State<Token> {
   String? consignor_name_value;
   String? item_name_value;
   String? payment_type_value;
+  String? lot_no_value;
 
   int tokenNo = 0;
 
@@ -24,6 +25,7 @@ class _TokenState extends State<Token> {
   late List<String> consignor_names_list = [];
   late List<String> item_name_list = [];
   late List<String> payment_type_list = [];
+  late List<String> lot_no_list = [];
 
   final TextEditingController _lotNo = TextEditingController();
   final TextEditingController _mark = TextEditingController();
@@ -37,12 +39,14 @@ class _TokenState extends State<Token> {
     final conslist = await getList("consignor_name");
     final itemlist = await getList("item_name");
     final custList = await getList("customer_name");
+    final lotList = await getList("lot_no");
     custList?.insert(0, "--- Cash ---");
 
     setState(() {
       consignor_names_list = conslist!;
       item_name_list = itemlist!;
       payment_type_list = custList!;
+      lot_no_list = lotList!;
     });
   }
 
@@ -157,6 +161,49 @@ class _TokenState extends State<Token> {
                         height: 10,
                       ),
 
+                      Padding(
+                        padding: const EdgeInsets.all(5.0),
+                        child: SizedBox(
+                          width: 300,
+                          height: 40,
+                          child: Container(
+                            decoration: const ShapeDecoration(
+                                shape: RoundedRectangleBorder(
+                              side: BorderSide(
+                                  width: 0.5, style: BorderStyle.solid),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(5.0)),
+                            )),
+                            child: DropdownButtonHideUnderline(
+                              child: Container(
+                                padding: const EdgeInsets.all(5),
+                                child: DropdownButton<String>(
+                                  hint: const Text("Lot No"),
+                                  style: const TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 12,
+                                  ),
+                                  items: lot_no_list
+                                      .map<DropdownMenuItem<String>>(
+                                          (String consignor) {
+                                    return DropdownMenuItem<String>(
+                                      value: consignor,
+                                      child: Text(consignor),
+                                    );
+                                  }).toList(),
+                                  value: lot_no_value,
+                                  onChanged: (String? value) {
+                                    setState(() {
+                                      lot_no_value = value ?? "";
+                                    });
+                                  },
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+
                       // ########## Consignor Name
                       Padding(
                         padding: const EdgeInsets.all(5.0),
@@ -175,25 +222,26 @@ class _TokenState extends State<Token> {
                               child: Container(
                                 padding: const EdgeInsets.all(5),
                                 child: DropdownButton<String>(
-                                    hint: const Text("Consignor Name"),
-                                    style: const TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 12,
-                                    ),
-                                    items: consignor_names_list
-                                        .map<DropdownMenuItem<String>>(
-                                            (String consignor) {
-                                      return DropdownMenuItem<String>(
-                                        value: consignor,
-                                        child: Text(consignor),
-                                      );
-                                    }).toList(),
-                                    onChanged: (String? value) {
-                                      setState(() {
-                                        consignor_name_value = value ?? "";
-                                      });
-                                    },
-                                    value: consignor_name_value),
+                                  hint: const Text("Consignor Name"),
+                                  style: const TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 12,
+                                  ),
+                                  items: consignor_names_list
+                                      .map<DropdownMenuItem<String>>(
+                                          (String consignor) {
+                                    return DropdownMenuItem<String>(
+                                      value: consignor,
+                                      child: Text(consignor),
+                                    );
+                                  }).toList(),
+                                  value: consignor_name_value,
+                                  onChanged: (String? value) {
+                                    setState(() {
+                                      consignor_name_value = value ?? "";
+                                    });
+                                  },
+                                ),
                               ),
                             ),
                           ),
@@ -289,37 +337,6 @@ class _TokenState extends State<Token> {
                         ),
                       ),
 
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          Text("Lot no:",
-                              style: TextStyle(
-                                  fontSize: 12, fontWeight: FontWeight.bold)),
-                          Container(
-                            width: 200,
-                            child: SizedBox(
-                              width: 100,
-                              height: 30,
-                              child: TextField(
-                                  controller: _lotNo,
-                                  obscureText: false,
-                                  decoration: InputDecoration(
-                                    labelText: 'Lot no.',
-                                    labelStyle: TextStyle(
-                                        color: Colors.black, fontSize: 12),
-                                    contentPadding: EdgeInsets.all(5),
-                                    border: OutlineInputBorder(),
-                                  ),
-                                  style: TextStyle(color: Colors.black),
-                                  textInputAction: TextInputAction.next,
-                                  keyboardType: TextInputType.number,
-                                  inputFormatters: <TextInputFormatter>[
-                                    FilteringTextInputFormatter.digitsOnly
-                                  ]),
-                            ),
-                          )
-                        ],
-                      ),
                       SizedBox(
                         height: 5,
                       ),
@@ -367,6 +384,22 @@ class _TokenState extends State<Token> {
                               height: 30,
                               child: TextField(
                                   controller: _units,
+                                  onChanged: (txt1) {
+                                    int units = 0;
+                                    if (txt1.isNotEmpty && txt1 != "") {
+                                      units = int.parse(txt1);
+                                    }
+
+                                    setState(() {
+                                      int rt = 0;
+
+                                      if (_wt.text.isEmpty &
+                                          _units.text.isNotEmpty) {
+                                        units = int.parse(_units.text);
+                                      }
+                                      _amt.text = (rt * units).toString();
+                                    });
+                                  },
                                   obscureText: false,
                                   decoration: InputDecoration(
                                     labelText: 'Units',
@@ -401,19 +434,22 @@ class _TokenState extends State<Token> {
                               height: 30,
                               child: TextField(
                                   controller: _wt,
-                                  onChanged: (txt) {
+                                  onChanged: (txt2) {
                                     int wt = 0;
-                                    if (txt.isNotEmpty && txt != "") {
-                                      wt = int.parse(txt);
+                                    if (txt2.isNotEmpty && txt2 != "") {
+                                      wt = int.parse(txt2);
                                     }
 
                                     setState(() {
                                       int rt = 0;
-                                      if (_rate.text.isNotEmpty) {
-                                        rt = int.parse(_rate.text);
-                                      }
 
-                                      _amt.text = (wt * rt).toString();
+                                      if (_wt.text.isNotEmpty &
+                                              _units.text.isEmpty ||
+                                          _units.text.isNotEmpty &
+                                              _wt.text.isNotEmpty) {
+                                        wt = int.parse(_wt.text);
+                                      }
+                                      _amt.text = (rt * wt).toString();
                                     });
                                   },
                                   obscureText: false,
@@ -459,12 +495,28 @@ class _TokenState extends State<Token> {
                                     }
 
                                     setState(() {
+                                      int units = 0;
                                       int wt = 0;
-                                      if (_wt.text.isNotEmpty) {
+
+                                      if (_wt.text.isNotEmpty &
+                                          _units.text.isEmpty) {
+                                        wt = int.parse(_wt.text);
+                                      }
+                                      _amt.text = (rt * wt).toString();
+
+                                      if (_units.text.isNotEmpty &
+                                          _wt.text.isNotEmpty) {
                                         wt = int.parse(_wt.text);
                                       }
 
                                       _amt.text = (rt * wt).toString();
+
+                                      if (_wt.text.isEmpty &
+                                          _units.text.isNotEmpty) {
+                                        units = int.parse(_units.text);
+                                      }
+
+                                      _amt.text = (rt * units).toString();
                                     });
                                   },
                                   decoration: InputDecoration(
@@ -522,29 +574,6 @@ class _TokenState extends State<Token> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
-                          Container(
-                            width: 60,
-                            height: 30,
-                            child: SizedBox(
-                              width: 40,
-                              height: 40,
-                              child: TextField(
-                                  obscureText: false,
-                                  decoration: InputDecoration(
-                                    labelText: 'copies',
-                                    labelStyle: TextStyle(
-                                        color: Colors.black, fontSize: 12),
-                                    contentPadding: EdgeInsets.all(5),
-                                    border: OutlineInputBorder(),
-                                  ),
-                                  style: TextStyle(color: Colors.black),
-                                  textInputAction: TextInputAction.next,
-                                  keyboardType: TextInputType.number,
-                                  inputFormatters: <TextInputFormatter>[
-                                    FilteringTextInputFormatter.digitsOnly
-                                  ]),
-                            ),
-                          ),
                           Container(
                             width: 90,
                             height: 30,
@@ -721,7 +750,7 @@ class _TokenState extends State<Token> {
                         height: 10,
                       ),
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
                           Container(
                             width: 100,
@@ -784,39 +813,6 @@ class _TokenState extends State<Token> {
                                       );
                                     },
                                     child: Center(child: const Text('HOME')),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          Container(
-                            width: 80,
-                            height: 30,
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(20),
-                              child: Stack(
-                                children: <Widget>[
-                                  Positioned.fill(
-                                    child: Container(
-                                      decoration: const BoxDecoration(
-                                          color: Colors.deepOrange),
-                                    ),
-                                  ),
-                                  TextButton(
-                                    style: TextButton.styleFrom(
-                                      foregroundColor: Colors.white,
-                                      textStyle: const TextStyle(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) => LoginPage()),
-                                      );
-                                    },
-                                    child: Center(child: const Text('EXIT')),
                                   ),
                                 ],
                               ),
@@ -934,6 +930,29 @@ class _TokenState extends State<Token> {
 
       canSave = false;
     });
+  }
+
+  void amount() {
+    int units = 0;
+    int wt = 0;
+    int rt = 0;
+
+    if (_wt.text.isNotEmpty & _units.text.isEmpty) {
+      wt = int.parse(_wt.text);
+    }
+    _amt.text = (rt * wt).toString();
+
+    if (_units.text.isNotEmpty & _wt.text.isNotEmpty) {
+      wt = int.parse(_wt.text);
+    }
+
+    _amt.text = (rt * wt).toString();
+
+    if (_wt.text.isEmpty & _units.text.isNotEmpty) {
+      units = int.parse(_units.text);
+    }
+
+    _amt.text = (rt * units).toString();
   }
 
   void _clearFields() {

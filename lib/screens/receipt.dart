@@ -226,22 +226,6 @@ class _ReceiptState extends State<Receipt> {
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         Container(
-                          width: 40,
-                          child: SizedBox(
-                            height: 40,
-                            child: TextFormField(
-                              obscureText: false,
-                              decoration: InputDecoration(
-                                labelText: '0',
-                                labelStyle: TextStyle(color: Colors.black),
-                                border: OutlineInputBorder(),
-                              ),
-                              style: TextStyle(color: Colors.black),
-                              textInputAction: TextInputAction.next,
-                            ),
-                          ),
-                        ),
-                        Container(
                           width: 90,
                           height: 40,
                           child: ClipRRect(
@@ -416,7 +400,7 @@ class _ReceiptState extends State<Receipt> {
                       height: 10,
                     ),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         Container(
                           width: 90,
@@ -478,40 +462,6 @@ class _ReceiptState extends State<Receipt> {
                                   },
                                   child:
                                       const Center(child: const Text('HOME')),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        Container(
-                          width: 70,
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(20),
-                            child: Stack(
-                              children: <Widget>[
-                                Positioned.fill(
-                                  child: Container(
-                                    decoration: const BoxDecoration(
-                                        color: Colors.deepOrange),
-                                  ),
-                                ),
-                                TextButton(
-                                  style: TextButton.styleFrom(
-                                    foregroundColor: Colors.white,
-                                    padding: const EdgeInsets.all(10.0),
-                                    textStyle: const TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => LoginPage()),
-                                    );
-                                  },
-                                  child:
-                                      const Center(child: const Text('EXIT')),
                                 ),
                               ],
                             ),

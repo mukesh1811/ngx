@@ -6,6 +6,7 @@ import 'package:excel/excel.dart' as xl;
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:ngx/screens/DB_Helper.dart';
+import 'package:ngx/screens/homepage.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -124,6 +125,17 @@ class _SettingsState extends State<Settings> {
     return 1;
   }
 
+  TextEditingController _pwd = TextEditingController();
+
+  Future<String> login_validate() async {
+    String login_status = await DB_Helper.auth("admin", _pwd.text);
+    return login_status;
+  }
+
+  void clearTextFields() {
+    _pwd.clear();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(children: [
@@ -132,60 +144,70 @@ class _SettingsState extends State<Settings> {
           image: AssetImage("images/veg1.jpg"),
           colorBlendMode: BlendMode.softLight,
           fit: BoxFit.fill,
-          opacity: AlwaysStoppedAnimation(.5),
+          opacity: AlwaysStoppedAnimation(.2),
         ),
       ),
       Scaffold(
           backgroundColor: Colors.transparent,
           body: SingleChildScrollView(
-            child: SafeArea(
-              child: Center(
-                child: Column(
-                  children: [
-                    Container(
-                      width: double.infinity,
-                      height: 60,
-                      color: Colors.deepOrange,
-                      padding: EdgeInsets.all(20),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: const [
-                          Text("Retail Management System",
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                              )),
-                          Text("Settings",
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                              ))
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: 100),
-                    Center(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            "Update config csv",
+              child: SafeArea(
+                  child: Center(
+            child: Column(children: [
+              Container(
+                width: double.infinity,
+                height: 60,
+                color: Colors.deepOrange,
+                padding: EdgeInsets.all(20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: const [
+                    Text("Retail Management System",
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        )),
+                    Text("Settings",
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ))
+                  ],
+                ),
+              ),
+              SizedBox(height: 10),
+              Padding(
+                padding: const EdgeInsets.all(2.0),
+                child: Table(
+                    defaultColumnWidth: IntrinsicColumnWidth(),
+                    defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+
+                    // Allows to add a border decoration around your table
+                    children: [
+                      TableRow(children: [
+                        Padding(
+                          padding: const EdgeInsets.all(5.0),
+                          child: Text(
+                            "Load Consignor Name",
                             style: TextStyle(
                                 color: Colors.deepOrange, fontSize: 22),
+                            textAlign: TextAlign.center,
                           ),
-                          Container(
-                            margin: const EdgeInsets.all(15.0),
-                            padding: const EdgeInsets.all(3.0),
-                            decoration: BoxDecoration(
-                                border: Border.all(color: Colors.deepOrange)),
+                        ),
+                        Container(
+                          margin: const EdgeInsets.fromLTRB(35, 15, 35, 15),
+                          padding: const EdgeInsets.all(2.0),
+                          decoration: BoxDecoration(
+                              border: Border.all(color: Colors.deepOrange)),
+                          child: Center(
                             child: IconButton(
                               onPressed: () async {
                                 int res = await _importCsv();
                                 String resText = "";
                                 if (res == 1) {
-                                  resText = 'Config updated successfully!';
+                                  resText =
+                                      'Consignor Name updated successfully!';
                                 } else {
-                                  resText = 'Config not updated';
+                                  resText = 'Consignor Name not updated';
                                 }
                                 ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(content: Text(resText)));
@@ -193,119 +215,277 @@ class _SettingsState extends State<Settings> {
                               icon: Icon(
                                 Icons.file_upload,
                                 color: Colors.deepOrange,
-                                size: 32,
+                                size: 23,
                               ),
                             ),
                           ),
-                        ],
-                      ),
-                    ),
-                    Center(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
+                        ),
+                      ]),
+                      TableRow(children: [
+                        Padding(
+                          padding: const EdgeInsets.all(5.0),
+                          child: Text(
+                            "Load Item Name",
+                            style: TextStyle(
+                                color: Colors.deepOrange, fontSize: 22),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                        Container(
+                          margin: const EdgeInsets.fromLTRB(35, 15, 35, 15),
+                          padding: const EdgeInsets.all(2.0),
+                          decoration: BoxDecoration(
+                              border: Border.all(color: Colors.deepOrange)),
+                          child: IconButton(
+                            onPressed: () async {
+                              int res = await _importCsv();
+                              String resText = "";
+                              if (res == 1) {
+                                resText = 'Item Name updated successfully!';
+                              } else {
+                                resText = 'Item Name not updated';
+                              }
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text(resText)));
+                            },
+                            icon: Icon(
+                              Icons.file_upload,
+                              color: Colors.deepOrange,
+                              size: 23,
+                            ),
+                          ),
+                        ),
+                      ]),
+                      TableRow(children: [
+                        Padding(
+                          padding: const EdgeInsets.all(5.0),
+                          child: Text(
+                            "Load Customer Name",
+                            style: TextStyle(
+                                color: Colors.deepOrange, fontSize: 22),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                        Container(
+                          margin: const EdgeInsets.fromLTRB(35, 15, 35, 15),
+                          padding: const EdgeInsets.all(2.0),
+                          decoration: BoxDecoration(
+                              border: Border.all(color: Colors.deepOrange)),
+                          child: IconButton(
+                            onPressed: () async {
+                              int res = await _importCsv();
+                              String resText = "";
+                              if (res == 1) {
+                                resText = 'Customer Name updated successfully!';
+                              } else {
+                                resText = 'Customer Name not updated';
+                              }
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text(resText)));
+                            },
+                            icon: Icon(
+                              Icons.file_upload,
+                              color: Colors.deepOrange,
+                              size: 23,
+                            ),
+                          ),
+                        ),
+                      ]),
+                      TableRow(children: [
+                        Padding(
+                          padding: const EdgeInsets.all(5.0),
+                          child: Text(
                             "Export DB To Excel",
                             style: TextStyle(
                                 color: Colors.deepOrange, fontSize: 22),
+                            textAlign: TextAlign.center,
                           ),
-                          Container(
-                            margin: const EdgeInsets.all(15.0),
-                            padding: const EdgeInsets.all(3.0),
-                            decoration: BoxDecoration(
-                                border: Border.all(color: Colors.deepOrange)),
-                            child: IconButton(
-                              onPressed: () async {
-                                int res = await exportDatabaseToExcel();
-                                String resText = "";
-                                if (res == 1) {
-                                  resText = 'Database exported successfully!';
-                                } else {
-                                  resText = 'Database not exported';
-                                }
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text(resText)));
-                              },
-                              icon: Icon(
-                                Icons.download,
-                                color: Colors.deepOrange,
-                                size: 32,
-                              ),
+                        ),
+                        Container(
+                          margin: const EdgeInsets.fromLTRB(35, 15, 35, 15),
+                          padding: const EdgeInsets.all(2.0),
+                          decoration: BoxDecoration(
+                              border: Border.all(color: Colors.deepOrange)),
+                          child: IconButton(
+                            onPressed: () async {
+                              int res = await exportDatabaseToExcel();
+                              String resText = "";
+                              if (res == 1) {
+                                resText = 'Database exported successfully!';
+                              } else {
+                                resText = 'Database not exported';
+                              }
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text(resText)));
+                            },
+                            icon: Icon(
+                              Icons.download,
+                              color: Colors.deepOrange,
+                              size: 23,
                             ),
                           ),
-                        ],
-                      ),
-                    ),
-                    Center(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
+                        ),
+                      ]),
+                      TableRow(children: [
+                        Padding(
+                          padding: const EdgeInsets.all(5.0),
+                          child: Text(
                             "Wipe Entries",
                             style: TextStyle(
                                 color: Colors.deepOrange, fontSize: 22),
+                            textAlign: TextAlign.center,
                           ),
-                          Container(
-                            margin: const EdgeInsets.all(15.0),
-                            padding: const EdgeInsets.all(3.0),
-                            decoration: BoxDecoration(
-                                border: Border.all(color: Colors.deepOrange)),
-                            child: IconButton(
-                              onPressed: () async {
-                                await exportDatabaseToExcel();
-                                await DB_Helper.deleteDB();
+                        ),
+                        Container(
+                          margin: const EdgeInsets.fromLTRB(35, 15, 35, 15),
+                          padding: const EdgeInsets.all(2.0),
+                          decoration: BoxDecoration(
+                              border: Border.all(color: Colors.deepOrange)),
+                          child: IconButton(
+                            onPressed: () async {
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) => AlertDialog(
+                                  title: const Text('Wipe the entries'),
+                                  content: TextField(
+                                    controller: _pwd,
+                                    obscureText: true,
+                                    cursorColor: Colors.black,
+                                    style: TextStyle(
+                                        color: Colors.black, fontSize: 24),
+                                    onTapOutside: (event) {},
 
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                        content:
-                                            Text("DB exported and wiped")));
-                              },
-                              icon: Icon(
-                                Icons.delete,
-                                color: Colors.deepOrange,
-                                size: 32,
-                              ),
+                                    //autofocus: true,
+                                    decoration: InputDecoration(
+                                        enabledBorder: OutlineInputBorder(
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(25)),
+                                            borderSide: BorderSide(
+                                                color: Colors.black,
+                                                width: 1.0)),
+                                        labelText: "Enter Password",
+                                        labelStyle: TextStyle(
+                                            color: Colors.black, fontSize: 18)),
+                                  ),
+                                  actions: <Widget>[
+                                    TextButton(
+                                      onPressed: () =>
+                                          Navigator.pop(context, 'Cancel'),
+                                      child: const Text('Cancel'),
+                                    ),
+                                    TextButton(
+                                      onPressed: () async {
+                                        bool login_status =
+                                            _pwd.text == "renuka";
+
+                                        if (login_status) {
+                                          clearTextFields();
+                                          await exportDatabaseToExcel();
+                                          //await DB_Helper.deleteDB();
+
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(SnackBar(
+                                                  content: Text(
+                                                      "DB exported and wiped successfully")));
+
+                                          Navigator.pop(context, 'Cancel');
+                                        } else {
+                                          clearTextFields();
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(SnackBar(
+                                                  content: Text(
+                                                      "Password incorrect")));
+                                        }
+                                      },
+                                      child: const Text('Wipe Entries'),
+                                    ),
+                                  ],
+                                ),
+                              );
+                              // await exportDatabaseToExcel();
+                              // await DB_Helper.deleteDB();
+                              //
+                              // ScaffoldMessenger.of(context).showSnackBar(
+                              //     SnackBar(
+                              //         content: Text("DB exported and wiped")));
+                            },
+                            icon: Icon(
+                              Icons.delete,
+                              color: Colors.deepOrange,
+                              size: 23,
                             ),
                           ),
-                        ],
+                        ),
+                      ]),
+                    ]),
+              ),
+
+              // Center(
+              //   child: Row(
+              //     mainAxisAlignment: MainAxisAlignment.center,
+              //     children: [
+              //       Text(
+              //         "Update config csv",
+              //         style: TextStyle(
+              //             color: Colors.deepOrange, fontSize: 22),
+              //       ),
+              //       Container(
+              //         margin: const EdgeInsets.all(15.0),
+              //         padding: const EdgeInsets.all(3.0),
+              //         decoration: BoxDecoration(
+              //             border: Border.all(color: Colors.deepOrange)),
+              //         child: IconButton(
+              //           onPressed: () async {
+              //             int res = await _importCsv();
+              //             String resText = "";
+              //             if (res == 1) {
+              //               resText = 'Config updated successfully!';
+              //             } else {
+              //               resText = 'Config not updated';
+              //             }
+              //             ScaffoldMessenger.of(context).showSnackBar(
+              //                 SnackBar(content: Text(resText)));
+              //           },
+              //           icon: Icon(
+              //             Icons.file_upload,
+              //             color: Colors.deepOrange,
+              //             size: 32,
+              //           ),
+              //         ),
+              //       ),
+              //     ],
+              //   ),
+              // ),
+
+              Center(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      margin: const EdgeInsets.all(10.0),
+                      padding: const EdgeInsets.all(1.0),
+                      decoration: BoxDecoration(
+                          border: Border.all(color: Colors.deepOrange)),
+                      child: IconButton(
+                        alignment: Alignment.center,
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => Homepage()),
+                          );
+                        },
+                        icon: Icon(
+                          Icons.home_rounded,
+                          color: Colors.deepOrange,
+                          size: 23,
+                        ),
                       ),
                     ),
-                    Center(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container(
-                            margin: const EdgeInsets.all(15.0),
-                            padding: const EdgeInsets.all(3.0),
-                            decoration: BoxDecoration(
-                                border: Border.all(color: Colors.deepOrange)),
-                            child: IconButton(
-                              alignment: Alignment.center,
-                              onPressed: () {
-                                Navigator.pop(context);
-                                Navigator.pop(context);
-
-                                // Navigator.push(
-                                //   context,
-                                //   MaterialPageRoute(
-                                //       builder: (context) => Homepage()),
-                                // );
-                              },
-                              icon: Icon(
-                                Icons.home_rounded,
-                                color: Colors.deepOrange,
-                                size: 32,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
                   ],
                 ),
               ),
-            ),
-          ))
+            ]),
+          ))))
     ]);
   }
 }

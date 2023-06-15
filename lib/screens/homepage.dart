@@ -6,6 +6,8 @@ import 'package:ngx/screens/receipt.dart';
 import 'package:ngx/screens/retail.dart';
 import 'package:ngx/screens/token.dart';
 
+import 'lotnumber.dart';
+
 class Homepage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -192,40 +194,82 @@ class Homepage extends StatelessWidget {
               SizedBox(
                 height: 30,
               ),
-              Container(
-                width: 130,
-                height: 90,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(20),
-                  child: Stack(
-                    children: <Widget>[
-                      Positioned.fill(
-                        child: Container(
-                          decoration:
-                              const BoxDecoration(color: Colors.deepOrange),
-                        ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Container(
+                    width: 130,
+                    height: 90,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(20),
+                      child: Stack(
+                        children: <Widget>[
+                          Positioned.fill(
+                            child: Container(
+                              decoration:
+                                  const BoxDecoration(color: Colors.deepOrange),
+                            ),
+                          ),
+                          TextButton(
+                            style: TextButton.styleFrom(
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.all(20.0),
+                              textStyle: const TextStyle(fontSize: 15),
+                            ),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => Retail()),
+                              );
+                            },
+                            child: Center(
+                                child: const Text(
+                              'RETAIL',
+                              textAlign: TextAlign.center,
+                            )),
+                          ),
+                        ],
                       ),
-                      TextButton(
-                        style: TextButton.styleFrom(
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.all(20.0),
-                          textStyle: const TextStyle(fontSize: 15),
-                        ),
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => Retail()),
-                          );
-                        },
-                        child: Center(
-                            child: const Text(
-                          'RETAIL',
-                          textAlign: TextAlign.center,
-                        )),
-                      ),
-                    ],
+                    ),
                   ),
-                ),
+                  Container(
+                    width: 130,
+                    height: 90,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(20),
+                      child: Stack(
+                        children: <Widget>[
+                          Positioned.fill(
+                            child: Container(
+                              decoration:
+                                  const BoxDecoration(color: Colors.deepOrange),
+                            ),
+                          ),
+                          TextButton(
+                            style: TextButton.styleFrom(
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.all(20.0),
+                              textStyle: const TextStyle(fontSize: 15),
+                            ),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => Lotnumber()),
+                              );
+                            },
+                            child: Center(
+                                child: const Text(
+                              'LOT NUMBER',
+                              textAlign: TextAlign.center,
+                            )),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
               SizedBox(
                 height: 30,

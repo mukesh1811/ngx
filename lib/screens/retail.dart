@@ -17,6 +17,7 @@ class Retail extends StatefulWidget {
 class _RetailState extends State<Retail> {
   String? item_name_value;
   String? payment_type_value;
+  String? lot_no_value;
 
   int retailNo = 0;
 
@@ -24,6 +25,7 @@ class _RetailState extends State<Retail> {
 
   late List<String> item_name_list = [];
   late List<String> payment_type_list = [];
+  late List<String> lot_no_list = [];
 
   final TextEditingController _units = TextEditingController();
   final TextEditingController _wt = TextEditingController();
@@ -34,6 +36,7 @@ class _RetailState extends State<Retail> {
   void _populateDropdown() async {
     final itemlist = await getList("item_name");
     final custList = await getList("customer_name");
+    final lotlist = await getList("lot_no");
     custList?.insert(0, "--- Cash ---");
 
     setState(() {
@@ -412,22 +415,6 @@ class _RetailState extends State<Retail> {
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         Container(
-                          width: 80,
-                          child: SizedBox(
-                            height: 40,
-                            child: TextFormField(
-                              obscureText: false,
-                              decoration: InputDecoration(
-                                labelText: '0',
-                                labelStyle: TextStyle(color: Colors.black),
-                                border: OutlineInputBorder(),
-                              ),
-                              style: TextStyle(color: Colors.black),
-                              textInputAction: TextInputAction.next,
-                            ),
-                          ),
-                        ),
-                        Container(
                           width: 90,
                           height: 40,
                           child: ClipRRect(
@@ -602,7 +589,7 @@ class _RetailState extends State<Retail> {
                       height: 5,
                     ),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         Container(
                           width: 100,
@@ -668,42 +655,6 @@ class _RetailState extends State<Retail> {
                                       );
                                     },
                                     child: Center(child: const Text('HOME')),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        Container(
-                          width: 80,
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(20),
-                            child: Stack(
-                              children: <Widget>[
-                                Positioned.fill(
-                                  child: Container(
-                                    decoration: const BoxDecoration(
-                                        color: Colors.deepOrange),
-                                  ),
-                                ),
-                                SizedBox(
-                                  height: 40,
-                                  child: TextButton(
-                                    style: TextButton.styleFrom(
-                                      foregroundColor: Colors.white,
-                                      padding: const EdgeInsets.all(10.0),
-                                      textStyle: const TextStyle(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) => LoginPage()),
-                                      );
-                                    },
-                                    child: Center(child: const Text('EXIT')),
                                   ),
                                 ),
                               ],
