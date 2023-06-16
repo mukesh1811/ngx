@@ -20,7 +20,8 @@ class Settings extends StatefulWidget {
 }
 
 class _SettingsState extends State<Settings> {
-  Future<int> _importCsv() async {
+
+  Future<int> _importConsignor() async {
     // Open file picker
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
@@ -44,7 +45,8 @@ class _SettingsState extends State<Settings> {
       Directory appDir = await getApplicationDocumentsDirectory();
       // Move the CSV file to the database directory
       File csvFile = File(csvFilePath);
-      String newCsvPath = join(appDir.path, 'pos_config.csv');
+      String newCsvPath = join(appDir.path, 'consignor_name.csv');
+
       print(newCsvPath);
       await csvFile.rename(newCsvPath);
 
@@ -52,6 +54,76 @@ class _SettingsState extends State<Settings> {
     }
     return 0;
   }
+
+  Future<int> _importItem() async {
+    // Open file picker
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['csv'],
+    );
+
+    if (result != null) {
+      PlatformFile file = result.files.first;
+      String csvFilePath = file.path!;
+
+      // Read CSV file
+      final input = File(csvFilePath).openRead();
+      final fields = await input
+          .transform(utf8.decoder)
+          .transform(CsvToListConverter())
+          .toList();
+
+      print(fields);
+
+      // Get database directory path
+      Directory appDir = await getApplicationDocumentsDirectory();
+      // Move the CSV file to the database directory
+      File csvFile = File(csvFilePath);
+      String newCsvPath = join(appDir.path, 'item_name.csv');
+
+      print(newCsvPath);
+      await csvFile.rename(newCsvPath);
+
+      return 1;
+    }
+    return 0;
+  }
+
+  Future<int> _importCustomer() async {
+    // Open file picker
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['csv'],
+    );
+
+    if (result != null) {
+      PlatformFile file = result.files.first;
+      String csvFilePath = file.path!;
+
+      // Read CSV file
+      final input = File(csvFilePath).openRead();
+      final fields = await input
+          .transform(utf8.decoder)
+          .transform(CsvToListConverter())
+          .toList();
+
+      print(fields);
+
+      // Get database directory path
+      Directory appDir = await getApplicationDocumentsDirectory();
+      // Move the CSV file to the database directory
+      File csvFile = File(csvFilePath);
+      String newCsvPath = join(appDir.path, 'customer_name.csv');
+
+      print(newCsvPath);
+      await csvFile.rename(newCsvPath);
+
+      return 1;
+    }
+    return 0;
+  }
+
+
 
   Future<int> exportDatabaseToExcel() async {
     // Get the database path
@@ -201,7 +273,7 @@ class _SettingsState extends State<Settings> {
                           child: Center(
                             child: IconButton(
                               onPressed: () async {
-                                int res = await _importCsv();
+                                int res = await _importConsignor();
                                 String resText = "";
                                 if (res == 1) {
                                   resText =
@@ -225,7 +297,7 @@ class _SettingsState extends State<Settings> {
                         Padding(
                           padding: const EdgeInsets.all(5.0),
                           child: Text(
-                            "Load Item Name",
+                            "Load Customer Name",
                             style: TextStyle(
                                 color: Colors.deepOrange, fontSize: 22),
                             textAlign: TextAlign.center,
@@ -238,12 +310,12 @@ class _SettingsState extends State<Settings> {
                               border: Border.all(color: Colors.deepOrange)),
                           child: IconButton(
                             onPressed: () async {
-                              int res = await _importCsv();
+                              int res = await _importCustomer();
                               String resText = "";
                               if (res == 1) {
-                                resText = 'Item Name updated successfully!';
+                                resText = 'Customer Name updated successfully!';
                               } else {
-                                resText = 'Item Name not updated';
+                                resText = 'Customer Name not updated';
                               }
                               ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(content: Text(resText)));
@@ -260,7 +332,7 @@ class _SettingsState extends State<Settings> {
                         Padding(
                           padding: const EdgeInsets.all(5.0),
                           child: Text(
-                            "Load Customer Name",
+                            "Load Item Name",
                             style: TextStyle(
                                 color: Colors.deepOrange, fontSize: 22),
                             textAlign: TextAlign.center,
@@ -273,12 +345,12 @@ class _SettingsState extends State<Settings> {
                               border: Border.all(color: Colors.deepOrange)),
                           child: IconButton(
                             onPressed: () async {
-                              int res = await _importCsv();
+                              int res = await _importItem();
                               String resText = "";
                               if (res == 1) {
-                                resText = 'Customer Name updated successfully!';
+                                resText = 'Item Name updated successfully!';
                               } else {
-                                resText = 'Customer Name not updated';
+                                resText = 'Item Name not updated';
                               }
                               ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(content: Text(resText)));

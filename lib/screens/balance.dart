@@ -36,8 +36,7 @@ class _BalanceState extends State<Balance> {
   int balance = 0;
 
   void _populateDropdown() async {
-    final custList = await getList("customer_name");
-
+    final custList = await getCustomerList();
     setState(() {
       customer_names_list = custList!;
     });
