@@ -36,17 +36,17 @@ class _TokenState extends State<Token> {
   final TextEditingController _existing_tokenNo = TextEditingController();
 
   void _populateDropdown() async {
-    final conslist = await getList("consignor_name");
-    final itemlist = await getList("item_name");
-    final custList = await getList("customer_name");
-    final lotList = await getList("lot_no");
+    final conslist = await getConsignorList();
+    final itemlist = await getItemList();
+    final custList = await getCustomerList();
+    // final lotList = await getList("lot_no");
     custList?.insert(0, "--- Cash ---");
 
     setState(() {
       consignor_names_list = conslist!;
       item_name_list = itemlist!;
       payment_type_list = custList!;
-      lot_no_list = lotList!;
+      // lot_no_list = lotList!;
     });
   }
 

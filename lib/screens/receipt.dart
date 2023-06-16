@@ -26,7 +26,7 @@ class _ReceiptState extends State<Receipt> {
   final TextEditingController _existing_receiptNo = TextEditingController();
 
   void _populateDropdown() async {
-    final custList = await getList("customer_name");
+    final custList = await getCustomerList();
 
     setState(() {
       customer_names_list = custList!;

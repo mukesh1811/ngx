@@ -17,7 +17,6 @@ class Retail extends StatefulWidget {
 class _RetailState extends State<Retail> {
   String? item_name_value;
   String? payment_type_value;
-  String? lot_no_value;
 
   int retailNo = 0;
 
@@ -25,7 +24,6 @@ class _RetailState extends State<Retail> {
 
   late List<String> item_name_list = [];
   late List<String> payment_type_list = [];
-  late List<String> lot_no_list = [];
 
   final TextEditingController _units = TextEditingController();
   final TextEditingController _wt = TextEditingController();
@@ -34,9 +32,8 @@ class _RetailState extends State<Retail> {
   final TextEditingController _existing_retailNo = TextEditingController();
 
   void _populateDropdown() async {
-    final itemlist = await getList("item_name");
-    final custList = await getList("customer_name");
-    final lotlist = await getList("lot_no");
+    final itemlist = await getItemList();
+    final custList = await getCustomerList();
     custList?.insert(0, "--- Cash ---");
 
     setState(() {
