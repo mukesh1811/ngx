@@ -50,6 +50,13 @@ class DB_Helper {
 		amount INTEGER
      )
       """);
+
+    await database.execute("""CREATE TABLE lotnumber(
+        lot_no TEXT,
+        consignor_name TEXT,
+        item_name TEXT,
+     )
+      """);
   }
 
   static Future<int> createRetail(Map<String, dynamic> data) async {
@@ -74,6 +81,15 @@ class DB_Helper {
     final db = await DB_Helper.db();
 
     final id = await db.insert('tokens', data,
+        conflictAlgorithm: ConflictAlgorithm.fail);
+
+    return id;
+  }
+
+  static Future<int> createlotnumber(Map<String, dynamic> data) async {
+    final db = await DB_Helper.db();
+
+    final id = await db.insert('lotnumber', data,
         conflictAlgorithm: ConflictAlgorithm.fail);
 
     return id;
@@ -138,6 +154,7 @@ class DB_Helper {
     await db.delete('tokens');
     await db.delete('receipts');
     await db.delete('retail');
+    await db.delete('lotnumber');
 
     return 1;
   }
@@ -215,6 +232,17 @@ class DB_Helper {
         await db.query('tokens', where: '_rowid_ = ?', whereArgs: [token_id]);
 
     print('Token: ${res}');
+
+    return res[0];
+  }
+
+  static Future<Map<String, Object?>> getlotnumbere(int token_id) async {
+    final db = await DB_Helper.db();
+
+    var res = await db
+        .query('lotnumber', where: '_rowid_ = ?', whereArgs: [token_id]);
+
+    print('Lotnumber: ${res}');
 
     return res[0];
   }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ngx/screens/ConfigHelper.dart';
 
+import 'DB_Helper.dart';
 import 'loginpage.dart';
 
 TextEditingController _lotno = TextEditingController();
@@ -26,8 +27,8 @@ class _LotnumberState extends State<Lotnumber> {
   late List<String> item_name_list = [];
 
   void _populateDropdown() async {
-    final conslist = await getList("consignor_name");
-    final itemlist = await getList("item_name");
+    final conslist = await getConsignorList();
+    final itemlist = await getItemList();
 
     setState(() {
       consignor_names_list = conslist!;
@@ -187,7 +188,7 @@ class _LotnumberState extends State<Lotnumber> {
                                   child: DropdownButton<String>(
                                       hint: const Text("Item Name"),
                                       style: const TextStyle(
-                                        color: Colors.white,
+                                        color: Colors.black,
                                         fontSize: 18,
                                       ),
                                       value: item_name_value,
@@ -236,7 +237,13 @@ class _LotnumberState extends State<Lotnumber> {
                                             fontSize: 12,
                                             fontWeight: FontWeight.bold),
                                       ),
-                                      onPressed: () async {},
+                                      onPressed: canSave
+                                          ? () async {
+                                              var snackBar = await saveToDB();
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(snackBar);
+                                            }
+                                          : null,
                                       child: Center(child: const Text('SAVE')),
                                     ),
                                   ],
@@ -288,5 +295,46 @@ class _LotnumberState extends State<Lotnumber> {
             ),
           ))
     ]);
+  }
+
+  Future<SnackBar> saveToDB() async {
+    print("Save");
+
+    if (_lotno.text.trim() == "") {
+      return const SnackBar(content: Text("Please enter lotnumber"));
+    }
+
+    if (consignor_name_value == null) {
+      return const SnackBar(content: Text("Please select a consignor name"));
+    }
+
+    if (item_name_value == null) {
+      return const SnackBar(content: Text("Please select a item name"));
+    }
+
+    final data = {
+      'consignor_name': consignor_name_value,
+      'item_name': item_name_value,
+      'lot_no': _lotno.text
+    };
+
+    int id = await DB_Helper.createlotnumber(data);
+
+    print("id");
+    print(id);
+
+    _clearFields();
+
+    return const SnackBar(content: Text("Lot number saved successfully!"));
+  }
+
+  void _clearFields() {
+    setState(() {
+      consignor_name_value = null;
+      item_name_value = null;
+      _lotno.text = "";
+
+      print("cleared!");
+    });
   }
 }
