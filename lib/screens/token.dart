@@ -195,6 +195,7 @@ class _TokenState extends State<Token> {
                                   onChanged: (String? value) {
                                     setState(() {
                                       lot_no_value = value ?? "";
+                                      _loadNoData();
                                     });
                                   },
                                 ),
@@ -969,6 +970,29 @@ class _TokenState extends State<Token> {
       _existing_tokenNo.text = "";
 
       print("cleared!");
+    });
+  }
+
+  Future<void> _loadNoData() async {
+    print(lot_no_value);
+
+    if (lot_no_value == "") {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text("Lot No is empty")));
+
+      return;
+    }
+
+    var res = await DB_Helper.getlotnumber(lot_no_value!);
+
+    print("returned lotnumber is");
+    print(res);
+
+    setState(() {
+      item_name_value = res['item_name'] as String?;
+      consignor_name_value = res['consignor_name'] as String;
+
+      canSave = false;
     });
   }
 }

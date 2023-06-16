@@ -225,6 +225,17 @@ class DB_Helper {
     return res[0];
   }
 
+  static Future<Map<String, Object?>> getlotnumber(String lot_id) async {
+    final db = await DB_Helper.db();
+
+    var res =
+        await db.query('lotnumber', where: 'lot_no = ?', whereArgs: [lot_id]);
+
+    print('Lotnumber: ${res}');
+
+    return res[0];
+  }
+
   static Future<Map<String, Object?>> getToken(int token_id) async {
     final db = await DB_Helper.db();
 
