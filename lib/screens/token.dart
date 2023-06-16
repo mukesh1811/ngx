@@ -13,8 +13,6 @@ class Token extends StatefulWidget {
 }
 
 class _TokenState extends State<Token> {
-  String? consignor_name_value;
-  String? item_name_value;
   String? payment_type_value;
   String? lot_no_value;
 
@@ -27,6 +25,8 @@ class _TokenState extends State<Token> {
   late List<String> payment_type_list = [];
   late List<String> lot_no_list = [];
 
+  final TextEditingController consignor = TextEditingController();
+  final TextEditingController item = TextEditingController();
   final TextEditingController _lotNo = TextEditingController();
   final TextEditingController _mark = TextEditingController();
   final TextEditingController _units = TextEditingController();
@@ -212,40 +212,18 @@ class _TokenState extends State<Token> {
                           width: 300,
                           height: 40,
                           child: Container(
-                            decoration: const ShapeDecoration(
-                                shape: RoundedRectangleBorder(
-                              side: BorderSide(
-                                  width: 0.5, style: BorderStyle.solid),
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(5.0)),
-                            )),
-                            child: DropdownButtonHideUnderline(
-                              child: Container(
-                                padding: const EdgeInsets.all(5),
-                                child: DropdownButton<String>(
-                                  hint: const Text("Consignor Name"),
-                                  style: const TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 12,
-                                  ),
-                                  items: consignor_names_list
-                                      .map<DropdownMenuItem<String>>(
-                                          (String consignor) {
-                                    return DropdownMenuItem<String>(
-                                      value: consignor,
-                                      child: Text(consignor),
-                                    );
-                                  }).toList(),
-                                  value: consignor_name_value,
-                                  onChanged: (String? value) {
-                                    setState(() {
-                                      consignor_name_value = value ?? "";
-                                    });
-                                  },
-                                ),
-                              ),
+                              child: TextField(
+                            controller: consignor,
+                            obscureText: false,
+                            decoration: InputDecoration(
+                              labelText: 'Consignor Name',
+                              labelStyle:
+                                  TextStyle(color: Colors.black, fontSize: 12),
+                              contentPadding: EdgeInsets.all(5),
+                              border: OutlineInputBorder(),
                             ),
-                          ),
+                            enabled: false,
+                          )),
                         ),
                       ),
                       // Consignor Name ################
@@ -258,39 +236,18 @@ class _TokenState extends State<Token> {
                           width: 300,
                           height: 40,
                           child: Container(
-                            decoration: const ShapeDecoration(
-                                shape: RoundedRectangleBorder(
-                              side: BorderSide(
-                                  width: 0.5, style: BorderStyle.solid),
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(5.0)),
-                            )),
-                            child: DropdownButtonHideUnderline(
-                              child: Container(
-                                padding: const EdgeInsets.all(5),
-                                child: DropdownButton<String>(
-                                    hint: const Text("Item Name"),
-                                    style: const TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 12,
-                                    ),
-                                    value: item_name_value,
-                                    onChanged: (String? value) {
-                                      setState(() {
-                                        item_name_value = value ?? "";
-                                      });
-                                    },
-                                    items: item_name_list
-                                        .map<DropdownMenuItem<String>>(
-                                            (String item) {
-                                      return DropdownMenuItem<String>(
-                                        value: item,
-                                        child: Text(item),
-                                      );
-                                    }).toList()),
-                              ),
+                              child: TextField(
+                            controller: item,
+                            obscureText: false,
+                            decoration: InputDecoration(
+                              labelText: 'Item Name',
+                              labelStyle:
+                                  TextStyle(color: Colors.black, fontSize: 12),
+                              contentPadding: EdgeInsets.all(5),
+                              border: OutlineInputBorder(),
                             ),
-                          ),
+                            enabled: false,
+                          )),
                         ),
                       ),
 
@@ -835,14 +792,6 @@ class _TokenState extends State<Token> {
   Future<SnackBar> saveToDB() async {
     print("Save");
 
-    if (consignor_name_value == null) {
-      return const SnackBar(content: Text("Please select a consignor name"));
-    }
-
-    if (item_name_value == null) {
-      return const SnackBar(content: Text("Please select an item name"));
-    }
-
     if (payment_type_value == null) {
       return const SnackBar(content: Text("Please select payment type"));
     }
@@ -868,8 +817,8 @@ class _TokenState extends State<Token> {
     }
 
     final data = {
-      'consignor_name': consignor_name_value,
-      'item_name': item_name_value,
+      'consignor_name': consignor.text,
+      'item_name': item.text,
       'payment_type': payment_type_value,
       'lot_no': _lotNo.text,
       'mark': _mark.text,
@@ -917,8 +866,8 @@ class _TokenState extends State<Token> {
     print(res);
 
     setState(() {
-      consignor_name_value = res['consignor_name'] as String?;
-      item_name_value = res['item_name'] as String?;
+      consignor.text = (res['consignor_name'] as String);
+      item.text = (res['item_name'] as String);
       payment_type_value = res['payment_type'] as String?;
       _lotNo.text = (res['lot_no'] as String?)!;
       _mark.text = (res['mark'] as String?)!;
@@ -958,8 +907,8 @@ class _TokenState extends State<Token> {
 
   void _clearFields() {
     setState(() {
-      consignor_name_value = null;
-      item_name_value = null;
+      consignor.text = "";
+      item.text = "";
       payment_type_value = null;
       _lotNo.text = "";
       _mark.text = "";
@@ -989,8 +938,8 @@ class _TokenState extends State<Token> {
     print(res);
 
     setState(() {
-      item_name_value = res['item_name'] as String?;
-      consignor_name_value = res['consignor_name'] as String;
+      item.text = res['item_name'] as String;
+      consignor.text = res['consignor_name'] as String;
 
       canSave = false;
     });
