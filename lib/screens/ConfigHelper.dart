@@ -1,41 +1,41 @@
 import 'dart:convert';
 import 'dart:io';
+
 import 'package:csv/csv.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
+
+import 'DB_Helper.dart';
 
 final String consignor_name_key = "ConsignorName";
 final String customer_name_key = "CustomerName";
 final String item_name_key = "ItemName";
 
-Future<List<String>?> getConsignorList() async
-{
-Directory appDir = await getApplicationDocumentsDirectory();
+Future<List<String>?> getConsignorList() async {
+  Directory appDir = await getApplicationDocumentsDirectory();
 // Move the CSV file to the database directory
-String newCsvPath = join(appDir.path, "consignor_name.csv");
-String key = consignor_name_key;
+  String newCsvPath = join(appDir.path, "consignor_name.csv");
+  String key = consignor_name_key;
 
-final input = File(newCsvPath).openRead();
-final fields = await input
-    .transform(utf8.decoder)
-    .transform(const CsvToListConverter())
-    .toList();
+  final input = File(newCsvPath).openRead();
+  final fields = await input
+      .transform(utf8.decoder)
+      .transform(const CsvToListConverter())
+      .toList();
 
-List headers = fields[0];
-int reqColIdx = headers.indexOf(key);
-List result = [];
+  List headers = fields[0];
+  int reqColIdx = headers.indexOf(key);
+  List result = [];
 
-for(var line in fields.sublist(1))
-{
-result.add(line[reqColIdx].toString());
+  for (var line in fields.sublist(1)) {
+    result.add(line[reqColIdx].toString());
+  }
+
+  print(result);
+  return result.cast<String>();
 }
 
-print(result);
-return result.cast<String>();
-}
-
-Future<List<String>?> getCustomerList() async
-{
+Future<List<String>?> getCustomerList() async {
   Directory appDir = await getApplicationDocumentsDirectory();
   // Move the CSV file to the database directory
   String newCsvPath = join(appDir.path, "customer_name.csv");
@@ -51,8 +51,7 @@ Future<List<String>?> getCustomerList() async
   int reqColIdx = headers.indexOf(key);
   List result = [];
 
-  for(var line in fields.sublist(1))
-  {
+  for (var line in fields.sublist(1)) {
     result.add(line[reqColIdx].toString());
   }
 
@@ -60,8 +59,7 @@ Future<List<String>?> getCustomerList() async
   return result.cast<String>();
 }
 
-Future<List<String>?> getItemList() async
-{
+Future<List<String>?> getItemList() async {
   Directory appDir = await getApplicationDocumentsDirectory();
 // Move the CSV file to the database directory
   String newCsvPath = join(appDir.path, "item_name.csv");
@@ -77,8 +75,7 @@ Future<List<String>?> getItemList() async
   int reqColIdx = headers.indexOf(key);
   List result = [];
 
-  for(var line in fields.sublist(1))
-  {
+  for (var line in fields.sublist(1)) {
     result.add(line[reqColIdx].toString());
   }
 
@@ -86,36 +83,55 @@ Future<List<String>?> getItemList() async
   return result.cast<String>();
 }
 
+Future<List<String>?> getLotNumberList() async {
+  final db = await DB_Helper.db();
 
-  Future<List<String>?> getList(String key) async
-  {
-    Directory appDir = await getApplicationDocumentsDirectory();
-    // Move the CSV file to the database directory
-    String newCsvPath = join(appDir.path, "pos_config.csv");
-    String key = "ItemName";
+  String lotnumber = """
+  SELECT
+  lot_no FROM lotnumber """;
 
-    final input = File(newCsvPath).openRead();
-    final fields = await input
-        .transform(utf8.decoder)
-        .transform(const CsvToListConverter())
-        .toList();
+  var res = await db.rawQuery(lotnumber);
+  List<String> lotnumb = <String>[];
 
-    var maplist = {for (var v in fields) v[0]: v.sublist(1)};
+  for (int i = 0; i < res.length; i++) {
+    var lot = res[i];
 
-    print(maplist);
+    var lotnum = lot['lot_no'].toString();
 
-    if (maplist[key] == null) {
-      return [""];
-    } else {
-      List result = [];
+    lotnumb.add(lotnum);
+  }
 
-      for (var item in maplist[key]!) {
-        if (!item.isEmpty) {
-          result.add(item);
-        }
+  return lotnumb;
+}
+
+Future<List<String>?> getList(String key) async {
+  Directory appDir = await getApplicationDocumentsDirectory();
+  // Move the CSV file to the database directory
+  String newCsvPath = join(appDir.path, "pos_config.csv");
+  String key = "ItemName";
+
+  final input = File(newCsvPath).openRead();
+  final fields = await input
+      .transform(utf8.decoder)
+      .transform(const CsvToListConverter())
+      .toList();
+
+  var maplist = {for (var v in fields) v[0]: v.sublist(1)};
+
+  print(maplist);
+
+  if (maplist[key] == null) {
+    return [""];
+  } else {
+    List result = [];
+
+    for (var item in maplist[key]!) {
+      if (!item.isEmpty) {
+        result.add(item);
       }
-
-      print(result);
-      return result.cast<String>();
     }
+
+    print(result);
+    return result.cast<String>();
+  }
 }

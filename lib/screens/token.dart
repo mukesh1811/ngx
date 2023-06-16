@@ -39,14 +39,14 @@ class _TokenState extends State<Token> {
     final conslist = await getConsignorList();
     final itemlist = await getItemList();
     final custList = await getCustomerList();
-    // final lotList = await getList("lot_no");
+    final lotList = await getLotNumberList();
     custList?.insert(0, "--- Cash ---");
 
     setState(() {
       consignor_names_list = conslist!;
       item_name_list = itemlist!;
       payment_type_list = custList!;
-      // lot_no_list = lotList!;
+      lot_no_list = lotList!;
     });
   }
 
