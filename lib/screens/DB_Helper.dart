@@ -362,4 +362,26 @@ class DB_Helper {
       debugPrint("Something went wrong when deleting an item: $err");
     }
   }
+
+  static Future<List<String>?> getLotNumberList() async {
+    final db = await DB_Helper.db();
+
+    String lotnumber = """
+  SELECT
+  lot_no FROM lotnumber """;
+
+    var res = await db.rawQuery(lotnumber);
+    List<String> lotnumb = <String>[];
+
+    for (int i = 0; i < res.length; i++) {
+      var lot = res[i];
+
+      var lotnum = lot['lot_no'].toString();
+
+      lotnumb.add(lotnum);
+    }
+
+    return lotnumb;
+  }
+
 }

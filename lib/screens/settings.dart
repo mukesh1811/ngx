@@ -12,6 +12,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:sqflite/sqflite.dart';
 
+import 'ConfigHelper.dart';
+
 class Settings extends StatefulWidget {
   const Settings({Key? key}) : super(key: key);
 
@@ -40,6 +42,11 @@ class _SettingsState extends State<Settings> {
           .toList();
 
       print(fields);
+
+      if(!fields[0].contains(consignor_name_key))
+      {
+        return -1;
+      }
 
       // Get database directory path
       Directory appDir = await getApplicationDocumentsDirectory();
@@ -75,6 +82,11 @@ class _SettingsState extends State<Settings> {
 
       print(fields);
 
+      if(!fields[0].contains(item_name_key))
+      {
+        return -1;
+      }
+
       // Get database directory path
       Directory appDir = await getApplicationDocumentsDirectory();
       // Move the CSV file to the database directory
@@ -108,6 +120,11 @@ class _SettingsState extends State<Settings> {
           .toList();
 
       print(fields);
+
+      if(!fields[0].contains(customer_name_key))
+        {
+          return -1;
+        }
 
       // Get database directory path
       Directory appDir = await getApplicationDocumentsDirectory();
@@ -278,7 +295,12 @@ class _SettingsState extends State<Settings> {
                                 if (res == 1) {
                                   resText =
                                       'Consignor Name updated successfully!';
-                                } else {
+                                }
+                                else if (res == -1)
+                                {
+                                  resText = "Key $consignor_name_key is missing. Update failed";
+                                }
+                                else {
                                   resText = 'Consignor Name not updated';
                                 }
                                 ScaffoldMessenger.of(context).showSnackBar(
@@ -312,9 +334,15 @@ class _SettingsState extends State<Settings> {
                             onPressed: () async {
                               int res = await _importCustomer();
                               String resText = "";
+
                               if (res == 1) {
                                 resText = 'Customer Name updated successfully!';
-                              } else {
+                              }
+                              else if (res == -1)
+                                {
+                                  resText = "Key $customer_name_key is missing. Update failed";
+                                }
+                              else {
                                 resText = 'Customer Name not updated';
                               }
                               ScaffoldMessenger.of(context).showSnackBar(
@@ -349,7 +377,12 @@ class _SettingsState extends State<Settings> {
                               String resText = "";
                               if (res == 1) {
                                 resText = 'Item Name updated successfully!';
-                              } else {
+                              }
+                              else if (res == -1)
+                              {
+                                resText = "Key $item_name_key is missing. Update failed";
+                              }
+                              else {
                                 resText = 'Item Name not updated';
                               }
                               ScaffoldMessenger.of(context).showSnackBar(

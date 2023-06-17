@@ -1,13 +1,17 @@
 # ngx
 
-NGX POS for Renukha Systems
+NGX POS for Renuka Systems
 
 # PROJECT MANAGEMENT:
 
 TODO
 #####
 
-check csvs shared by client
+take closing balance from customer file
+
+delete config.dart
+
+option to alter key column in input files
 
 Db export separate files
 
@@ -92,13 +96,17 @@ load customer name
 
 Pull existing ticket - null check
 
+check and import csv files shared by client
+
 #################################################################################################################################################
 ASK
 
 ####
 
+duplicates in consignor and customer name. currently using id column
+
 Db wipe logic
 Cash payment logic
 payment_type + cash
 Date not correct. Manual input?
-Customer Balance -> from Receipt. ?
+Customer Balance -> from Receipt. no from input file
