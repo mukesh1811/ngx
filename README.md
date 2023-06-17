@@ -7,6 +7,7 @@ NGX POS for Renukha Systems
 TODO
 #####
 
+check csvs shared by client
 
 Db export separate files
 
