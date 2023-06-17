@@ -256,6 +256,24 @@ class _RetailState extends State<Retail> {
                             child: TextField(
                                 controller: _units,
                                 obscureText: false,
+                                onChanged: (txt1) {
+                                  if (_wt.text.isEmpty || _wt.text == "") {
+                                    int units = 0;
+                                    if (txt1.isNotEmpty && txt1 != "") {
+                                      units = int.parse(txt1);
+                                    }
+
+                                    setState(() {
+                                      int rt = 0;
+
+                                      if (_rate.text.isNotEmpty &&
+                                          _rate.text != "") {
+                                        rt = int.parse(_rate.text);
+                                      }
+                                      _amt.text = (rt * units).toString();
+                                    });
+                                  }
+                                },
                                 decoration: InputDecoration(
                                   labelText: 'Units',
                                   labelStyle: TextStyle(
@@ -289,19 +307,22 @@ class _RetailState extends State<Retail> {
                             height: 30,
                             child: TextField(
                                 controller: _wt,
-                                onChanged: (txt) {
+                                onChanged: (txt2) {
                                   int wt = 0;
-                                  if (txt.isNotEmpty && txt != "") {
-                                    wt = int.parse(txt);
+                                  if (txt2.isNotEmpty && txt2 != "") {
+                                    wt = int.parse(txt2);
+                                  } else if (_units.text.isNotEmpty) {
+                                    wt = int.parse(_units.text);
                                   }
 
                                   setState(() {
                                     int rt = 0;
-                                    if (_rate.text.isNotEmpty) {
+
+                                    if (_rate.text.isNotEmpty &&
+                                        _rate.text != "") {
                                       rt = int.parse(_rate.text);
                                     }
-
-                                    _amt.text = (wt * rt).toString();
+                                    _amt.text = (rt * wt).toString();
                                   });
                                 },
                                 obscureText: false,
@@ -346,13 +367,16 @@ class _RetailState extends State<Retail> {
                                     rt = int.parse(txt);
                                   }
 
-                                  setState(() {
-                                    int wt = 0;
-                                    if (_wt.text.isNotEmpty) {
-                                      wt = int.parse(_wt.text);
-                                    }
+                                  int multiplier = 0;
 
-                                    _amt.text = (rt * wt).toString();
+                                  if (_wt.text.isNotEmpty) {
+                                    multiplier = int.parse(_wt.text);
+                                  } else if (_units.text.isNotEmpty) {
+                                    multiplier = int.parse(_units.text);
+                                  }
+
+                                  setState(() {
+                                    _amt.text = (rt * multiplier).toString();
                                   });
                                 },
                                 decoration: InputDecoration(

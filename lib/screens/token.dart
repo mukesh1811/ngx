@@ -27,7 +27,7 @@ class _TokenState extends State<Token> {
 
   final TextEditingController consignor = TextEditingController();
   final TextEditingController item = TextEditingController();
-  final TextEditingController _lotNo = TextEditingController();
+
   final TextEditingController _mark = TextEditingController();
   final TextEditingController _units = TextEditingController();
   final TextEditingController _wt = TextEditingController();
@@ -63,7 +63,6 @@ class _TokenState extends State<Token> {
     super.initState();
     _populateDropdown();
 
-    _lotNo.text = "";
     _mark.text = "";
     _units.text = "";
     _wt.text = "";
@@ -343,20 +342,22 @@ class _TokenState extends State<Token> {
                               child: TextField(
                                   controller: _units,
                                   onChanged: (txt1) {
-                                    int units = 0;
-                                    if (txt1.isNotEmpty && txt1 != "") {
-                                      units = int.parse(txt1);
-                                    }
-
-                                    setState(() {
-                                      int rt = 0;
-
-                                      if (_wt.text.isEmpty &
-                                          _units.text.isNotEmpty) {
-                                        units = int.parse(_units.text);
+                                    if (_wt.text.isEmpty || _wt.text == "") {
+                                      int units = 0;
+                                      if (txt1.isNotEmpty && txt1 != "") {
+                                        units = int.parse(txt1);
                                       }
-                                      _amt.text = (rt * units).toString();
-                                    });
+
+                                      setState(() {
+                                        int rt = 0;
+
+                                        if (_rate.text.isNotEmpty &&
+                                            _rate.text != "") {
+                                          rt = int.parse(_rate.text);
+                                        }
+                                        _amt.text = (rt * units).toString();
+                                      });
+                                    }
                                   },
                                   obscureText: false,
                                   decoration: InputDecoration(
@@ -396,16 +397,16 @@ class _TokenState extends State<Token> {
                                     int wt = 0;
                                     if (txt2.isNotEmpty && txt2 != "") {
                                       wt = int.parse(txt2);
+                                    } else if (_units.text.isNotEmpty) {
+                                      wt = int.parse(_units.text);
                                     }
 
                                     setState(() {
                                       int rt = 0;
 
-                                      if (_wt.text.isNotEmpty &
-                                              _units.text.isEmpty ||
-                                          _units.text.isNotEmpty &
-                                              _wt.text.isNotEmpty) {
-                                        wt = int.parse(_wt.text);
+                                      if (_rate.text.isNotEmpty &&
+                                          _rate.text != "") {
+                                        rt = int.parse(_rate.text);
                                       }
                                       _amt.text = (rt * wt).toString();
                                     });
@@ -452,29 +453,16 @@ class _TokenState extends State<Token> {
                                       rt = int.parse(txt);
                                     }
 
+                                    int multiplier = 0;
+
+                                    if (_wt.text.isNotEmpty) {
+                                      multiplier = int.parse(_wt.text);
+                                    } else if (_units.text.isNotEmpty) {
+                                      multiplier = int.parse(_units.text);
+                                    }
+
                                     setState(() {
-                                      int units = 0;
-                                      int wt = 0;
-
-                                      if (_wt.text.isNotEmpty &
-                                          _units.text.isEmpty) {
-                                        wt = int.parse(_wt.text);
-                                      }
-                                      _amt.text = (rt * wt).toString();
-
-                                      if (_units.text.isNotEmpty &
-                                          _wt.text.isNotEmpty) {
-                                        wt = int.parse(_wt.text);
-                                      }
-
-                                      _amt.text = (rt * wt).toString();
-
-                                      if (_wt.text.isEmpty &
-                                          _units.text.isNotEmpty) {
-                                        units = int.parse(_units.text);
-                                      }
-
-                                      _amt.text = (rt * units).toString();
+                                      _amt.text = (rt * multiplier).toString();
                                     });
                                   },
                                   decoration: InputDecoration(
@@ -796,34 +784,46 @@ class _TokenState extends State<Token> {
       return const SnackBar(content: Text("Please select payment type"));
     }
 
-    if (_lotNo.text.trim() == "") {
-      return const SnackBar(content: Text("Please enter Lot No"));
+    if (lot_no_value == null) {
+      return const SnackBar(content: Text("Please select Lot No"));
     }
 
     if (_mark.text.trim() == "") {
       return const SnackBar(content: Text("Please enter Mark"));
     }
 
-    if (_units.text.trim() == "") {
-      return const SnackBar(content: Text("Please enter Units"));
-    }
-
-    if (_wt.text.trim() == "") {
-      return const SnackBar(content: Text("Please enter Weight"));
+    if (_wt.text.trim() == "" && _units.text.trim() == "") {
+      return const SnackBar(
+          content: Text("Please enter either weight or unit"));
     }
 
     if (_rate.text.trim() == "") {
       return const SnackBar(content: Text("Please enter Rate"));
     }
 
+    var units;
+    var weight;
+
+    if (_units.text != "") {
+      units = int.parse(_units.text);
+    } else {
+      units = "";
+    }
+
+    if (_wt.text != "") {
+      weight = int.parse(_wt.text);
+    } else {
+      weight = "";
+    }
+
     final data = {
       'consignor_name': consignor.text,
       'item_name': item.text,
       'payment_type': payment_type_value,
-      'lot_no': _lotNo.text,
+      'lot_no': lot_no_value,
       'mark': _mark.text,
-      'units': int.parse(_units.text),
-      'weight': int.parse(_wt.text),
+      'units': units,
+      'weight': weight,
       'rate': int.parse(_rate.text),
       'amount': int.parse(_amt.text)
     };
@@ -869,7 +869,7 @@ class _TokenState extends State<Token> {
       consignor.text = (res['consignor_name'] as String);
       item.text = (res['item_name'] as String);
       payment_type_value = res['payment_type'] as String?;
-      _lotNo.text = (res['lot_no'] as String?)!;
+      lot_no_value = (res['lot_no'] as String?)!;
       _mark.text = (res['mark'] as String?)!;
       _units.text = res['units'].toString();
       _wt.text = res['weight'].toString();
@@ -910,7 +910,7 @@ class _TokenState extends State<Token> {
       consignor.text = "";
       item.text = "";
       payment_type_value = null;
-      _lotNo.text = "";
+      lot_no_value = null;
       _mark.text = "";
       _units.text = "";
       _wt.text = "";
@@ -940,8 +940,6 @@ class _TokenState extends State<Token> {
     setState(() {
       item.text = res['item_name'] as String;
       consignor.text = res['consignor_name'] as String;
-
-      canSave = false;
     });
   }
 }

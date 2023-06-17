@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:ngx/screens/ConfigHelper.dart';
 
 import 'DB_Helper.dart';
+import 'homepage.dart';
 import 'loginpage.dart';
 
 TextEditingController _lotno = TextEditingController();
@@ -214,12 +215,48 @@ class _LotnumberState extends State<Lotnumber> {
                           height: 20,
                         ),
 
+                        Container(
+                          width: 100,
+                          height: 40,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(20),
+                            child: Stack(
+                              children: <Widget>[
+                                Positioned.fill(
+                                  child: Container(
+                                    decoration: const BoxDecoration(
+                                        color: Colors.deepOrange),
+                                  ),
+                                ),
+                                TextButton(
+                                  style: TextButton.styleFrom(
+                                    foregroundColor: Colors.white,
+                                    textStyle: const TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  onPressed: canSave
+                                      ? () async {
+                                          var snackBar = await saveToDB();
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(snackBar);
+                                        }
+                                      : null,
+                                  child: Center(child: const Text('SAVE')),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 20,
+                        ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             Container(
                               width: 100,
-                              height: 30,
+                              height: 40,
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(20),
                                 child: Stack(
@@ -234,40 +271,7 @@ class _LotnumberState extends State<Lotnumber> {
                                       style: TextButton.styleFrom(
                                         foregroundColor: Colors.white,
                                         textStyle: const TextStyle(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                      onPressed: canSave
-                                          ? () async {
-                                              var snackBar = await saveToDB();
-                                              ScaffoldMessenger.of(context)
-                                                  .showSnackBar(snackBar);
-                                            }
-                                          : null,
-                                      child: Center(child: const Text('SAVE')),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            Container(
-                              width: 100,
-                              height: 30,
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(20),
-                                child: Stack(
-                                  children: <Widget>[
-                                    Positioned.fill(
-                                      child: Container(
-                                        decoration: const BoxDecoration(
-                                            color: Colors.deepOrange),
-                                      ),
-                                    ),
-                                    TextButton(
-                                      style: TextButton.styleFrom(
-                                        foregroundColor: Colors.white,
-                                        textStyle: const TextStyle(
-                                            fontSize: 12,
+                                            fontSize: 15,
                                             fontWeight: FontWeight.bold),
                                       ),
                                       onPressed: () {
@@ -280,6 +284,43 @@ class _LotnumberState extends State<Lotnumber> {
                                       },
                                       child:
                                           Center(child: const Text('LOGOUT')),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            Container(
+                              width: 100,
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(20),
+                                child: Stack(
+                                  children: <Widget>[
+                                    Positioned.fill(
+                                      child: Container(
+                                        decoration: const BoxDecoration(
+                                            color: Colors.deepOrange),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: 40,
+                                      child: TextButton(
+                                        style: TextButton.styleFrom(
+                                          foregroundColor: Colors.white,
+                                          textStyle: const TextStyle(
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        onPressed: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    Homepage()),
+                                          );
+                                        },
+                                        child:
+                                            Center(child: const Text('HOME')),
+                                      ),
                                     ),
                                   ],
                                 ),
