@@ -7,9 +7,6 @@ NGX POS for Renuka Systems
 TODO
 #####
 
-take closing balance from customer file
-
-delete config.dart
 
 option to alter key column in input files
 
@@ -29,7 +26,6 @@ Delivery
 
 #################################################################################################################################################
 DONE
-
 #####
 
 Login - ui
@@ -98,9 +94,14 @@ Pull existing ticket - null check
 
 check and import csv files shared by client
 
+delete config.dart
+
+take closing balance from customer file
+customer csv import check - balance column
+customer csv import check - no nulls in balance column
+
 #################################################################################################################################################
 ASK
-
 ####
 
 duplicates in consignor and customer name. currently using id column
@@ -110,3 +111,15 @@ Cash payment logic
 payment_type + cash
 Date not correct. Manual input?
 Customer Balance -> from Receipt. no from input file
+
+
+#################################################################################################################################################
+Assumptions:
+####
+
+"Consignor Code" must in consignor input csv ; else file not loaded
+"Customer Code" must in customer input csv ; else file not loaded
+"ClosingBalance" must in customer input csv ; else file not loaded
+"ClosingBalance" must not have blanks in customer input csv; else file not loaded
+"ClosingBalance" must be integer in customer input csv; else file not loaded
+"Item Code" must in item input csv; else file not loaded

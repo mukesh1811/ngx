@@ -7,6 +7,7 @@ import 'package:path_provider/path_provider.dart';
 
 final String consignor_name_key = "Consignor Code";
 final String customer_name_key = "Customer Code";
+final String customer_balance_key = "ClosingBalance";
 final String item_name_key = "Item Code";
 
 Future<List<String>?> getConsignorList() async {
@@ -81,11 +82,14 @@ Future<List<String>?> getItemList() async {
   return result.cast<String>();
 }
 
-Future<List<String>?> getList(String key) async {
+Future<int> getCustomerBalance(String custumer_lookup_id) async
+{
   Directory appDir = await getApplicationDocumentsDirectory();
+
   // Read the CSV file from the database directory
-  String newCsvPath = join(appDir.path, "pos_config.csv");
-  String key = "ItemName";
+  String newCsvPath = join(appDir.path, "customer_name.csv");
+  String customer_lookup_key = customer_name_key;
+  String customer_balance_key = "ClosingBalance";
 
   final input = File(newCsvPath).openRead();
   final fields = await input
@@ -93,22 +97,20 @@ Future<List<String>?> getList(String key) async {
       .transform(const CsvToListConverter())
       .toList();
 
-  var map_list = {for (var v in fields) v[0]: v.sublist(1)};
+  List headers = fields[0];
+  int lookupColIdx = headers.indexOf(customer_lookup_key);
+  int balanceColIdx = headers.indexOf(customer_balance_key);
 
-  print(map_list);
+  int balance = 0;
 
-  if (map_list[key] == null) {
-    return [""];
-  } else {
-    List result = [];
-
-    for (var item in map_list[key]!) {
-      if (!item.isEmpty) {
-        result.add(item);
+  for (var line in fields.sublist(1)) {
+    if(line[lookupColIdx] == custumer_lookup_id)
+      {
+        balance = line[balanceColIdx];
       }
-    }
-
-    print(result);
-    return result.cast<String>();
   }
+
+  print(balance.toString());
+
+  return balance;
 }

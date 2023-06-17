@@ -41,7 +41,7 @@ class _SettingsState extends State<Settings> {
           .transform(CsvToListConverter())
           .toList();
 
-      print(fields);
+      print(fields[0]);
 
       if(!fields[0].contains(consignor_name_key))
       {
@@ -80,7 +80,7 @@ class _SettingsState extends State<Settings> {
           .transform(CsvToListConverter())
           .toList();
 
-      print(fields);
+      print(fields[0]);
 
       if(!fields[0].contains(item_name_key))
       {
@@ -119,12 +119,30 @@ class _SettingsState extends State<Settings> {
           .transform(CsvToListConverter())
           .toList();
 
-      print(fields);
+      print(fields[0]);
 
       if(!fields[0].contains(customer_name_key))
         {
           return -1;
         }
+
+      if(!fields[0].contains(customer_balance_key))
+      {
+        return -2;
+      }
+
+      int balanceColIdx = fields[0].indexOf(customer_balance_key);
+      for (var line in fields.sublist(1)) {
+        var balance = line[balanceColIdx];
+        if(balance is int)
+          {
+
+          }
+        else
+          {
+            return -3;
+          }
+      }
 
       // Get database directory path
       Directory appDir = await getApplicationDocumentsDirectory();
@@ -342,6 +360,15 @@ class _SettingsState extends State<Settings> {
                                 {
                                   resText = "Key $customer_name_key is missing. Update failed";
                                 }
+
+                              else if (res == -2)
+                              {
+                                resText = "Key $customer_balance_key is missing. Update failed";
+                              }
+                              else if (res == -3)
+                              {
+                                resText = "Invalid value in customer balance. Update failed";
+                              }
                               else {
                                 resText = 'Customer Name not updated';
                               }

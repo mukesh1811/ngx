@@ -307,11 +307,25 @@ class _BalanceState extends State<Balance> {
     var balVal = 0;
 
     if (customer_name_value != null) {
-      balVal = await DB_Helper.getBalance(customer_name_value!);
+      balVal = await getCustomerBalance(customer_name_value!);
+
+
     }
 
     setState(() {
       balance = balVal;
     });
   }
+
+  // Future<void> setBalance() async {
+  //   var balVal = 0;
+  //
+  //   if (customer_name_value != null) {
+  //     balVal = await DB_Helper.getBalance(customer_name_value!);
+  //   }
+  //
+  //   setState(() {
+  //     balance = balVal;
+  //   });
+  // }
 }
