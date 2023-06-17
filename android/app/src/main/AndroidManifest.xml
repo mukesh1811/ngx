@@ -3,7 +3,7 @@
    <application
        android:name="${applicationName}"
        android:icon="@mipmap/launcher_icon"
-       android:label="ngx"
+       android:label="PIMS"
        android:requestLegacyExternalStorage="true">
        <activity
            android:name=".MainActivity"
