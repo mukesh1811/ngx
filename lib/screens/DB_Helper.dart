@@ -54,7 +54,7 @@ class DB_Helper {
     await database.execute("""CREATE TABLE lotnumber(
         lot_no TEXT,
         consignor_name TEXT,
-        item_name TEXT,
+        item_name TEXT
      )
       """);
   }

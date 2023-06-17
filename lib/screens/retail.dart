@@ -705,23 +705,35 @@ class _RetailState extends State<Retail> {
       return const SnackBar(content: Text("Please select payment type"));
     }
 
-    if (_units.text.trim() == "") {
-      return const SnackBar(content: Text("Please enter Units"));
-    }
-
-    if (_wt.text.trim() == "") {
-      return const SnackBar(content: Text("Please enter Weight"));
+    if (_wt.text.trim() == "" && _units.text.trim() == "") {
+      return const SnackBar(
+          content: Text("Please enter either weight or unit"));
     }
 
     if (_rate.text.trim() == "") {
       return const SnackBar(content: Text("Please enter Rate"));
     }
 
+    var units;
+    var weight;
+
+    if (_units.text != "") {
+      units = int.parse(_units.text);
+    } else {
+      units = "";
+    }
+
+    if (_wt.text != "") {
+      weight = int.parse(_wt.text);
+    } else {
+      weight = "";
+    }
+
     final data = {
       'item_name': item_name_value,
       'payment_type': payment_type_value,
-      'units': int.parse(_units.text),
-      'weight': int.parse(_wt.text),
+      'units': units,
+      'weight': weight,
       'rate': int.parse(_rate.text),
       'amount': int.parse(_amt.text)
     };
