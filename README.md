@@ -7,10 +7,9 @@ NGX POS for Renuka Systems
 TODO
 #####
 
+Item wise report
 
 option to alter key column in input files
-
-Db export separate files
 
 print
 
@@ -99,6 +98,8 @@ delete config.dart
 take closing balance from customer file
 customer csv import check - balance column
 customer csv import check - no nulls in balance column
+
+Db export separate files
 
 #################################################################################################################################################
 ASK

@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:csv/csv.dart';
-import 'package:excel/excel.dart' as xl;
+//import 'package:excel/excel.dart' as xl;
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:ngx/screens/DB_Helper.dart';
@@ -158,79 +158,151 @@ class _SettingsState extends State<Settings> {
     return 0;
   }
 
+  Future<int> exportDatabaseToCsvFiles() async
+  {
 
 
-  Future<int> exportDatabaseToExcel() async {
-    // Get the database path
-    final String databasePath = join(await getDatabasesPath(), 'pos.db');
-    print('databasePath: $databasePath');
+      // Get the database path
+      final String databasePath = join(await getDatabasesPath(), 'pos.db');
 
-    // Open the database
-    final Database database = await openDatabase(databasePath);
+      // Open the database
+      final Database database = await openDatabase(databasePath);
 
-    // Get the list of table names
-    final List<Map<String, dynamic>> tables = await database
-        .rawQuery("SELECT name FROM sqlite_master WHERE type='table'");
+      // Get the list of table names
+      final List<Map<String, dynamic>> tables =
+      await database.rawQuery("SELECT name FROM sqlite_master WHERE type='table'");
 
-    // Create a new Excel workbook
-    final xl.Excel excel = xl.Excel.createExcel();
+      // Get the directory for saving the CSV files
+      final String directory = "/storage/emulated/0/Documents/db_exports";
 
-    // Loop through each table
-    for (final Map<String, dynamic> table in tables) {
-      final String tableName = table['name'];
-      print('Table: $tableName');
+      if (await Directory(directory).exists()) {
+        print('Specified folder exists');
+      } else {
+        print('Specified folder does not exist. Hence creating..');
+        await Directory(directory).create(recursive: true);
+        print('Folder created successfully');
+      }
 
-      if (tableName != 'android_metadata') {
-        // Query the table and retrieve all rows
-        final List<Map<String, dynamic>> rows = await database.query(tableName);
+      var status = await Permission.storage.status;
+      print('Status Before: $status');
+      if (!status.isGranted) {
+        await Permission.storage.request();
+      }
+      print('Status After: $status');
 
-        // Create a new Excel sheet for the table
-        final xl.Sheet sheetObject = excel[tableName];
-        excel.link(tableName, sheetObject);
+      // Loop through each table
+      for (final Map<String, dynamic> table in tables) {
 
-        // Add column headers to the sheet
-        final List<String> columnHeaders =
-            rows.isNotEmpty ? rows[0].keys.toList() : [];
+          final String tableName = table['name'];
 
-        sheetObject.insertRowIterables(columnHeaders, 0);
+          if (!['android_metadata','users'].contains(tableName)) {
 
-        // Add rows to the sheet
-        for (var rowIndex = 0; rowIndex < rows.length; rowIndex++) {
-          final row = rows[rowIndex];
+          final File csvFile = File('${directory}/$tableName.csv');
 
-          sheetObject.insertRowIterables(row.values.toList(), rowIndex + 1);
+          print(tableName);
+          print(csvFile);
+
+          final csvData = <List<dynamic>>[];
+          final List<Map<String, dynamic>> rows = await database.query(tableName);
+
+
+          csvData.add(rows[0].keys.toList());
+
+          for (final Map<String, dynamic> row in rows) {
+            csvData.add(row.values.toList());
+          }
+
+          final csvString = ListToCsvConverter().convert(csvData);
+
+
+          await csvFile.writeAsString(csvString, flush: true);
+
+          print('CSV file saved at: $csvFile');
         }
       }
 
-      // Add the sheet to the workbook
-      //excel.sheets.add(sheetObject);
-    }
+      // Close the database
+      await database.close();
 
-    var status = await Permission.storage.status;
-    print('Status Before: $status');
-    if (!status.isGranted) {
-      await Permission.storage.request();
-    }
-    print('Status After: $status');
-
-    // Save the Excel file
-    var fileBytes = excel.save();
-
-    var excelfullname = '/storage/emulated/0/Documents/pos.xlsx';
-
-    File(excelfullname)
-      ..createSync(recursive: true)
-      ..writeAsBytesSync(fileBytes!);
-
-    // Save the Excel file
-    // const String excelPath = '/storage/emulated/0/Documents/pos.xlsx';
-    // await excel.save(fileName: excelPath);
-
-    // Close the database
-    await database.close();
-
+    print("Function called");
     return 1;
   }
+
+  // ##############
+  // this commented function can export the db to a single .xlsx file with each sheet containing data of each table
+  // commented but not deleted in case if needed in future
+  // ##############
+  // Future<int> exportDatabaseToExcel() async {
+  //   // Get the database path
+  //   final String databasePath = join(await getDatabasesPath(), 'pos.db');
+  //   print('databasePath: $databasePath');
+  //
+  //   // Open the database
+  //   final Database database = await openDatabase(databasePath);
+  //
+  //   // Get the list of table names
+  //   final List<Map<String, dynamic>> tables = await database
+  //       .rawQuery("SELECT name FROM sqlite_master WHERE type='table'");
+  //
+  //   // Create a new Excel workbook
+  //   final xl.Excel excel = xl.Excel.createExcel();
+  //
+  //   // Loop through each table
+  //   for (final Map<String, dynamic> table in tables) {
+  //     final String tableName = table['name'];
+  //     print('Table: $tableName');
+  //
+  //     if (tableName != 'android_metadata') {
+  //       // Query the table and retrieve all rows
+  //       final List<Map<String, dynamic>> rows = await database.query(tableName);
+  //
+  //       // Create a new Excel sheet for the table
+  //       final xl.Sheet sheetObject = excel[tableName];
+  //       excel.link(tableName, sheetObject);
+  //
+  //       // Add column headers to the sheet
+  //       final List<String> columnHeaders =
+  //           rows.isNotEmpty ? rows[0].keys.toList() : [];
+  //
+  //       sheetObject.insertRowIterables(columnHeaders, 0);
+  //
+  //       // Add rows to the sheet
+  //       for (var rowIndex = 0; rowIndex < rows.length; rowIndex++) {
+  //         final row = rows[rowIndex];
+  //
+  //         sheetObject.insertRowIterables(row.values.toList(), rowIndex + 1);
+  //       }
+  //     }
+  //
+  //     // Add the sheet to the workbook
+  //     //excel.sheets.add(sheetObject);
+  //   }
+  //
+  //   var status = await Permission.storage.status;
+  //   print('Status Before: $status');
+  //   if (!status.isGranted) {
+  //     await Permission.storage.request();
+  //   }
+  //   print('Status After: $status');
+  //
+  //   // Save the Excel file
+  //   var fileBytes = excel.save();
+  //
+  //   var excelfullname = '/storage/emulated/0/Documents/pos.xlsx';
+  //
+  //   File(excelfullname)
+  //     ..createSync(recursive: true)
+  //     ..writeAsBytesSync(fileBytes!);
+  //
+  //   // Save the Excel file
+  //   // const String excelPath = '/storage/emulated/0/Documents/pos.xlsx';
+  //   // await excel.save(fileName: excelPath);
+  //
+  //   // Close the database
+  //   await database.close();
+  //
+  //   return 1;
+  // }
 
   TextEditingController _pwd = TextEditingController();
 
@@ -440,7 +512,8 @@ class _SettingsState extends State<Settings> {
                               border: Border.all(color: Colors.deepOrange)),
                           child: IconButton(
                             onPressed: () async {
-                              int res = await exportDatabaseToExcel();
+                              //int res = await exportDatabaseToExcel();
+                              int res = await exportDatabaseToCsvFiles();
                               String resText = "";
                               if (res == 1) {
                                 resText = 'Database exported successfully!';
@@ -512,8 +585,8 @@ class _SettingsState extends State<Settings> {
 
                                         if (login_status) {
                                           clearTextFields();
-                                          await exportDatabaseToExcel();
-                                          //await DB_Helper.deleteDB();
+                                          await exportDatabaseToCsvFiles();
+                                          await DB_Helper.deleteDB();
 
                                           ScaffoldMessenger.of(context)
                                               .showSnackBar(SnackBar(
