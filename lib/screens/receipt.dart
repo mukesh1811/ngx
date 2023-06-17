@@ -523,6 +523,13 @@ class _ReceiptState extends State<Receipt> {
 
     var res = await DB_Helper.getReceipts(int.parse(_existing_receiptNo.text));
 
+    if (res == null) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text("Receipt No invalid")));
+
+      return;
+    }
+
     print("returned receipt no is");
     print(res);
 

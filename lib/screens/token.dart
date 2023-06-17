@@ -862,6 +862,13 @@ class _TokenState extends State<Token> {
 
     var res = await DB_Helper.getToken(int.parse(_existing_tokenNo.text));
 
+    if (res == null) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text("Token No invalid")));
+
+      return;
+    }
+
     print("returned token is");
     print(res);
 

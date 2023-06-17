@@ -203,7 +203,7 @@ class DB_Helper {
     }
   }
 
-  static Future<Map<String, Object?>> getRetail(int token_id) async {
+  static Future<Map<String, Object?>?> getRetail(int token_id) async {
     final db = await DB_Helper.db();
 
     var res =
@@ -211,10 +211,14 @@ class DB_Helper {
 
     print('Token: ${res}');
 
-    return res[0];
+    if (res.length == 0) {
+      return null;
+    } else {
+      return res[0];
+    }
   }
 
-  static Future<Map<String, Object?>> getReceipts(int token_id) async {
+  static Future<Map<String, Object?>?> getReceipts(int token_id) async {
     final db = await DB_Helper.db();
 
     var res =
@@ -222,21 +226,14 @@ class DB_Helper {
 
     print('Receipts: ${res}');
 
-    return res[0];
+    if (res.length == 0) {
+      return null;
+    } else {
+      return res[0];
+    }
   }
 
-  static Future<Map<String, Object?>> getlotnumber(String lot_id) async {
-    final db = await DB_Helper.db();
-
-    var res =
-        await db.query('lotnumber', where: 'lot_no = ?', whereArgs: [lot_id]);
-
-    print('Lotnumber: ${res}');
-
-    return res[0];
-  }
-
-  static Future<Map<String, Object?>> getToken(int token_id) async {
+  static Future<Map<String, Object?>?> getToken(int token_id) async {
     final db = await DB_Helper.db();
 
     var res =
@@ -244,14 +241,18 @@ class DB_Helper {
 
     print('Token: ${res}');
 
-    return res[0];
+    if (res.length == 0) {
+      return null;
+    } else {
+      return res[0];
+    }
   }
 
-  static Future<Map<String, Object?>> getlotnumbere(int token_id) async {
+  static Future<Map<String, Object?>> getlotnumber(String lot_id) async {
     final db = await DB_Helper.db();
 
-    var res = await db
-        .query('lotnumber', where: '_rowid_ = ?', whereArgs: [token_id]);
+    var res =
+        await db.query('lotnumber', where: 'lot_no = ?', whereArgs: [lot_id]);
 
     print('Lotnumber: ${res}');
 

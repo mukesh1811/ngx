@@ -753,12 +753,19 @@ class _RetailState extends State<Retail> {
 
     if (_existing_retailNo.text == "") {
       ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Existing Token No is empty")));
+          const SnackBar(content: Text("Existing Retail No is empty")));
 
       return;
     }
 
     var res = await DB_Helper.getRetail(int.parse(_existing_retailNo.text));
+
+    if (res == null) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text("Retail No invalid")));
+
+      return;
+    }
 
     print("returned token is");
     print(res);
