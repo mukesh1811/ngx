@@ -124,6 +124,7 @@ c and g - numeric
 units mandatory in token
 mark not mandatory
 item name - not code use name
+item csv import check - no nulls
 
 #################################################################################################################################################
 ASK

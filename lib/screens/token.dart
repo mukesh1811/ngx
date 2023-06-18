@@ -1,3 +1,5 @@
+//import 'dart:html';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -939,7 +941,14 @@ class _TokenState extends State<Token> {
 
     _clearFields();
 
+    //focus refresh
+    Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+            builder: (BuildContext context) => super.widget));
+
     return const SnackBar(content: Text("Token saved successfully!"));
+
   }
 
   Future<void> _loadData() async {

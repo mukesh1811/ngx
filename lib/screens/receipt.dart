@@ -508,6 +508,11 @@ class _ReceiptState extends State<Receipt> {
 
     _clearFields();
 
+    Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+            builder: (BuildContext context) => super.widget));
+
     return const SnackBar(content: Text("Receipt saved successfully!"));
   }
 

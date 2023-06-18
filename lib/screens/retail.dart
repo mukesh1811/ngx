@@ -749,13 +749,12 @@ class _RetailState extends State<Retail> {
       });
     }
 
-    // Navigator.push(
-    //   context,
-    //   MaterialPageRoute(builder: (context) => Token()),
-    // );
-    ;
-
     _clearFields();
+
+    Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+            builder: (BuildContext context) => super.widget));
 
     return const SnackBar(content: Text("Retail info saved successfully!"));
   }
