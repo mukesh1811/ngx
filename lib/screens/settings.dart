@@ -87,6 +87,15 @@ class _SettingsState extends State<Settings> {
         return -1;
       }
 
+      int itemIdx = fields[0].indexOf(item_name_key);
+      for (var line in fields.sublist(1)) {
+        var item_name = line[itemIdx];
+        if(item_name == "")
+        {
+          return -2;
+        }
+      }
+
       // Get database directory path
       Directory appDir = await getApplicationDocumentsDirectory();
       // Move the CSV file to the database directory
@@ -480,6 +489,10 @@ class _SettingsState extends State<Settings> {
                               else if (res == -1)
                               {
                                 resText = "Key $item_name_key is missing. Update failed";
+                              }
+                              else if (res == -2)
+                              {
+                                resText = "Blanks found in $item_name_key. Update failed";
                               }
                               else {
                                 resText = 'Item Name not updated';

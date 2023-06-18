@@ -148,4 +148,5 @@ Assumptions:
 "ClosingBalance" must in customer input csv ; else file not loaded
 "ClosingBalance" must not have blanks in customer input csv; else file not loaded
 "ClosingBalance" must be integer in customer input csv; else file not loaded
-"Item Code" must in item input csv; else file not loaded
+"Item Name" must in item input csv; else file not loaded
+"Item Name" must not have blanks
