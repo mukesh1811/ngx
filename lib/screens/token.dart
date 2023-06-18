@@ -32,6 +32,7 @@ class _TokenState extends State<Token> {
   final TextEditingController _units = TextEditingController();
   final TextEditingController _wt = TextEditingController();
   final TextEditingController _rate = TextEditingController();
+  final TextEditingController _c_and_g = TextEditingController();
   final TextEditingController _amt = TextEditingController();
   final TextEditingController _existing_tokenNo = TextEditingController();
 
@@ -355,7 +356,13 @@ class _TokenState extends State<Token> {
                                             _rate.text != "") {
                                           rt = int.parse(_rate.text);
                                         }
-                                        _amt.text = (rt * units).toString();
+                                        int cANDg = 0;
+                                        if (_c_and_g.text.isNotEmpty &&
+                                            _c_and_g.text != "") {
+                                          cANDg = int.parse(_rate.text);
+                                        }
+                                        _amt.text = ((rt * units) + cANDg).toString();
+
                                       });
                                     }
                                   },
@@ -408,7 +415,13 @@ class _TokenState extends State<Token> {
                                           _rate.text != "") {
                                         rt = int.parse(_rate.text);
                                       }
-                                      _amt.text = (rt * wt).toString();
+
+                                      int cANDg = 0;
+                                      if (_c_and_g.text.isNotEmpty &&
+                                          _c_and_g.text != "") {
+                                        cANDg = int.parse(_rate.text);
+                                      }
+                                      _amt.text = ((rt * wt) + cANDg).toString();
                                     });
                                   },
                                   obscureText: false,
@@ -453,6 +466,11 @@ class _TokenState extends State<Token> {
                                       rt = int.parse(txt);
                                     }
 
+                                    int cANDg = 0;
+                                    if (_c_and_g.text != "" || _c_and_g.text.isNotEmpty) {
+                                      cANDg = int.parse(_c_and_g.text);
+                                    }
+
                                     int multiplier = 0;
 
                                     if (_wt.text.isNotEmpty) {
@@ -462,11 +480,68 @@ class _TokenState extends State<Token> {
                                     }
 
                                     setState(() {
-                                      _amt.text = (rt * multiplier).toString();
+                                      _amt.text = ((rt * multiplier) + cANDg).toString();
                                     });
                                   },
                                   decoration: InputDecoration(
                                     labelText: 'Rate',
+                                    labelStyle: TextStyle(
+                                        color: Colors.black, fontSize: 12),
+                                    contentPadding: EdgeInsets.all(5),
+                                    border: OutlineInputBorder(),
+                                  ),
+                                  style: TextStyle(color: Colors.black),
+                                  textInputAction: TextInputAction.next,
+                                  keyboardType: TextInputType.number,
+                                  inputFormatters: <TextInputFormatter>[
+                                    FilteringTextInputFormatter.digitsOnly
+                                  ]),
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(
+                        height: 5,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          Text("C and G:",
+                              style: TextStyle(
+                                  fontSize: 12, fontWeight: FontWeight.bold)),
+                          Container(
+                            width: 200,
+                            child: SizedBox(
+                              width: 100,
+                              height: 30,
+                              child: TextField(
+                                  controller: _c_and_g,
+                                  obscureText: false,
+                                  onChanged: (txt) {
+                                    int cANDg = 0;
+                                    if (txt != "" || txt.isNotEmpty) {
+                                      cANDg = int.parse(txt);
+                                    }
+
+                                    int rt = 0;
+                                    if (_rate.text != "" || _rate.text.isNotEmpty) {
+                                      rt = int.parse(_rate.text);
+                                    }
+
+                                    int multiplier = 0;
+
+                                    if (_wt.text.isNotEmpty) {
+                                      multiplier = int.parse(_wt.text);
+                                    } else if (_units.text.isNotEmpty) {
+                                      multiplier = int.parse(_units.text);
+                                    }
+
+                                    setState(() {
+                                      _amt.text = ((rt * multiplier) + cANDg).toString();
+                                    });
+                                  },
+                                  decoration: InputDecoration(
+                                    labelText: 'CandG',
                                     labelStyle: TextStyle(
                                         color: Colors.black, fontSize: 12),
                                     contentPadding: EdgeInsets.all(5),
@@ -512,6 +587,8 @@ class _TokenState extends State<Token> {
                               ),
                             ),
                           ),
+
+
                         ],
                       ),
                       SizedBox(
@@ -788,14 +865,21 @@ class _TokenState extends State<Token> {
       return const SnackBar(content: Text("Please select Lot No"));
     }
 
-    if (_mark.text.trim() == "") {
-      return const SnackBar(content: Text("Please enter Mark"));
+    //mark is not mandatory
+    // if (_mark.text.trim() == "") {
+    //   return const SnackBar(content: Text("Please enter Mark"));
+    // }
+
+    //units is mandatory
+    if (_units.text.trim() == "") {
+      return const SnackBar(content: Text("Please enter Units"));
     }
 
-    if (_wt.text.trim() == "" && _units.text.trim() == "") {
-      return const SnackBar(
-          content: Text("Please enter either weight or unit"));
-    }
+    //weight is not mandatory
+    // if (_wt.text.trim() == "") {
+    //   return const SnackBar(
+    //       content: Text("Please enter weight"));
+    // }
 
     if (_rate.text.trim() == "") {
       return const SnackBar(content: Text("Please enter Rate"));
@@ -803,6 +887,7 @@ class _TokenState extends State<Token> {
 
     var units;
     var weight;
+    var c_and_g;
 
     if (_units.text != "") {
       units = int.parse(_units.text);
@@ -816,6 +901,12 @@ class _TokenState extends State<Token> {
       weight = "";
     }
 
+    if (_c_and_g.text != "") {
+      c_and_g = int.parse(_c_and_g.text);
+    } else {
+      c_and_g = "";
+    }
+
     final data = {
       'consignor_name': consignor.text,
       'item_name': item.text,
@@ -825,6 +916,7 @@ class _TokenState extends State<Token> {
       'units': units,
       'weight': weight,
       'rate': int.parse(_rate.text),
+      'c_and_g': c_and_g,
       'amount': int.parse(_amt.text)
     };
 
@@ -922,6 +1014,7 @@ class _TokenState extends State<Token> {
       _units.text = "";
       _wt.text = "";
       _rate.text = "";
+      _c_and_g.text = "";
       _amt.text = "";
       _existing_tokenNo.text = "";
 

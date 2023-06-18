@@ -30,6 +30,7 @@ class DB_Helper {
         units INTEGER,
         weight INTEGER,
         rate INTEGER,
+        c_and_g INTEGER,
         amount INTEGER
      )
       """);
@@ -59,7 +60,8 @@ class DB_Helper {
       """);
   }
 
-  static Future<int> createRetail(Map<String, dynamic> data) async {
+  static Future<int> createRetail(Map<String, dynamic> data) async
+  {
     final db = await DB_Helper.db();
 
     final id = await db.insert('retail', data,

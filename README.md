@@ -7,8 +7,6 @@ NGX POS for Renuka Systems
 TODO
 #####
 
-c and g - numeric
-
 token and retail
 
 duplicates in consignor and customer name. currently using id column - use name-location (5) - check in db
@@ -17,9 +15,6 @@ item name use name
 after save, cursor move to first element
 
 lot number not mandatory - "no lot"
-
-units mandatory in token
-mark not mandatory
 
 token no | date(DDMMYYYY)
 
@@ -82,7 +77,7 @@ Set icon
 
 printTest
 
----------------------------------------------
+--------------------------------------------- after demo 1
 
 Remove exit button from all pages
 
@@ -124,8 +119,11 @@ customer csv import check - no nulls in balance column
 
 Db export separate files
 
----------------------------------------------
+--------------------------------------------- after demo 2
 
+c and g - numeric
+units mandatory in token
+mark not mandatory
 
 #################################################################################################################################################
 ASK
