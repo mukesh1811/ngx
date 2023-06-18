@@ -8,7 +8,7 @@ import 'package:path_provider/path_provider.dart';
 final String consignor_name_key = "Consignor Code";
 final String customer_name_key = "Customer Code";
 final String customer_balance_key = "ClosingBalance";
-final String item_name_key = "Item Code";
+final String item_name_key = "Item Name";
 
 Future<List<String>?> getConsignorList() async {
   Directory appDir = await getApplicationDocumentsDirectory();
@@ -63,6 +63,7 @@ Future<List<String>?> getItemList() async {
   // Read the CSV file from the database directory
   String newCsvPath = join(appDir.path, "item_name.csv");
   String key = item_name_key;
+  print(item_name_key);
 
   final input = File(newCsvPath).openRead();
   final fields = await input

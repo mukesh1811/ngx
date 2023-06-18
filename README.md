@@ -7,14 +7,13 @@ NGX POS for Renuka Systems
 TODO
 #####
 
-token and retail
-
 duplicates in consignor and customer name. currently using id column - use name-location (5) - check in db
-item name use name
 
 after save, cursor move to first element
 
 lot number not mandatory - "no lot"
+
+token and retail
 
 token no | date(DDMMYYYY)
 
@@ -124,6 +123,7 @@ Db export separate files
 c and g - numeric
 units mandatory in token
 mark not mandatory
+item name - not code use name
 
 #################################################################################################################################################
 ASK
