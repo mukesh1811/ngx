@@ -7,7 +7,28 @@ NGX POS for Renuka Systems
 TODO
 #####
 
-Item wise report
+c and g - numeric
+
+token and retail
+
+duplicates in consignor and customer name. currently using id column - use name-location (5) - check in db
+item name use name
+
+after save, cursor move to first element
+
+lot number not mandatory - "no lot"
+
+units mandatory in token
+mark not mandatory
+
+token no | date(DDMMYYYY)
+
+Item wise summary - split it into 2
+token:
+item | rate | sum(units)
+total weight = sum(wt)
+retail
+item | rate | sum(wt) | sum(amt)
 
 option to alter key column in input files
 
@@ -61,6 +82,8 @@ Set icon
 
 printTest
 
+---------------------------------------------
+
 Remove exit button from all pages
 
 Remove No.of copies text field from all pages
@@ -101,11 +124,15 @@ customer csv import check - no nulls in balance column
 
 Db export separate files
 
+---------------------------------------------
+
+
 #################################################################################################################################################
 ASK
 ####
 
-duplicates in consignor and customer name. currently using id column
+
+
 
 Db wipe logic
 Cash payment logic
