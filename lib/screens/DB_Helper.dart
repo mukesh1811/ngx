@@ -21,8 +21,11 @@ class DB_Helper {
      )
       """);
 
-    await database.execute("""CREATE TABLE tokens(
-        consignor_name TEXT,
+    await database.execute("""
+    CREATE TABLE tokens(
+		    token_no INTEGER,
+		    date_field TEXT,
+        consignor_id TEXT,
         item_name TEXT,
         payment_type TEXT,
         lot_no TEXT,
@@ -30,31 +33,37 @@ class DB_Helper {
         units INTEGER,
         weight INTEGER,
         rate INTEGER,
-        c_and_g INTEGER,
+		    c_and_g INTEGER,
         amount INTEGER
      )
       """);
 
-    await database.execute("""CREATE TABLE receipts(
-        customer_name TEXT,
+    await database.execute("""
+    CREATE TABLE receipts(
+		    receipt_no INTEGER,
+		    date_field TEXT,
+        customer_id TEXT,
         balance INTEGER
      )
       """);
 
     await database.execute("""
     CREATE TABLE retail(
+		    retail_no INTEGER,
+		    date_field TEXT,
         item_name TEXT,
         payment_type TEXT,
-		units INTEGER,
-		weight INTEGER,
-		rate INTEGER,
-		amount INTEGER
+		    units INTEGER,
+		    weight INTEGER,
+		    rate INTEGER,
+		    amount INTEGER
      )
       """);
 
-    await database.execute("""CREATE TABLE lotnumber(
+    await database.execute("""
+    CREATE TABLE lotnumber(
         lot_no TEXT,
-        consignor_name TEXT,
+        consignor_id TEXT,
         item_name TEXT
      )
       """);
@@ -120,16 +129,13 @@ class DB_Helper {
     final db = await DB_Helper.db();
 
     var max_rowid =
-        await db.rawQuery("select max(_rowid_) as token_no from retail");
+        await db.rawQuery("select max(_rowid_) as retail_no from retail");
 
-    print("max_rowid");
-    print(max_rowid);
-    print(max_rowid[0]['token_no']);
 
-    if (max_rowid[0]['token_no'] == null) {
+    if (max_rowid[0]['retail_no'] == null) {
       return 1;
     } else {
-      return int.parse(max_rowid[0]['token_no'].toString()) + 1;
+      return int.parse(max_rowid[0]['retail_no'].toString()) + 1;
     }
   }
 
@@ -137,16 +143,12 @@ class DB_Helper {
     final db = await DB_Helper.db();
 
     var max_rowid =
-        await db.rawQuery("select max(_rowid_) as token_no from receipts");
+        await db.rawQuery("select max(_rowid_) as receipt_no from receipts");
 
-    print("max_rowid");
-    print(max_rowid);
-    print(max_rowid[0]['token_no']);
-
-    if (max_rowid[0]['token_no'] == null) {
+    if (max_rowid[0]['receipt_no'] == null) {
       return 1;
     } else {
-      return int.parse(max_rowid[0]['token_no'].toString()) + 1;
+      return int.parse(max_rowid[0]['receipt_no'].toString()) + 1;
     }
   }
 

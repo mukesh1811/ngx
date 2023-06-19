@@ -17,6 +17,7 @@ class _ReceiptState extends State<Receipt> {
   String? customer_name_value;
 
   int receiptNo = 0;
+  String dt_field = DateFormat("dd/MM/yyyy").format(DateTime.now());
 
   bool canSave = true;
 
@@ -41,6 +42,12 @@ class _ReceiptState extends State<Receipt> {
     });
   }
 
+  void _setDate() async {
+    setState(() {
+      dt_field = DateFormat("dd/MM/yyyy").format(DateTime.now());;
+    });
+  }
+
   @override
   initState() {
     super.initState();
@@ -49,6 +56,7 @@ class _ReceiptState extends State<Receipt> {
     _balance_txtcntrl.text = "";
 
     _setReceiptNo();
+    _setDate();
   }
 
   @override
@@ -130,8 +138,7 @@ class _ReceiptState extends State<Receipt> {
                                           fontSize: 12,
                                           fontWeight: FontWeight.bold)),
                                   Text(
-                                      DateFormat("dd/MM/yyyy")
-                                          .format(DateTime.now()),
+                                      dt_field,
                                       style: TextStyle(
                                           fontSize: 12,
                                           fontWeight: FontWeight.bold)),
@@ -247,10 +254,11 @@ class _ReceiptState extends State<Receipt> {
                                         fontWeight: FontWeight.bold),
                                   ),
                                   onPressed: () async {
+                                    if(canSave) {
                                     var snackBar = await saveToDB();
                                     ScaffoldMessenger.of(context)
                                         .showSnackBar(snackBar);
-                                  },
+                                  }},
                                   child: Center(child: const Text('Print')),
                                 ),
                               ],
@@ -381,9 +389,11 @@ class _ReceiptState extends State<Receipt> {
                                       onPressed: () {
                                         _clearFields();
                                         _setReceiptNo();
+                                        _setDate();
                                         setState(() {
                                           canSave = true;
                                         });
+                                        focusRefresh();
                                       },
                                       child: Center(
                                           child: const Text('NEW RECEIPT')),
@@ -491,7 +501,9 @@ class _ReceiptState extends State<Receipt> {
     }
 
     final data = {
-      'customer_name': customer_name_value,
+      'receipt_no' : receiptNo,
+      'date_field' : dt_field,
+      'customer_id': customer_name_value,
       'balance': _balance_txtcntrl.text
     };
 
@@ -503,17 +515,24 @@ class _ReceiptState extends State<Receipt> {
     if (id == receiptNo) {
       setState(() {
         _setReceiptNo();
+        _setDate();
       });
     }
 
     _clearFields();
 
+    focusRefresh();
+
+    return const SnackBar(content: Text("Receipt saved successfully!"));
+  }
+
+  void focusRefresh()
+  {
+    //focus refresh
     Navigator.pushReplacement(
         context,
         MaterialPageRoute(
             builder: (BuildContext context) => super.widget));
-
-    return const SnackBar(content: Text("Receipt saved successfully!"));
   }
 
   Future<void> _loadData() async {
@@ -539,7 +558,8 @@ class _ReceiptState extends State<Receipt> {
     print(res);
 
     setState(() {
-      customer_name_value = res['customer_name'] as String?;
+      dt_field = res['date_field'].toString();
+      customer_name_value = res['customer_id'] as String?;
       _balance_txtcntrl.text = res['balance'].toString();
 
       receiptNo = int.parse(_existing_receiptNo.text);

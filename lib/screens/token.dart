@@ -19,6 +19,7 @@ class _TokenState extends State<Token> {
   String? lot_no_value;
 
   int tokenNo = 0;
+  String dt_field = DateFormat("dd/MM/yyyy").format(DateTime.now());
 
   bool canSave = true;
 
@@ -61,6 +62,12 @@ class _TokenState extends State<Token> {
     });
   }
 
+  void _setDate() async {
+    setState(() {
+      dt_field = DateFormat("dd/MM/yyyy").format(DateTime.now());;
+    });
+  }
+
   @override
   initState() {
     super.initState();
@@ -73,6 +80,7 @@ class _TokenState extends State<Token> {
     _rate.text = "";
 
     _setTokenNo();
+    _setDate();
   }
 
   @override
@@ -151,8 +159,7 @@ class _TokenState extends State<Token> {
                                             fontSize: 12,
                                             fontWeight: FontWeight.bold)),
                                     Text(
-                                        DateFormat("dd/MM/yyyy")
-                                            .format(DateTime.now()),
+                                        dt_field.toString(),
                                         style: TextStyle(
                                             fontSize: 12,
                                             fontWeight: FontWeight.bold)),
@@ -621,9 +628,11 @@ class _TokenState extends State<Token> {
                                           fontWeight: FontWeight.bold),
                                     ),
                                     onPressed: () async {
-                                      var snackBar = await saveToDB();
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(snackBar);
+                                      if(canSave) {
+                                        var snackBar = await saveToDB();
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(snackBar);
+                                      }
                                     },
                                     child: Center(child: const Text('Print')),
                                   ),
@@ -757,9 +766,11 @@ class _TokenState extends State<Token> {
                                       onPressed: () {
                                         _clearFields();
                                         _setTokenNo();
+                                        _setDate();
                                         setState(() {
                                           canSave = true;
                                         });
+                                        focusRefresh();
                                       },
                                       child: Center(
                                           child: const Text('NEW TOKEN')),
@@ -910,7 +921,9 @@ class _TokenState extends State<Token> {
     }
 
     final data = {
-      'consignor_name': consignor.text,
+      'token_no' : tokenNo,
+      'date_field' : dt_field,
+      'consignor_id': consignor.text,
       'item_name': item.text,
       'payment_type': payment_type_value,
       'lot_no': lot_no_value,
@@ -930,25 +943,25 @@ class _TokenState extends State<Token> {
     if (id == tokenNo) {
       setState(() {
         _setTokenNo();
+        _setDate();
       });
     }
 
-    // Navigator.push(
-    //   context,
-    //   MaterialPageRoute(builder: (context) => Token()),
-    // );
-    ;
-
     _clearFields();
 
+    focusRefresh();
+
+    return const SnackBar(content: Text("Token saved successfully!"));
+
+  }
+
+  void focusRefresh()
+  {
     //focus refresh
     Navigator.pushReplacement(
         context,
         MaterialPageRoute(
             builder: (BuildContext context) => super.widget));
-
-    return const SnackBar(content: Text("Token saved successfully!"));
-
   }
 
   Future<void> _loadData() async {
@@ -974,11 +987,12 @@ class _TokenState extends State<Token> {
     print(res);
 
     setState(() {
-      consignor.text = (res['consignor_name'] as String);
+      dt_field = res['date_field'].toString();
+      consignor.text = (res['consignor_id'] as String);
       item.text = (res['item_name'] as String);
       payment_type_value = res['payment_type'] as String?;
-      lot_no_value = (res['lot_no'] as String?)!;
-      _mark.text = (res['mark'] as String?)!;
+      lot_no_value = res['lot_no'].toString();
+      _mark.text = res['mark'].toString();
       _units.text = res['units'].toString();
       _wt.text = res['weight'].toString();
       _rate.text = res['rate'].toString();
@@ -1047,8 +1061,8 @@ class _TokenState extends State<Token> {
     print(res);
 
     setState(() {
+      consignor.text = res['consignor_id'] as String;
       item.text = res['item_name'] as String;
-      consignor.text = res['consignor_name'] as String;
     });
   }
 }

@@ -19,6 +19,7 @@ class _RetailState extends State<Retail> {
   String? payment_type_value;
 
   int retailNo = 0;
+  String dt_field = DateFormat("dd/MM/yyyy").format(DateTime.now());
 
   bool canSave = true;
 
@@ -50,6 +51,12 @@ class _RetailState extends State<Retail> {
     });
   }
 
+  void _setDate() async {
+    setState(() {
+      dt_field = DateFormat("dd/MM/yyyy").format(DateTime.now());;
+    });
+  }
+
   @override
   initState() {
     super.initState();
@@ -61,6 +68,7 @@ class _RetailState extends State<Retail> {
     _rate.text = "";
 
     _setRetailNo();
+    _setDate();
   }
 
   @override
@@ -141,8 +149,7 @@ class _RetailState extends State<Retail> {
                                           fontSize: 15,
                                           fontWeight: FontWeight.bold)),
                                   Text(
-                                      DateFormat("dd/MM/yyyy")
-                                          .format(DateTime.now()),
+                                      dt_field,
                                       style: TextStyle(
                                           fontSize: 15,
                                           fontWeight: FontWeight.bold)),
@@ -457,10 +464,11 @@ class _RetailState extends State<Retail> {
                                         fontWeight: FontWeight.bold),
                                   ),
                                   onPressed: () async {
+                                    if(canSave) {
                                     var snackBar = await saveToDB();
                                     ScaffoldMessenger.of(context)
                                         .showSnackBar(snackBar);
-                                  },
+                                  }},
                                   child: Center(child: const Text('Print')),
                                 ),
                               ],
@@ -591,9 +599,11 @@ class _RetailState extends State<Retail> {
                                       onPressed: () {
                                         _clearFields();
                                         _setRetailNo();
+                                        _setDate();
                                         setState(() {
                                           canSave = true;
                                         });
+                                        focusRefresh();
                                       },
                                       child: Center(
                                           child: const Text('NEW RETAIL')),
@@ -730,6 +740,8 @@ class _RetailState extends State<Retail> {
     }
 
     final data = {
+      'retail_no' : retailNo,
+      'date_field' : dt_field,
       'item_name': item_name_value,
       'payment_type': payment_type_value,
       'units': units,
@@ -746,17 +758,23 @@ class _RetailState extends State<Retail> {
     if (id == retailNo) {
       setState(() {
         _setRetailNo();
+        _setDate();
       });
     }
 
     _clearFields();
 
+    focusRefresh();
+
+    return const SnackBar(content: Text("Retail info saved successfully!"));
+  }
+
+  void focusRefresh()
+  {
     Navigator.pushReplacement(
         context,
         MaterialPageRoute(
             builder: (BuildContext context) => super.widget));
-
-    return const SnackBar(content: Text("Retail info saved successfully!"));
   }
 
   Future<void> _loadData() async {
@@ -782,8 +800,9 @@ class _RetailState extends State<Retail> {
     print(res);
 
     setState(() {
-      item_name_value = res['item_name'] as String?;
-      payment_type_value = res['payment_type'] as String?;
+      dt_field = res['date_field'].toString();
+      item_name_value = res['item_name'].toString();
+      payment_type_value = res['payment_type'].toString();
       _units.text = res['units'].toString();
       _wt.text = res['weight'].toString();
       _rate.text = res['rate'].toString();

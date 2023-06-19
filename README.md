@@ -7,15 +7,11 @@ NGX POS for Renuka Systems
 TODO
 #####
 
-duplicates in consignor and customer name. currently using id column - use name-location (5) - check in db
-
-after save, cursor move to first element
-
 lot number not mandatory - "no lot"
 
-token and retail
+duplicates in consignor and customer name. currently using id column - use name-location (5) - check in db
 
-token no | date(DDMMYYYY)
+print
 
 Item wise summary - split it into 2
 token:
@@ -25,8 +21,6 @@ retail
 item | rate | sum(wt) | sum(amt)
 
 option to alter key column in input files
-
-print
 
 Test
 
@@ -125,6 +119,9 @@ units mandatory in token
 mark not mandatory
 item name - not code use name
 item csv import check - no nulls
+after save, cursor move to first element
+token no | date(DDMMYYYY)
+save in print - under canSave flag
 
 #################################################################################################################################################
 ASK

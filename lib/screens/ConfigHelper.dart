@@ -30,7 +30,6 @@ Future<List<String>?> getConsignorList() async {
     result.add(line[reqColIdx].toString());
   }
 
-  print(result);
   return result.cast<String>();
 }
 
@@ -54,7 +53,6 @@ Future<List<String>?> getCustomerList() async {
     result.add(line[reqColIdx].toString());
   }
 
-  print(result);
   return result.cast<String>();
 }
 
@@ -63,7 +61,6 @@ Future<List<String>?> getItemList() async {
   // Read the CSV file from the database directory
   String newCsvPath = join(appDir.path, "item_name.csv");
   String key = item_name_key;
-  print(item_name_key);
 
   final input = File(newCsvPath).openRead();
   final fields = await input
@@ -79,7 +76,6 @@ Future<List<String>?> getItemList() async {
     result.add(line[reqColIdx].toString());
   }
 
-  print(result);
   return result.cast<String>();
 }
 
@@ -89,8 +85,7 @@ Future<int> getCustomerBalance(String custumer_lookup_id) async
 
   // Read the CSV file from the database directory
   String newCsvPath = join(appDir.path, "customer_name.csv");
-  String customer_lookup_key = customer_name_key;
-  String customer_balance_key = "ClosingBalance";
+
 
   final input = File(newCsvPath).openRead();
   final fields = await input
@@ -99,7 +94,7 @@ Future<int> getCustomerBalance(String custumer_lookup_id) async
       .toList();
 
   List headers = fields[0];
-  int lookupColIdx = headers.indexOf(customer_lookup_key);
+  int lookupColIdx = headers.indexOf(customer_name_key);
   int balanceColIdx = headers.indexOf(customer_balance_key);
 
   int balance = 0;
@@ -110,8 +105,6 @@ Future<int> getCustomerBalance(String custumer_lookup_id) async
         balance = line[balanceColIdx];
       }
   }
-
-  print(balance.toString());
 
   return balance;
 }

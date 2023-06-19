@@ -354,9 +354,9 @@ class _LotnumberState extends State<Lotnumber> {
     }
 
     final data = {
-      'consignor_name': consignor_name_value,
-      'item_name': item_name_value,
-      'lot_no': _lotno.text
+      'lot_no': _lotno.text,
+      'consignor_id': consignor_name_value,
+      'item_name': item_name_value
     };
 
     int id = await DB_Helper.createlotnumber(data);
