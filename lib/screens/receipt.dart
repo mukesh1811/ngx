@@ -181,7 +181,7 @@ class _ReceiptState extends State<Receipt> {
                                   value: customer_name_value,
                                   onChanged: (String? value) {
                                     setState(() {
-                                      customer_name_value = value ?? "dummy";
+                                      customer_name_value = value ?? "";
                                     });
                                   },
                                   items: customer_names_list
@@ -500,10 +500,13 @@ class _ReceiptState extends State<Receipt> {
       return const SnackBar(content: Text("Please enter balance amount"));
     }
 
+    String custId = await getCustomerID(customer_name_value!);
+
+
     final data = {
       'receipt_no' : receiptNo,
       'date_field' : dt_field,
-      'customer_id': customer_name_value,
+      'customer_id': custId,
       'balance': _balance_txtcntrl.text
     };
 
@@ -554,12 +557,14 @@ class _ReceiptState extends State<Receipt> {
       return;
     }
 
-    print("returned receipt no is");
-    print(res);
+    String custDisplayName = await getCustomerDisplayValue(res['customer_id'].toString());
 
     setState(() {
       dt_field = res['date_field'].toString();
-      customer_name_value = res['customer_id'] as String?;
+
+
+      customer_name_value = custDisplayName;
+
       _balance_txtcntrl.text = res['balance'].toString();
 
       receiptNo = int.parse(_existing_receiptNo.text);

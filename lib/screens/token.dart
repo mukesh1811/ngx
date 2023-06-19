@@ -1014,6 +1014,11 @@ class _TokenState extends State<Token> {
       return const SnackBar(content: Text("Please enter Rate"));
     }
 
+    if(payment_type_value != "--- Cash ---")
+    {
+      payment_type_value = await getCustomerID(payment_type_value!);
+    }
+
     var units;
     var weight;
     var c_and_g;
@@ -1106,6 +1111,12 @@ class _TokenState extends State<Token> {
     print("returned token is");
     print(res);
 
+    String paymentType = res['payment_type'].toString();
+    if(paymentType != "--- Cash ---")
+    {
+      paymentType = await getCustomerDisplayValue(paymentType);
+    }
+
     setState(() {
       dt_field = res['date_field'].toString();
 
@@ -1115,7 +1126,7 @@ class _TokenState extends State<Token> {
       //item.text = (res['item_name'] as String);
       item_name_value = res['item_name'].toString();
 
-      payment_type_value = res['payment_type'] as String?;
+      payment_type_value = paymentType;
 
       if(res['lot_no'].toString() == "null")
         {

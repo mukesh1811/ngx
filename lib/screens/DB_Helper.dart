@@ -228,8 +228,6 @@ class DB_Helper {
     var res =
         await db.query('receipts', where: '_rowid_ = ?', whereArgs: [token_id]);
 
-    print('Receipts: ${res}');
-
     if (res.length == 0) {
       return null;
     } else {

@@ -8,6 +8,10 @@ TODO
 #####
 
 duplicates in consignor and customer name. currently using id column - use name-location (5) - check in db
+    construct name-loc
+    deconstruct name-loc to id
+    
+    add all columns to input file validation
 
 print
 

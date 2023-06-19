@@ -739,6 +739,11 @@ class _RetailState extends State<Retail> {
       weight = "";
     }
 
+    if(payment_type_value != "--- Cash ---")
+      {
+        payment_type_value = await getCustomerID(payment_type_value!);
+      }
+
     final data = {
       'retail_no' : retailNo,
       'date_field' : dt_field,
@@ -799,10 +804,16 @@ class _RetailState extends State<Retail> {
     print("returned token is");
     print(res);
 
+    String paymentType = res['payment_type'].toString();
+    if(paymentType != "--- Cash ---")
+      {
+        paymentType = await getCustomerDisplayValue(paymentType);
+      }
+
     setState(() {
       dt_field = res['date_field'].toString();
       item_name_value = res['item_name'].toString();
-      payment_type_value = res['payment_type'].toString();
+      payment_type_value = paymentType;
       _units.text = res['units'].toString();
       _wt.text = res['weight'].toString();
       _rate.text = res['rate'].toString();
