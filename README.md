@@ -7,13 +7,14 @@ NGX POS for Renuka Systems
 TODO
 #####
 
-duplicates in consignor and customer name. currently using id column - use name-location (5) - check in db
-    construct name-loc
-    deconstruct name-loc to id
-    
-    add all columns to input file validation
+add all columns to input file validation
 
-print
+print token
+print retail
+
+print others
+
+token load slow for consignor and item dropdown
 
 Item wise summary - split it into 2
 token:
@@ -125,6 +126,12 @@ after save, cursor move to first element
 token no | date(DDMMYYYY)
 save in print - under canSave flag
 lot number not mandatory - "no lot"
+
+duplicates in consignor and customer name. currently using id column - use name-location (5) - check in db
+construct name-loc
+deconstruct name-loc to id
+
+
 
 #################################################################################################################################################
 ASK

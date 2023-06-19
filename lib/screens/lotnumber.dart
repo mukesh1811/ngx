@@ -105,7 +105,7 @@ class _LotnumberState extends State<Lotnumber> {
                           child: TextField(
                             controller: _lotno,
                             cursorColor: Colors.black,
-                            style: TextStyle(color: Colors.black, fontSize: 18),
+                            style: TextStyle(color: Colors.black, fontSize: 12),
 
                             //autofocus: true,
                             decoration: InputDecoration(
@@ -116,7 +116,8 @@ class _LotnumberState extends State<Lotnumber> {
                                         color: Colors.black, width: 1.0)),
                                 labelText: "Lot Number",
                                 labelStyle: TextStyle(
-                                    color: Colors.black, fontSize: 18)),
+
+                                    color: Colors.black, fontSize: 12)),
                           ),
                         ),
 
@@ -144,7 +145,7 @@ class _LotnumberState extends State<Lotnumber> {
                                     ),
                                     style: const TextStyle(
                                       color: Colors.black,
-                                      fontSize: 18,
+                                      fontSize: 12,
                                     ),
                                     items: consignor_names_list
                                         .map<DropdownMenuItem<String>>(
@@ -190,7 +191,7 @@ class _LotnumberState extends State<Lotnumber> {
                                       hint: const Text("Item Name"),
                                       style: const TextStyle(
                                         color: Colors.black,
-                                        fontSize: 18,
+                                        fontSize: 12,
                                       ),
                                       value: item_name_value,
                                       onChanged: (String? value) {
@@ -353,9 +354,11 @@ class _LotnumberState extends State<Lotnumber> {
       return const SnackBar(content: Text("Please select a item name"));
     }
 
+    String consignorId = await getConsignorID(consignor_name_value!);
+
     final data = {
       'lot_no': _lotno.text,
-      'consignor_id': consignor_name_value,
+      'consignor_id': consignorId,
       'item_name': item_name_value
     };
 

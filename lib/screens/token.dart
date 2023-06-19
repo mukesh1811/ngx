@@ -223,7 +223,7 @@ class _TokenState extends State<Token> {
                                       lot_no_value = value ?? "";
                                       if(!is_dash)
                                         {
-                                          _loadNoData();
+                                          _loadLotData();
                                         }
                                       lot_selected = !is_dash;
 
@@ -1019,6 +1019,8 @@ class _TokenState extends State<Token> {
       payment_type_value = await getCustomerID(payment_type_value!);
     }
 
+    String consignorId = await getConsignorID(consignor_name_value!);
+
     var units;
     var weight;
     var c_and_g;
@@ -1045,7 +1047,7 @@ class _TokenState extends State<Token> {
       'token_no' : tokenNo,
       'date_field' : dt_field,
       // 'consignor_id': consignor.text,
-      'consignor_id': consignor_name_value,
+      'consignor_id': consignorId,
 
       //'item_name': item.text,
       'item_name': item_name_value,
@@ -1117,11 +1119,13 @@ class _TokenState extends State<Token> {
       paymentType = await getCustomerDisplayValue(paymentType);
     }
 
+    String consignorDisplayName = await getConsignorDisplayValue(res['consignor_id'].toString());
+
     setState(() {
       dt_field = res['date_field'].toString();
 
       //consignor.text = (res['consignor_id'] as String);
-      consignor_name_value = res['consignor_id'].toString();
+      consignor_name_value = consignorDisplayName;
 
       //item.text = (res['item_name'] as String);
       item_name_value = res['item_name'].toString();
@@ -1193,7 +1197,7 @@ class _TokenState extends State<Token> {
     });
   }
 
-  Future<void> _loadNoData() async {
+  Future<void> _loadLotData() async {
     print(lot_no_value);
 
     if (lot_no_value == "") {
@@ -1205,12 +1209,14 @@ class _TokenState extends State<Token> {
 
     var res = await DB_Helper.getlotnumber(lot_no_value!);
 
-    print("returned lotnumber is");
+    print("returned lot number is");
     print(res);
+
+    String consignorDisplayName = await getConsignorDisplayValue(res['consignor_id'].toString());
 
     setState(() {
       //consignor.text = res['consignor_id'] as String;
-      consignor_name_value = res['consignor_id'].toString();
+      consignor_name_value = consignorDisplayName;
 
       //item.text = res['item_name'] as String;
       item_name_value = res['item_name'].toString();
