@@ -15,8 +15,12 @@ class Token extends StatefulWidget {
 }
 
 class _TokenState extends State<Token> {
+  String? consignor_name_value;
+  String? item_name_value;
   String? payment_type_value;
   String? lot_no_value;
+
+  bool lot_selected = false;
 
   int tokenNo = 0;
   String dt_field = DateFormat("dd/MM/yyyy").format(DateTime.now());
@@ -42,9 +46,13 @@ class _TokenState extends State<Token> {
   void _populateDropdown() async {
     final conslist = await getConsignorList();
     final itemlist = await getItemList();
+
     final custList = await getCustomerList();
-    final lotList = await DB_Helper.getLotNumberList();
     custList?.insert(0, "--- Cash ---");
+
+    final lotList = await DB_Helper.getLotNumberList();
+    lotList?.insert(0, "---");
+
 
     setState(() {
       consignor_names_list = conslist!;
@@ -81,6 +89,9 @@ class _TokenState extends State<Token> {
 
     _setTokenNo();
     _setDate();
+
+    lot_selected = false;
+
   }
 
   @override
@@ -202,9 +213,20 @@ class _TokenState extends State<Token> {
                                   }).toList(),
                                   value: lot_no_value,
                                   onChanged: (String? value) {
+                                    bool is_dash = false;
+                                    if(value == "---")
+                                      {
+                                        is_dash = true;
+                                      }
                                     setState(() {
+
                                       lot_no_value = value ?? "";
-                                      _loadNoData();
+                                      if(!is_dash)
+                                        {
+                                          _loadNoData();
+                                        }
+                                      lot_selected = !is_dash;
+
                                     });
                                   },
                                 ),
@@ -215,48 +237,134 @@ class _TokenState extends State<Token> {
                       ),
 
                       // ########## Consignor Name
+                      // ## text - commented as we are using drop down now.
+                      // Padding(
+                      //   padding: const EdgeInsets.all(5.0),
+                      //   child: SizedBox(
+                      //     width: 300,
+                      //     height: 40,
+                      //     child: Container(
+                      //         child: TextField(
+                      //       controller: consignor,
+                      //       obscureText: false,
+                      //       decoration: InputDecoration(
+                      //         labelText: 'Consignor Name',
+                      //         labelStyle:
+                      //             TextStyle(color: Colors.black, fontSize: 12),
+                      //         contentPadding: EdgeInsets.all(5),
+                      //         border: OutlineInputBorder(),
+                      //       ),
+                      //       enabled: false,
+                      //     )),
+                      //   ),
+                      // ),
                       Padding(
                         padding: const EdgeInsets.all(5.0),
                         child: SizedBox(
                           width: 300,
                           height: 40,
                           child: Container(
-                              child: TextField(
-                            controller: consignor,
-                            obscureText: false,
-                            decoration: InputDecoration(
-                              labelText: 'Consignor Name',
-                              labelStyle:
-                                  TextStyle(color: Colors.black, fontSize: 12),
-                              contentPadding: EdgeInsets.all(5),
-                              border: OutlineInputBorder(),
+                            decoration: const ShapeDecoration(
+                                shape: RoundedRectangleBorder(
+                                  side: BorderSide(
+                                      width: 0.5, style: BorderStyle.solid),
+                                  borderRadius:
+                                  BorderRadius.all(Radius.circular(5.0)),
+                                )),
+                            child: DropdownButtonHideUnderline(
+                              child: Container(
+                                padding: const EdgeInsets.all(5),
+                                child: DropdownButton<String>(
+                                    hint: const Text("Consignor Name"),
+                                    disabledHint: Text(consignor_name_value ?? ""),
+                                    style: const TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 12,
+                                    ),
+                                    value: consignor_name_value,
+                                    onChanged: lot_selected ? null : (value) {
+                                      setState(() {
+                                        consignor_name_value = value ?? "";
+                                      });
+                                    },
+                                    items: consignor_names_list
+                                        .map<DropdownMenuItem<String>>(
+                                            (String item) {
+                                          return DropdownMenuItem<String>(
+                                            value: item,
+                                            child: Text(item),
+                                          );
+                                        }).toList()),
+                              ),
                             ),
-                            enabled: false,
-                          )),
+                          ),
                         ),
                       ),
                       // Consignor Name ################
 
                       // ########## ITEM NAME
-
+                      // text. commented as drop down is being used
+                      // Padding(
+                      //   padding: const EdgeInsets.all(5.0),
+                      //   child: SizedBox(
+                      //     width: 300,
+                      //     height: 40,
+                      //     child: Container(
+                      //         child: TextField(
+                      //       controller: item,
+                      //       obscureText: false,
+                      //       decoration: InputDecoration(
+                      //         labelText: 'Item Name',
+                      //         labelStyle:
+                      //             TextStyle(color: Colors.black, fontSize: 12),
+                      //         contentPadding: EdgeInsets.all(5),
+                      //         border: OutlineInputBorder(),
+                      //       ),
+                      //       enabled: false,
+                      //     )),
+                      //   ),
+                      // ),
                       Padding(
                         padding: const EdgeInsets.all(5.0),
                         child: SizedBox(
                           width: 300,
                           height: 40,
                           child: Container(
-                              child: TextField(
-                            controller: item,
-                            obscureText: false,
-                            decoration: InputDecoration(
-                              labelText: 'Item Name',
-                              labelStyle:
-                                  TextStyle(color: Colors.black, fontSize: 12),
-                              contentPadding: EdgeInsets.all(5),
-                              border: OutlineInputBorder(),
+                            decoration: const ShapeDecoration(
+                                shape: RoundedRectangleBorder(
+                                  side: BorderSide(
+                                      width: 0.5, style: BorderStyle.solid),
+                                  borderRadius:
+                                  BorderRadius.all(Radius.circular(5.0)),
+                                )),
+                            child: DropdownButtonHideUnderline(
+                              child: Container(
+                                padding: const EdgeInsets.all(5),
+                                child: DropdownButton<String>(
+                                    hint: const Text("Item Name"),
+                                    disabledHint: Text(item_name_value ?? "", ),
+                                    style: const TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 12,
+
+                                    ),
+                                    value: item_name_value,
+                                    onChanged: lot_selected ? null : (String? value) {
+                                      setState(() {
+                                        item_name_value = value ?? "";
+                                      });
+                                    },
+                                    items: item_name_list
+                                        .map<DropdownMenuItem<String>>(
+                                            (String item) {
+                                          return DropdownMenuItem<String>(
+                                            value: item,
+                                            child: Text(item),
+                                          );
+                                        }).toList()),
+                              ),
                             ),
-                            enabled: false,
-                          )),
+                          ),
                         ),
                       ),
 
@@ -874,8 +982,16 @@ class _TokenState extends State<Token> {
       return const SnackBar(content: Text("Please select payment type"));
     }
 
-    if (lot_no_value == null) {
-      return const SnackBar(content: Text("Please select Lot No"));
+    // if (lot_no_value == null) {
+    //   return const SnackBar(content: Text("Please select Lot No"));
+    // }
+
+    if (consignor_name_value == null) {
+      return const SnackBar(content: Text("Consignor blank. Select Lot No or enter Consignor Name"));
+    }
+
+    if (item_name_value == null) {
+      return const SnackBar(content: Text("Item blank. Select Lot No or enter Item Name"));
     }
 
     //mark is not mandatory
@@ -923,8 +1039,12 @@ class _TokenState extends State<Token> {
     final data = {
       'token_no' : tokenNo,
       'date_field' : dt_field,
-      'consignor_id': consignor.text,
-      'item_name': item.text,
+      // 'consignor_id': consignor.text,
+      'consignor_id': consignor_name_value,
+
+      //'item_name': item.text,
+      'item_name': item_name_value,
+
       'payment_type': payment_type_value,
       'lot_no': lot_no_value,
       'mark': _mark.text,
@@ -988,10 +1108,25 @@ class _TokenState extends State<Token> {
 
     setState(() {
       dt_field = res['date_field'].toString();
-      consignor.text = (res['consignor_id'] as String);
-      item.text = (res['item_name'] as String);
+
+      //consignor.text = (res['consignor_id'] as String);
+      consignor_name_value = res['consignor_id'].toString();
+
+      //item.text = (res['item_name'] as String);
+      item_name_value = res['item_name'].toString();
+
       payment_type_value = res['payment_type'] as String?;
-      lot_no_value = res['lot_no'].toString();
+
+      if(res['lot_no'].toString() == "null")
+        {
+          lot_no_value = "---";
+        }
+      else
+        {
+          lot_no_value = res['lot_no'].toString();
+        }
+
+
       _mark.text = res['mark'].toString();
       _units.text = res['units'].toString();
       _wt.text = res['weight'].toString();
@@ -1001,6 +1136,8 @@ class _TokenState extends State<Token> {
       tokenNo = int.parse(_existing_tokenNo.text);
 
       canSave = false;
+
+
     });
   }
 
@@ -1061,8 +1198,11 @@ class _TokenState extends State<Token> {
     print(res);
 
     setState(() {
-      consignor.text = res['consignor_id'] as String;
-      item.text = res['item_name'] as String;
+      //consignor.text = res['consignor_id'] as String;
+      consignor_name_value = res['consignor_id'].toString();
+
+      //item.text = res['item_name'] as String;
+      item_name_value = res['item_name'].toString();
     });
   }
 }

@@ -7,8 +7,6 @@ NGX POS for Renuka Systems
 TODO
 #####
 
-lot number not mandatory - "no lot"
-
 duplicates in consignor and customer name. currently using id column - use name-location (5) - check in db
 
 print
@@ -122,6 +120,7 @@ item csv import check - no nulls
 after save, cursor move to first element
 token no | date(DDMMYYYY)
 save in print - under canSave flag
+lot number not mandatory - "no lot"
 
 #################################################################################################################################################
 ASK

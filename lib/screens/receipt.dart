@@ -181,7 +181,7 @@ class _ReceiptState extends State<Receipt> {
                                   value: customer_name_value,
                                   onChanged: (String? value) {
                                     setState(() {
-                                      customer_name_value = value ?? "";
+                                      customer_name_value = value ?? "dummy";
                                     });
                                   },
                                   items: customer_names_list
