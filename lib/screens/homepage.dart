@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:ngx/screens/DB_Helper.dart';
 import 'package:ngx/screens/SettingsLogin.dart';
 import 'package:ngx/screens/balance.dart';
 import 'package:ngx/screens/loginpage.dart';
@@ -9,6 +11,22 @@ import 'package:ngx/screens/token.dart';
 import 'lotnumber.dart';
 
 class Homepage extends StatelessWidget {
+
+  static const platform = MethodChannel('ngx.print.channel');
+  Future<void> _print(String printContent) async {
+
+    var arguments = {
+      'print_content' : printContent
+    };
+
+    try {
+      final int result = await platform.invokeMethod('printContent', arguments);
+    } on PlatformException catch (e) {
+      print("ERROR: '${e.message}'.");
+    }
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Stack(children: [
@@ -137,11 +155,46 @@ class Homepage extends StatelessWidget {
                             padding: const EdgeInsets.all(20.0),
                             textStyle: const TextStyle(fontSize: 15),
                           ),
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => Homepage()),
+                          // onPressed: () async {
+                          //   print("item wise reports \t dialogue");
+                          //   print("\n");
+                          //   print( await DB_Helper.item_report_token());
+                          // },
+                          onPressed: () async {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) =>
+                                  AlertDialog(actions: [
+                                    SizedBox(
+                                      height: 20,
+                                    ),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                      children: [
+                                        ElevatedButton( //token button
+                                            onPressed: () async
+                                            {
+                                              var res = await DB_Helper.item_report_token();
+                                              print(res);
+                                              _print(res);
+                                            },
+                                            child: Text("Token")
+                                        ),
+                                        ElevatedButton( //retail button
+                                            onPressed: () async
+                                            {
+                                              var res = await DB_Helper.item_report_retail();
+                                              print(res);
+                                              _print(res);
+                                            },
+                                            child: Text("Retail")
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(
+                                      height: 20,
+                                    ),
+                                  ]),
                             );
                           },
                           child: Center(

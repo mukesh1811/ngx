@@ -16,15 +16,17 @@ import androidx.annotation.NonNull
 import com.ngx.mp200sdk.NGXAshwaPrinter
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
+import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 
 
 class MainActivity : FlutterActivity() {
 
     //ui style components
-    private val title_font_size = 42f;
+    private val title_font_size = 42f
+    private val body_font_size = 24f;
 
-
+    //printer related
     private val CHANNEL = "ngx.print.channel"
 
 
@@ -49,10 +51,318 @@ class MainActivity : FlutterActivity() {
                 } else {
                     result.error("UNAVAILABLE", "Status = $printStatus", null)
                 }
-            } else {
+            }
+            else if (call.method == "printToken")
+            { 
+                
+                val printStatus = printToken(call)
+
+                if (printStatus != -1) {
+                    result.success(printStatus)
+                } else {
+                    result.error("UNAVAILABLE", "Status = $printStatus", null)
+                }
+            }
+            else if (call.method == "printRetail")
+            {
+
+                val printStatus = printRetail(call)
+
+                if (printStatus != -1) {
+                    result.success(printStatus)
+                } else {
+                    result.error("UNAVAILABLE", "Status = $printStatus", null)
+                }
+            }
+            else if (call.method == "printReceipt")
+            {
+
+                val printStatus = printReceipt(call)
+
+                if (printStatus != -1) {
+                    result.success(printStatus)
+                } else {
+                    result.error("UNAVAILABLE", "Status = $printStatus", null)
+                }
+            }
+            else if (call.method == "printContent")
+            {
+
+                val printStatus = printContent(call)
+
+                if (printStatus != -1) {
+                    result.success(printStatus)
+                } else {
+                    result.error("UNAVAILABLE", "Status = $printStatus", null)
+                }
+            }
+            else {
                 result.notImplemented()
             }
         }
+
+    }
+
+    private fun printContent(call: MethodCall): Int {
+
+        val content_str = call.argument( "print_content") ?: "dummy_report_content";
+
+        val ngxPrinter = NGXAshwaPrinter.getNgxPrinterInstance()
+        ngxPrinter.initService(this)
+
+        val tp = TextPaint()
+        tp.typeface = Typeface.DEFAULT_BOLD
+        tp.textSize = title_font_size
+
+        ngxPrinter.addText("RENUKA SYSTEMS", Layout.Alignment.ALIGN_CENTER, tp)
+
+        tp.typeface = Typeface.DEFAULT
+        tp.textSize = 18f
+
+        ngxPrinter.addText( content_str, Layout.Alignment.ALIGN_NORMAL,tp)
+
+        ngxPrinter.print()
+
+        ngxPrinter.lineFeed(5)
+
+        return 100
+
+    }
+
+    private fun printToken(call: MethodCall): Int {
+
+        val token_no = call.argument( "token_no") ?: "dummy_token_no";
+        val date_field = call.argument( "date_field") ?: "dummy_date_field";
+        val lot_no = call.argument( "lot_no") ?: "dummy_lot_no";
+        val consignor_id = call.argument( "consignor_id") ?: "dummy_consignor_id";
+        val item_name = call.argument( "item_name") ?: "dummy_item_name";
+        val payment_type = call.argument( "payment_type") ?: "dummy_payment_type";
+        val mark = call.argument( "mark") ?: "dummy_mark";
+        val units = call.argument( "units") ?: "dummy_units";
+        val weight = call.argument( "weight") ?: "dummy_weight";
+        val rate = call.argument( "rate") ?: "dummy_rate";
+        val c_and_g = call.argument( "c_and_g") ?: "dummy_c_and_g";
+        val amount = call.argument( "amount") ?: "dummy_amount";
+
+        val ngxPrinter = NGXAshwaPrinter.getNgxPrinterInstance()
+        ngxPrinter.initService(this)
+
+        val tp = TextPaint()
+        tp.typeface = Typeface.DEFAULT_BOLD
+        tp.textSize = title_font_size
+
+        ngxPrinter.addText("RENUKA SYSTEMS", Layout.Alignment.ALIGN_CENTER, tp)
+
+        val stringBuilder = StringBuilder()
+
+        stringBuilder.append("Token No: $token_no                     $date_field")
+
+        stringBuilder.append("\n")
+
+        stringBuilder.append("---------------------------------------------------")
+
+        stringBuilder.append("\n")
+
+        if(lot_no != "---")
+        {
+        stringBuilder.append("Lot No:          $lot_no")
+        stringBuilder.append("\n")
+        }
+
+        stringBuilder.append("Consignor Name:  \n$consignor_id")
+        stringBuilder.append("\n")
+        stringBuilder.append("\n")
+        stringBuilder.append("Item Name:       $item_name")
+        stringBuilder.append("\n")
+
+
+        if(payment_type != "--- Cash ---")
+        {
+        stringBuilder.append("\n")
+        stringBuilder.append("Customer Name:   \n$payment_type")
+        stringBuilder.append("\n")
+        stringBuilder.append("\n")
+        }
+
+        stringBuilder.append("---------------------------------------------------")
+        stringBuilder.append("\n")
+
+        if(mark != "")
+        {
+        stringBuilder.append("Mark :                       " + mark)
+        stringBuilder.append("\n")
+        }
+
+        stringBuilder.append("Units   :                    " + units)
+        stringBuilder.append("\n")
+
+        if(weight != "") {
+        stringBuilder.append("Weight  :                  " + weight)
+        stringBuilder.append("\n")
+        }
+
+        stringBuilder.append("Rate    :                    " + rate)
+        stringBuilder.append("\n")
+
+        if(c_and_g != "") {
+        stringBuilder.append("C and G :                    " + c_and_g)
+        stringBuilder.append("\n")
+        }
+
+        stringBuilder.append("---------------------------------------------------")
+        stringBuilder.append("\n")
+
+        stringBuilder.append("Amount  :                     " + amount)
+        stringBuilder.append("\n")
+        stringBuilder.append("---------------------------------------------------")
+
+
+
+        tp.typeface = Typeface.DEFAULT
+        tp.textSize = body_font_size
+
+        ngxPrinter.addText(stringBuilder.toString(), Layout.Alignment.ALIGN_NORMAL,tp)
+
+        ngxPrinter.print()
+
+        ngxPrinter.lineFeed(5)
+
+        return 100
+
+    }
+
+    private fun printRetail(call: MethodCall): Int {
+
+        val retail_no = call.argument( "retail_no") ?: "dummy_retail_no";
+        val date_field = call.argument( "date_field") ?: "dummy_date_field";
+
+        val item_name = call.argument( "item_name") ?: "dummy_item_name";
+        val payment_type = call.argument( "payment_type") ?: "dummy_payment_type";
+
+        val units = call.argument( "units") ?: "dummy_units";
+        val weight = call.argument( "weight") ?: "dummy_weight";
+        val rate = call.argument( "rate") ?: "dummy_rate";
+
+        val amount = call.argument( "amount") ?: "dummy_amount";
+
+        val ngxPrinter = NGXAshwaPrinter.getNgxPrinterInstance()
+        ngxPrinter.initService(this)
+
+        val tp = TextPaint()
+        tp.typeface = Typeface.DEFAULT_BOLD
+        tp.textSize = title_font_size
+
+        ngxPrinter.addText("RENUKA SYSTEMS", Layout.Alignment.ALIGN_CENTER, tp)
+
+        val stringBuilder = StringBuilder()
+
+        stringBuilder.append("Retail No: $retail_no                     $date_field")
+
+        stringBuilder.append("\n")
+
+        stringBuilder.append("---------------------------------------------------")
+
+        stringBuilder.append("\n")
+
+        stringBuilder.append("Item Name:       $item_name")
+        stringBuilder.append("\n")
+
+
+        if(payment_type != "--- Cash ---")
+        {
+            stringBuilder.append("\n")
+            stringBuilder.append("Customer Name:   \n$payment_type")
+            stringBuilder.append("\n")
+            stringBuilder.append("\n")
+        }
+
+        stringBuilder.append("---------------------------------------------------")
+        stringBuilder.append("\n")
+
+
+        if(units != "")
+        {
+        stringBuilder.append("Units :                          " + units)
+        stringBuilder.append("\n")
+        }
+
+        if(weight != "")
+        {
+        stringBuilder.append("Weight :                       " + weight)
+        stringBuilder.append("\n")
+        }
+
+        stringBuilder.append("Rate :                           " + rate)
+        stringBuilder.append("\n")
+
+
+        stringBuilder.append("---------------------------------------------------")
+        stringBuilder.append("\n")
+
+        stringBuilder.append("Amount :                     " + amount)
+        stringBuilder.append("\n")
+        stringBuilder.append("---------------------------------------------------")
+
+
+
+        tp.typeface = Typeface.DEFAULT
+        tp.textSize = body_font_size
+
+        ngxPrinter.addText(stringBuilder.toString(), Layout.Alignment.ALIGN_NORMAL,tp)
+
+        ngxPrinter.print()
+
+        ngxPrinter.lineFeed(5)
+
+        return 100
+
+    }
+
+    private fun printReceipt(call: MethodCall): Int {
+
+        val receipt_no = call.argument( "receipt_no") ?: "dummy_receipt_no";
+        val date_field = call.argument( "date_field") ?: "dummy_date_field";
+
+        val customer_name = call.argument( "customer_name") ?: "dummy_customer_name";
+
+        val balance = call.argument( "balance") ?: "dummy_balance";
+
+        val ngxPrinter = NGXAshwaPrinter.getNgxPrinterInstance()
+        ngxPrinter.initService(this)
+
+        val tp = TextPaint()
+        tp.typeface = Typeface.DEFAULT_BOLD
+        tp.textSize = title_font_size
+
+        ngxPrinter.addText("RENUKA SYSTEMS", Layout.Alignment.ALIGN_CENTER, tp)
+
+        val stringBuilder = StringBuilder()
+
+        stringBuilder.append("Receipt No: $receipt_no                   $date_field")
+
+        stringBuilder.append("\n")
+
+        stringBuilder.append("---------------------------------------------------")
+
+        stringBuilder.append("Customer Name:       \n$customer_name")
+        stringBuilder.append("\n")
+
+        stringBuilder.append("\n")
+
+        stringBuilder.append("Balance:       $balance")
+        stringBuilder.append("\n")
+
+
+        tp.typeface = Typeface.DEFAULT
+        tp.textSize = body_font_size
+
+        ngxPrinter.addText(stringBuilder.toString(), Layout.Alignment.ALIGN_NORMAL,tp)
+
+        ngxPrinter.print()
+
+        ngxPrinter.lineFeed(5)
+
+        return 100
 
     }
 
@@ -80,7 +390,7 @@ class MainActivity : FlutterActivity() {
 
 
         val ngxPrinter = NGXAshwaPrinter.getNgxPrinterInstance()
-        val tvStatus: TextView? = null
+
 
         val tp = TextPaint()
         tp.typeface = Typeface.DEFAULT_BOLD

@@ -32,6 +32,32 @@ class _RetailState extends State<Retail> {
   final TextEditingController _amt = TextEditingController();
   final TextEditingController _existing_retailNo = TextEditingController();
 
+  static const platform = MethodChannel('ngx.print.channel');
+  Future<void> _print() async {
+
+    var arguments = {
+      'retail_no' : retailNo.toString(),
+      'date_field' : dt_field.toString(),
+
+      //'item_name': item.text,
+      'item_name': item_name_value.toString(),
+
+      'payment_type': payment_type_value.toString(),
+
+      'units': _units.text.toString(),
+      'weight': _wt.text.toString(),
+      'rate': _rate.text.toString(),
+
+      'amount': _amt.text.toString()
+    };
+
+    try {
+      final int result = await platform.invokeMethod('printRetail', arguments);
+    } on PlatformException catch (e) {
+      print("ERROR: '${e.message}'.");
+    }
+  }
+
   void _populateDropdown() async {
     final itemlist = await getItemList();
     final custList = await getCustomerList();
@@ -464,11 +490,18 @@ class _RetailState extends State<Retail> {
                                         fontWeight: FontWeight.bold),
                                   ),
                                   onPressed: () async {
+
+
                                     if(canSave) {
-                                    var snackBar = await saveToDB();
-                                    ScaffoldMessenger.of(context)
-                                        .showSnackBar(snackBar);
-                                  }},
+                                      var snackBar = await saveToDB(true);
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(snackBar);
+                                    }
+                                    else
+                                    {
+                                      _print();
+                                    }
+                                    },
                                   child: Center(child: const Text('Print')),
                                 ),
                               ],
@@ -498,7 +531,7 @@ class _RetailState extends State<Retail> {
                                   ),
                                   onPressed: canSave
                                       ? () async {
-                                          var snackBar = await saveToDB();
+                                          var snackBar = await saveToDB(false);
                                           ScaffoldMessenger.of(context)
                                               .showSnackBar(snackBar);
                                         }
@@ -704,74 +737,94 @@ class _RetailState extends State<Retail> {
     );
   }
 
-  Future<SnackBar> saveToDB() async {
+  Future<SnackBar> saveToDB(bool shouldPrint) async {
     print("Save");
 
-    if (item_name_value == null) {
-      return const SnackBar(content: Text("Please select an item name"));
-    }
+    String validationResult = formValidate();
 
-    if (payment_type_value == null) {
-      return const SnackBar(content: Text("Please select payment type"));
-    }
+    if(validationResult == "") {
+      var units;
+      var weight;
 
-    if (_wt.text.trim() == "" && _units.text.trim() == "") {
-      return const SnackBar(
-          content: Text("Please enter either weight or unit"));
-    }
+      if (_units.text != "") {
+        units = int.parse(_units.text);
+      } else {
+        units = "";
+      }
 
-    if (_rate.text.trim() == "") {
-      return const SnackBar(content: Text("Please enter Rate"));
-    }
+      if (_wt.text != "") {
+        weight = int.parse(_wt.text);
+      } else {
+        weight = "";
+      }
 
-    var units;
-    var weight;
-
-    if (_units.text != "") {
-      units = int.parse(_units.text);
-    } else {
-      units = "";
-    }
-
-    if (_wt.text != "") {
-      weight = int.parse(_wt.text);
-    } else {
-      weight = "";
-    }
-
-    if(payment_type_value != "--- Cash ---")
-      {
+      if (payment_type_value != "--- Cash ---") {
         payment_type_value = await getCustomerID(payment_type_value!);
       }
 
-    final data = {
-      'retail_no' : retailNo,
-      'date_field' : dt_field,
-      'item_name': item_name_value,
-      'payment_type': payment_type_value,
-      'units': units,
-      'weight': weight,
-      'rate': int.parse(_rate.text),
-      'amount': int.parse(_amt.text)
-    };
+      final data = {
+        'retail_no': retailNo,
+        'date_field': dt_field,
+        'item_name': item_name_value,
+        'payment_type': payment_type_value,
+        'units': units,
+        'weight': weight,
+        'rate': int.parse(_rate.text),
+        'amount': int.parse(_amt.text)
+      };
 
-    int id = await DB_Helper.createRetail(data);
+      int id = await DB_Helper.createRetail(data);
 
-    print("id");
-    print(id);
+      print("id");
+      print(id);
 
-    if (id == retailNo) {
-      setState(() {
-        _setRetailNo();
-        _setDate();
-      });
+      if (id == retailNo) {
+        setState(() {
+          _setRetailNo();
+          _setDate();
+        });
+      }
+
+      validationResult = "Token saved successfully!";
+
+      //print
+      if (shouldPrint) {
+        _print();
+      }
+
+      _clearFields();
+
+      focusRefresh();
     }
 
-    _clearFields();
+    return SnackBar(content: Text("$validationResult"));
 
-    focusRefresh();
 
-    return const SnackBar(content: Text("Retail info saved successfully!"));
+  }
+
+  String formValidate()
+  {
+
+    if (item_name_value == null) {
+      return "Please select an item name";
+    }
+
+    if (payment_type_value == null) {
+      return "Please select payment type";
+    }
+
+    if (_wt.text.trim() == "" && _units.text.trim() == "") {
+      return "Please enter either weight or unit";
+    }
+
+    if (_rate.text.trim() == "") {
+      return "Please enter Rate";
+    }
+
+
+
+    //validation pass
+    return "";
   }
 
   void focusRefresh()

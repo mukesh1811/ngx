@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:ngx/screens/homepage.dart';
 import 'package:ngx/screens/loginpage.dart';
@@ -25,6 +26,28 @@ class _ReceiptState extends State<Receipt> {
 
   final TextEditingController _balance_txtcntrl = TextEditingController();
   final TextEditingController _existing_receiptNo = TextEditingController();
+
+
+  static const platform = MethodChannel('ngx.print.channel');
+  Future<void> _print() async {
+
+    var arguments = {
+      'receipt_no' : receiptNo.toString(),
+      'date_field' : dt_field.toString(),
+
+      //'item_name': item.text,
+      'customer_name': customer_name_value.toString(),
+
+      'balance': _balance_txtcntrl.text.toString()
+    };
+
+    try {
+      final int result = await platform.invokeMethod('printReceipt', arguments);
+    } on PlatformException catch (e) {
+      print("ERROR: '${e.message}'.");
+    }
+  }
+
 
   void _populateDropdown() async {
     final custList = await getCustomerList();
@@ -255,10 +278,15 @@ class _ReceiptState extends State<Receipt> {
                                   ),
                                   onPressed: () async {
                                     if(canSave) {
-                                    var snackBar = await saveToDB();
-                                    ScaffoldMessenger.of(context)
-                                        .showSnackBar(snackBar);
-                                  }},
+                                      var snackBar = await saveToDB(true);
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(snackBar);
+                                    }
+                                    else
+                                    {
+                                      _print();
+                                    }
+                                    },
                                   child: Center(child: const Text('Print')),
                                 ),
                               ],
@@ -288,7 +316,7 @@ class _ReceiptState extends State<Receipt> {
                                   ),
                                   onPressed: canSave
                                       ? () async {
-                                          var snackBar = await saveToDB();
+                                          var snackBar = await saveToDB(false);
                                           ScaffoldMessenger.of(context)
                                               .showSnackBar(snackBar);
                                         }
@@ -489,45 +517,65 @@ class _ReceiptState extends State<Receipt> {
     );
   }
 
-  Future<SnackBar> saveToDB() async {
+  Future<SnackBar> saveToDB(bool shouldPrint) async {
     print("Save");
 
+    String validationResult = formValidate();
+
+    if(validationResult == "") {
+      String custId = await getCustomerID(customer_name_value!);
+
+
+      final data = {
+        'receipt_no': receiptNo,
+        'date_field': dt_field,
+        'customer_id': custId,
+        'balance': _balance_txtcntrl.text
+      };
+
+      int id = await DB_Helper.createReceipt(data);
+
+      print("id");
+      print(id);
+
+      if (id == receiptNo) {
+        setState(() {
+          _setReceiptNo();
+          _setDate();
+        });
+      }
+
+      validationResult = "Token saved successfully!";
+
+      //print
+      if (shouldPrint) {
+        _print();
+      }
+
+      _clearFields();
+
+      focusRefresh();
+
+    }
+      return SnackBar(content: Text("$validationResult"));
+
+  }
+
+  String formValidate()
+  {
     if (customer_name_value == null) {
-      return const SnackBar(content: Text("Please select a customer name"));
+      return "Please select a customer name";
     }
 
     if (_balance_txtcntrl.text.trim() == "") {
-      return const SnackBar(content: Text("Please enter balance amount"));
+      return "Please enter balance amount";
     }
 
-    String custId = await getCustomerID(customer_name_value!);
+    //validation pass
+    return "";
 
-
-    final data = {
-      'receipt_no' : receiptNo,
-      'date_field' : dt_field,
-      'customer_id': custId,
-      'balance': _balance_txtcntrl.text
-    };
-
-    int id = await DB_Helper.createReceipt(data);
-
-    print("id");
-    print(id);
-
-    if (id == receiptNo) {
-      setState(() {
-        _setReceiptNo();
-        _setDate();
-      });
-    }
-
-    _clearFields();
-
-    focusRefresh();
-
-    return const SnackBar(content: Text("Receipt saved successfully!"));
   }
+
 
   void focusRefresh()
   {

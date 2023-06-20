@@ -7,11 +7,6 @@ NGX POS for Renuka Systems
 TODO
 #####
 
-print token
-print retail
-
-print others
-
 Item wise summary - split it into 2
 token:
 item | rate | sum(units)
@@ -132,6 +127,13 @@ construct name-loc
 deconstruct name-loc to id
 
 add all columns to input file validation
+
+decouple validation and savetodb
+
+print token
+print retail
+
+print others
 
 #################################################################################################################################################
 ASK

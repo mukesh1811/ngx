@@ -386,4 +386,99 @@ class DB_Helper {
     return lotnumb;
   }
 
+  static Future<String> item_report_token() async
+  {
+    final db = await DB_Helper.db();
+
+    String qry = """
+      SELECT
+      item_name,
+      rate,
+      sum(units) as total_units
+      FROM
+      tokens
+      group by
+      item_name,
+      rate;
+    """;
+
+    var res = await db.rawQuery(qry);
+
+    print(res.toString());
+
+    StringBuffer stringBuffer = StringBuffer();
+
+    for(String key in res[0].keys)
+      {
+        stringBuffer.write(key);
+        stringBuffer.write("\t");
+        stringBuffer.write("\t");
+      }
+
+    stringBuffer.write("\n");
+
+    for (Map line in res)
+    {
+      for (String key in line.keys)
+      {
+        stringBuffer.write(line[key]);
+        stringBuffer.write("\t");
+        stringBuffer.write("\t");
+        stringBuffer.write("\t");
+      }
+      stringBuffer.write("\n");
+    }
+    return stringBuffer.toString();
+
+    return "";
+  }
+
+  static Future<String> item_report_retail() async
+  {
+    final db = await DB_Helper.db();
+
+    String qry = """
+      SELECT
+      item_name,
+      rate,
+      sum(units) as total_units,
+      sum(amount) as total_amount
+      FROM
+      retail
+      group by
+      item_name,
+      rate;
+    """;
+
+    var res = await db.rawQuery(qry);
+
+    print(res.toString());
+
+    StringBuffer stringBuffer = StringBuffer();
+
+    for(String key in res[0].keys)
+    {
+      stringBuffer.write(key);
+      stringBuffer.write("\t");
+      stringBuffer.write("\t");
+    }
+
+    stringBuffer.write("\n");
+
+    for (Map line in res)
+    {
+      for (String key in line.keys)
+      {
+        stringBuffer.write(line[key]);
+        stringBuffer.write("\t");
+        stringBuffer.write("\t");
+        stringBuffer.write("\t");
+      }
+      stringBuffer.write("\n");
+    }
+    return stringBuffer.toString();
+
+    return "";
+  }
+
 }

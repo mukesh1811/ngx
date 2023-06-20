@@ -16,7 +16,7 @@ class Balance extends StatefulWidget {
 class _BalanceState extends State<Balance> {
   static const platform = MethodChannel('ngx.print.channel');
 
-  Future<void> _printName() async {
+  Future<void> _print() async {
     try {
       var args = {
         'customer_name': customer_name_value,
@@ -211,7 +211,7 @@ class _BalanceState extends State<Balance> {
                                         fontSize: 15,
                                         fontWeight: FontWeight.bold),
                                   ),
-                                  onPressed: _printName,
+                                  onPressed: _print,
                                   child: Center(child: const Text('PRINT')),
                                 ),
                               ],

@@ -43,6 +43,37 @@ class _TokenState extends State<Token> {
   final TextEditingController _amt = TextEditingController();
   final TextEditingController _existing_tokenNo = TextEditingController();
 
+
+  static const platform = MethodChannel('ngx.print.channel');
+  Future<void> _print() async {
+
+    var arguments = {
+      'token_no' : tokenNo.toString(),
+      'date_field' : dt_field.toString(),
+
+      // 'consignor_id': consignor.text,
+      'consignor_id': consignor_name_value.toString(),
+
+      //'item_name': item.text,
+      'item_name': item_name_value.toString(),
+
+      'payment_type': payment_type_value.toString(),
+      'lot_no': lot_no_value.toString(),
+      'mark': _mark.text.toString(),
+      'units': _units.text.toString(),
+      'weight': _wt.text.toString(),
+      'rate': _rate.text.toString(),
+      'c_and_g': _c_and_g.text.toString(),
+      'amount': _amt.text.toString()
+    };
+
+    try {
+      final int result = await platform.invokeMethod('printToken', arguments);
+    } on PlatformException catch (e) {
+      print("ERROR: '${e.message}'.");
+    }
+  }
+
   void _populateDropdown() async {
     final conslist = await getConsignorList();
     final itemlist = await getItemList();
@@ -736,11 +767,18 @@ class _TokenState extends State<Token> {
                                           fontWeight: FontWeight.bold),
                                     ),
                                     onPressed: () async {
+
+
+
                                       if(canSave) {
-                                        var snackBar = await saveToDB();
+                                        var snackBar = await saveToDB(true);
                                         ScaffoldMessenger.of(context)
                                             .showSnackBar(snackBar);
                                       }
+                                      else
+                                        {
+                                          _print();
+                                        }
                                     },
                                     child: Center(child: const Text('Print')),
                                   ),
@@ -771,7 +809,7 @@ class _TokenState extends State<Token> {
                                     ),
                                     onPressed: canSave
                                         ? () async {
-                                            var snackBar = await saveToDB();
+                                            var snackBar = await saveToDB(false);
                                             ScaffoldMessenger.of(context)
                                                 .showSnackBar(snackBar);
                                           }
@@ -975,111 +1013,120 @@ class _TokenState extends State<Token> {
     );
   }
 
-  Future<SnackBar> saveToDB() async {
+
+  Future<SnackBar> saveToDB(bool should_print) async {
     print("Save");
 
+    String validationResult = formValidate();
+
+    if(validationResult == "")
+      {
+
+        if(payment_type_value != "--- Cash ---")
+        {
+          payment_type_value = await getCustomerID(payment_type_value!);
+        }
+
+        String consignorId = await getConsignorID(consignor_name_value!);
+
+        //data process
+        var units;
+        var weight;
+        var c_and_g;
+
+        if (_units.text != "") {
+          units = int.parse(_units.text);
+        } else {
+          units = "";
+        }
+
+        if (_wt.text != "") {
+          weight = int.parse(_wt.text);
+        } else {
+          weight = "";
+        }
+
+        if (_c_and_g.text != "") {
+          c_and_g = int.parse(_c_and_g.text);
+        } else {
+          c_and_g = "";
+        }
+
+        final data = {
+          'token_no' : tokenNo,
+          'date_field' : dt_field,
+          // 'consignor_id': consignor.text,
+          'consignor_id': consignorId,
+
+          //'item_name': item.text,
+          'item_name': item_name_value,
+
+          'payment_type': payment_type_value,
+          'lot_no': lot_no_value,
+          'mark': _mark.text,
+          'units': units,
+          'weight': weight,
+          'rate': int.parse(_rate.text),
+          'c_and_g': c_and_g,
+          'amount': int.parse(_amt.text)
+        };
+
+        //save
+        int id = await DB_Helper.createToken(data);
+
+        print("id");
+        print(id);
+
+        if (id == tokenNo) {
+          setState(() {
+            _setTokenNo();
+            _setDate();
+          });
+        }
+
+
+        validationResult = "Token saved successfully!";
+
+        //print
+        if(should_print)    {
+          _print();
+        }
+
+        _clearFields();
+
+        focusRefresh();
+      }
+
+    return SnackBar(content: Text("$validationResult"));
+
+  }
+
+  String formValidate()
+  {
+
     if (payment_type_value == null) {
-      return const SnackBar(content: Text("Please select payment type"));
+      return "Please select payment type";
     }
 
-    // if (lot_no_value == null) {
-    //   return const SnackBar(content: Text("Please select Lot No"));
-    // }
-
     if (consignor_name_value == null) {
-      return const SnackBar(content: Text("Consignor blank. Select Lot No or enter Consignor Name"));
+      return "Consignor blank. Select Lot No or enter Consignor Name";
     }
 
     if (item_name_value == null) {
-      return const SnackBar(content: Text("Item blank. Select Lot No or enter Item Name"));
+      return "Item blank. Select Lot No or enter Item Name";
     }
-
-    //mark is not mandatory
-    // if (_mark.text.trim() == "") {
-    //   return const SnackBar(content: Text("Please enter Mark"));
-    // }
 
     //units is mandatory
     if (_units.text.trim() == "") {
-      return const SnackBar(content: Text("Please enter Units"));
+      return "Please enter Units";
     }
-
-    //weight is not mandatory
-    // if (_wt.text.trim() == "") {
-    //   return const SnackBar(
-    //       content: Text("Please enter weight"));
-    // }
 
     if (_rate.text.trim() == "") {
-      return const SnackBar(content: Text("Please enter Rate"));
+      return "Please enter Rate";
     }
 
-    if(payment_type_value != "--- Cash ---")
-    {
-      payment_type_value = await getCustomerID(payment_type_value!);
-    }
-
-    String consignorId = await getConsignorID(consignor_name_value!);
-
-    var units;
-    var weight;
-    var c_and_g;
-
-    if (_units.text != "") {
-      units = int.parse(_units.text);
-    } else {
-      units = "";
-    }
-
-    if (_wt.text != "") {
-      weight = int.parse(_wt.text);
-    } else {
-      weight = "";
-    }
-
-    if (_c_and_g.text != "") {
-      c_and_g = int.parse(_c_and_g.text);
-    } else {
-      c_and_g = "";
-    }
-
-    final data = {
-      'token_no' : tokenNo,
-      'date_field' : dt_field,
-      // 'consignor_id': consignor.text,
-      'consignor_id': consignorId,
-
-      //'item_name': item.text,
-      'item_name': item_name_value,
-
-      'payment_type': payment_type_value,
-      'lot_no': lot_no_value,
-      'mark': _mark.text,
-      'units': units,
-      'weight': weight,
-      'rate': int.parse(_rate.text),
-      'c_and_g': c_and_g,
-      'amount': int.parse(_amt.text)
-    };
-
-    int id = await DB_Helper.createToken(data);
-
-    print("id");
-    print(id);
-
-    if (id == tokenNo) {
-      setState(() {
-        _setTokenNo();
-        _setDate();
-      });
-    }
-
-    _clearFields();
-
-    focusRefresh();
-
-    return const SnackBar(content: Text("Token saved successfully!"));
-
+    //validation pass
+    return "";
   }
 
   void focusRefresh()
@@ -1147,6 +1194,7 @@ class _TokenState extends State<Token> {
       _wt.text = res['weight'].toString();
       _rate.text = res['rate'].toString();
       _amt.text = res['amount'].toString();
+      _c_and_g.text = res['c_and_g'].toString();
 
       tokenNo = int.parse(_existing_tokenNo.text);
 
