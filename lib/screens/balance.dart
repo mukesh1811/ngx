@@ -22,7 +22,7 @@ class _BalanceState extends State<Balance> {
         'customer_name': customer_name_value,
         'balance': balance.toString()
       };
-      final int result = await platform.invokeMethod('print', args);
+      final int result = await platform.invokeMethod('printBalance', args);
     } on PlatformException catch (e) {
       print("ERROR: '${e.message}'.");
     }

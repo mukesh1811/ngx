@@ -20,6 +20,11 @@ import io.flutter.plugin.common.MethodChannel
 
 
 class MainActivity : FlutterActivity() {
+
+    //ui style components
+    private val title_font_size = 42f;
+
+
     private val CHANNEL = "ngx.print.channel"
 
 
@@ -30,19 +35,19 @@ class MainActivity : FlutterActivity() {
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL).setMethodCallHandler {
             // This method is invoked on the main thread.
                 call, result ->
-            if (call.method == "print") {
+            if (call.method == "printBalance") {
 
                 val customer_name = call.argument("customer_name") ?: "Mukesh"
                 val balance = call.argument("balance") ?: "0"
 
-                val printStatus = printOut(customer_name, balance)
+                val printStatus = printBalance(customer_name, balance)
 
                 //val batteryLevel = getBatteryLevel()
 
                 if (printStatus != -1) {
                     result.success(printStatus)
                 } else {
-                    result.error("UNAVAILABLE", "Battry level not available.", null)
+                    result.error("UNAVAILABLE", "Status = $printStatus", null)
                 }
             } else {
                 result.notImplemented()
@@ -71,7 +76,7 @@ class MainActivity : FlutterActivity() {
         return batteryLevel
     }
 
-    private fun printOut(customer_name: String, balance: String): Int {
+    private fun printBalance(customer_name: String, balance: String): Int {
 
 
         val ngxPrinter = NGXAshwaPrinter.getNgxPrinterInstance()
@@ -79,7 +84,7 @@ class MainActivity : FlutterActivity() {
 
         val tp = TextPaint()
         tp.typeface = Typeface.DEFAULT_BOLD
-        tp.textSize = 38f
+        tp.textSize = title_font_size
 
         ngxPrinter.initService(this)
 
@@ -87,23 +92,34 @@ class MainActivity : FlutterActivity() {
 
         //reset style
         tp.typeface = Typeface.DEFAULT
-        tp.textSize = 26f
-
-        ngxPrinter.addText("\n")
+        tp.textSize = 28f
 
 
-        ngxPrinter.addText("Customer Name: ", Layout.Alignment.ALIGN_NORMAL, tp)
+        val stringBuilder = StringBuilder()
 
-        ngxPrinter.addText(customer_name, Layout.Alignment.ALIGN_NORMAL, tp)
-        ngxPrinter.addText("\n")
+        stringBuilder.append("\n")
+        //ngxPrinter.addText("\n")
 
-        ngxPrinter.addText("Balance: $balance", Layout.Alignment.ALIGN_NORMAL, tp)
+        stringBuilder.append("Customer Name:\n")
+        //ngxPrinter.addText("Customer Name: ", Layout.Alignment.ALIGN_NORMAL, tp)
 
-        ngxPrinter.addText("------------------------------", Layout.Alignment.ALIGN_NORMAL, tp)
+        stringBuilder.append("$customer_name \n \n")
+//        ngxPrinter.addText(customer_name, Layout.Alignment.ALIGN_NORMAL, tp)
+//        ngxPrinter.addText("\n")
+
+        stringBuilder.append("Balance:     $balance \n")
+        //ngxPrinter.addText("Balance:     $balance", Layout.Alignment.ALIGN_NORMAL, tp)
+
+        // tp.setTypeface(Typeface.create(tf, Typeface.BOLD));
+        ngxPrinter.addText(stringBuilder.toString(), Layout.Alignment.ALIGN_NORMAL, tp)
+
+        tp.typeface = Typeface.DEFAULT_BOLD
+        tp.textSize = 48f
+        ngxPrinter.addText("---------------\n", Layout.Alignment.ALIGN_CENTER, tp)
 
         ngxPrinter.print()
 
-        ngxPrinter.lineFeed(7)
+        ngxPrinter.lineFeed(5)
 
         return 100
     }
