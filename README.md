@@ -7,14 +7,10 @@ NGX POS for Renuka Systems
 TODO
 #####
 
-add all columns to input file validation
-
 print token
 print retail
 
 print others
-
-token load slow for consignor and item dropdown
 
 Item wise summary - split it into 2
 token:
@@ -22,6 +18,10 @@ item | rate | sum(units)
 total weight = sum(wt)
 retail
 item | rate | sum(wt) | sum(amt)
+
+token load slow for consignor and item dropdown
+
+duplicates check in input file
 
 option to alter key column in input files
 
@@ -131,7 +131,7 @@ duplicates in consignor and customer name. currently using id column - use name-
 construct name-loc
 deconstruct name-loc to id
 
-
+add all columns to input file validation
 
 #################################################################################################################################################
 ASK

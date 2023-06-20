@@ -43,10 +43,14 @@ class _SettingsState extends State<Settings> {
 
       print(fields[0]);
 
-      if(!fields[0].contains(consignor_name_key))
+      for(int idx = 0; idx < consignor_mandatory_columns.length ; idx++)
       {
-        return -1;
+        if(!fields[0].contains(consignor_mandatory_columns[idx]))
+        {
+          return -(idx + 1);
+        }
       }
+
 
       // Get database directory path
       Directory appDir = await getApplicationDocumentsDirectory();
@@ -82,9 +86,12 @@ class _SettingsState extends State<Settings> {
 
       print(fields[0]);
 
-      if(!fields[0].contains(item_name_key))
+      for(int idx = 0; idx < item_mandatory_columns.length ; idx++)
       {
-        return -1;
+        if(!fields[0].contains(item_mandatory_columns[idx]))
+        {
+          return -(idx + 1);
+        }
       }
 
       int itemIdx = fields[0].indexOf(item_name_key);
@@ -92,7 +99,7 @@ class _SettingsState extends State<Settings> {
         var item_name = line[itemIdx];
         if(item_name == "")
         {
-          return -2;
+          return 2;
         }
       }
 
@@ -130,16 +137,15 @@ class _SettingsState extends State<Settings> {
 
       print(fields[0]);
 
-      if(!fields[0].contains(customer_name_key))
+      for(int idx = 0; idx < customer_mandatory_columns.length ; idx++)
         {
-          return -1;
+          if(!fields[0].contains(customer_mandatory_columns[idx]))
+            {
+              return -(idx + 1);
+            }
         }
 
-      if(!fields[0].contains(customer_balance_key))
-      {
-        return -2;
-      }
-
+      //balance column format checking.. all should be int
       int balanceColIdx = fields[0].indexOf(customer_balance_key);
       for (var line in fields.sublist(1)) {
         var balance = line[balanceColIdx];
@@ -149,7 +155,7 @@ class _SettingsState extends State<Settings> {
           }
         else
           {
-            return -3;
+            return 2;
           }
       }
 
@@ -375,7 +381,7 @@ class _SettingsState extends State<Settings> {
                         Padding(
                           padding: const EdgeInsets.all(5.0),
                           child: Text(
-                            "Load Consignor Name",
+                            "Load Consignor File",
                             style: TextStyle(
                                 color: Colors.deepOrange, fontSize: 22),
                             textAlign: TextAlign.center,
@@ -395,9 +401,10 @@ class _SettingsState extends State<Settings> {
                                   resText =
                                       'Consignor Name updated successfully!';
                                 }
-                                else if (res == -1)
+                                else if (res < 0)
                                 {
-                                  resText = "Key $consignor_name_key is missing. Update failed";
+                                  String missingColName = consignor_mandatory_columns[(res * -1) - 1];
+                                  resText = "$missingColName column is missing. Update failed";
                                 }
                                 else {
                                   resText = 'Consignor Name not updated';
@@ -418,7 +425,7 @@ class _SettingsState extends State<Settings> {
                         Padding(
                           padding: const EdgeInsets.all(5.0),
                           child: Text(
-                            "Load Customer Name",
+                            "Load Customer File",
                             style: TextStyle(
                                 color: Colors.deepOrange, fontSize: 22),
                             textAlign: TextAlign.center,
@@ -435,23 +442,19 @@ class _SettingsState extends State<Settings> {
                               String resText = "";
 
                               if (res == 1) {
-                                resText = 'Customer Name updated successfully!';
+                                resText = 'Customer File updated successfully!';
                               }
-                              else if (res == -1)
-                                {
-                                  resText = "Key $customer_name_key is missing. Update failed";
-                                }
-
-                              else if (res == -2)
-                              {
-                                resText = "Key $customer_balance_key is missing. Update failed";
-                              }
-                              else if (res == -3)
+                              else if (res == 2)
                               {
                                 resText = "Invalid value in customer balance. Update failed";
                               }
+                              else if (res < 0)
+                                {
+                                  String missingColName = customer_mandatory_columns[(res * -1) - 1];
+                                  resText = "$missingColName column is missing. Update failed";
+                                }
                               else {
-                                resText = 'Customer Name not updated';
+                                resText = 'Customer File not updated';
                               }
                               ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(content: Text(resText)));
@@ -468,7 +471,7 @@ class _SettingsState extends State<Settings> {
                         Padding(
                           padding: const EdgeInsets.all(5.0),
                           child: Text(
-                            "Load Item Name",
+                            "Load Item File",
                             style: TextStyle(
                                 color: Colors.deepOrange, fontSize: 22),
                             textAlign: TextAlign.center,
@@ -486,11 +489,12 @@ class _SettingsState extends State<Settings> {
                               if (res == 1) {
                                 resText = 'Item Name updated successfully!';
                               }
-                              else if (res == -1)
+                              else if (res < 0)
                               {
-                                resText = "Key $item_name_key is missing. Update failed";
+                                String missingColName = item_mandatory_columns[(res * -1) - 1];
+                                resText = "$missingColName column is missing. Update failed";
                               }
-                              else if (res == -2)
+                              else if (res == 2)
                               {
                                 resText = "Blanks found in $item_name_key. Update failed";
                               }
