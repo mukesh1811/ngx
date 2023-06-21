@@ -105,6 +105,7 @@ class MainActivity : FlutterActivity() {
 
     private fun printContent(call: MethodCall): Int {
 
+        val reportType = call.argument( "report_type") ?: "dummy_report_content";
         val content_str = call.argument( "print_content") ?: "dummy_report_content";
 
         val ngxPrinter = NGXAshwaPrinter.getNgxPrinterInstance()
@@ -116,8 +117,12 @@ class MainActivity : FlutterActivity() {
 
         ngxPrinter.addText("RENUKA SYSTEMS", Layout.Alignment.ALIGN_CENTER, tp)
 
+        tp.textSize = 32f
+
+        ngxPrinter.addText("ITEM REPORT - ${reportType.uppercase()}", Layout.Alignment.ALIGN_CENTER, tp)
+
         tp.typeface = Typeface.DEFAULT
-        tp.textSize = 18f
+        tp.textSize = 22f
 
         ngxPrinter.addText( content_str, Layout.Alignment.ALIGN_NORMAL,tp)
 
@@ -167,6 +172,7 @@ class MainActivity : FlutterActivity() {
         {
         stringBuilder.append("Lot No:          $lot_no")
         stringBuilder.append("\n")
+        stringBuilder.append("\n")
         }
 
         stringBuilder.append("Consignor Name:  \n$consignor_id")
@@ -189,23 +195,23 @@ class MainActivity : FlutterActivity() {
 
         if(mark != "")
         {
-        stringBuilder.append("Mark :                       " + mark)
+        stringBuilder.append("Mark :                             " + mark)
         stringBuilder.append("\n")
         }
 
-        stringBuilder.append("Units   :                    " + units)
+        stringBuilder.append("Units   :                          " + units)
         stringBuilder.append("\n")
 
         if(weight != "") {
-        stringBuilder.append("Weight  :                  " + weight)
+        stringBuilder.append("Weight  :                        " + weight)
         stringBuilder.append("\n")
         }
 
-        stringBuilder.append("Rate    :                    " + rate)
+        stringBuilder.append("Rate    :                          " + rate)
         stringBuilder.append("\n")
 
         if(c_and_g != "") {
-        stringBuilder.append("C and G :                    " + c_and_g)
+        stringBuilder.append("C and G :                        " + c_and_g)
         stringBuilder.append("\n")
         }
 

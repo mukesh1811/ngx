@@ -758,15 +758,16 @@ class _RetailState extends State<Retail> {
         weight = "";
       }
 
+      String? paymentResolved = payment_type_value;
       if (payment_type_value != "--- Cash ---") {
-        payment_type_value = await getCustomerID(payment_type_value!);
+        paymentResolved = await getCustomerID(payment_type_value!);
       }
 
       final data = {
         'retail_no': retailNo,
         'date_field': dt_field,
         'item_name': item_name_value,
-        'payment_type': payment_type_value,
+        'payment_type': paymentResolved,
         'units': units,
         'weight': weight,
         'rate': int.parse(_rate.text),

@@ -128,27 +128,27 @@ class DB_Helper {
   static Future<int> getMaxRetailNo() async {
     final db = await DB_Helper.db();
 
-    var max_rowid =
+    var max_row_id =
         await db.rawQuery("select max(_rowid_) as retail_no from retail");
 
 
-    if (max_rowid[0]['retail_no'] == null) {
+    if (max_row_id[0]['retail_no'] == null) {
       return 1;
     } else {
-      return int.parse(max_rowid[0]['retail_no'].toString()) + 1;
+      return int.parse(max_row_id[0]['retail_no'].toString()) + 1;
     }
   }
 
   static Future<int> getMaxReceiptNo() async {
     final db = await DB_Helper.db();
 
-    var max_rowid =
+    var max_row_id =
         await db.rawQuery("select max(_rowid_) as receipt_no from receipts");
 
-    if (max_rowid[0]['receipt_no'] == null) {
+    if (max_row_id[0]['receipt_no'] == null) {
       return 1;
     } else {
-      return int.parse(max_rowid[0]['receipt_no'].toString()) + 1;
+      return int.parse(max_row_id[0]['receipt_no'].toString()) + 1;
     }
   }
 
@@ -301,10 +301,10 @@ class DB_Helper {
   }
 
   static Future<int> createItem_static(
-      String? title, String? descrption, String? author) async {
+      String? title, String? description, String? author) async {
     final db = await DB_Helper.db();
 
-    final data = {'title': title, 'description': descrption, 'author': author};
+    final data = {'title': title, 'description': description, 'author': author};
     final id = await db.insert('items', data,
         conflictAlgorithm: sql.ConflictAlgorithm.replace);
     return id;
@@ -394,7 +394,9 @@ class DB_Helper {
       SELECT
       item_name,
       rate,
-      sum(units) as total_units
+      sum(units) as total_units,
+      sum(weight) as total_weight,
+      sum(amount) as total_amount
       FROM
       tokens
       group by
@@ -407,30 +409,30 @@ class DB_Helper {
     print(res.toString());
 
     StringBuffer stringBuffer = StringBuffer();
-
-    for(String key in res[0].keys)
-      {
-        stringBuffer.write(key);
-        stringBuffer.write("\t");
-        stringBuffer.write("\t");
-      }
-
     stringBuffer.write("\n");
 
     for (Map line in res)
     {
+      stringBuffer.write(line['item_name']);
+      stringBuffer.write("\n");
+      stringBuffer.write("__________");
+      stringBuffer.write("\n");
+
       for (String key in line.keys)
       {
-        stringBuffer.write(line[key]);
-        stringBuffer.write("\t");
-        stringBuffer.write("\t");
-        stringBuffer.write("\t");
+        if(key != 'item_name')
+        {
+          stringBuffer.write("$key = ${line[key]}");
+          stringBuffer.write("\n");
+        }
       }
+
+      stringBuffer.write("______________________________");
       stringBuffer.write("\n");
     }
-    return stringBuffer.toString();
 
-    return "";
+
+    return stringBuffer.toString();
   }
 
   static Future<String> item_report_retail() async
@@ -442,6 +444,7 @@ class DB_Helper {
       item_name,
       rate,
       sum(units) as total_units,
+      sum(weight) as total_weight,
       sum(amount) as total_amount
       FROM
       retail
@@ -455,30 +458,29 @@ class DB_Helper {
     print(res.toString());
 
     StringBuffer stringBuffer = StringBuffer();
-
-    for(String key in res[0].keys)
-    {
-      stringBuffer.write(key);
-      stringBuffer.write("\t");
-      stringBuffer.write("\t");
-    }
-
     stringBuffer.write("\n");
 
     for (Map line in res)
     {
+      stringBuffer.write(line['item_name']);
+      stringBuffer.write("\n");
+      stringBuffer.write("__________");
+      stringBuffer.write("\n");
+
       for (String key in line.keys)
-      {
-        stringBuffer.write(line[key]);
-        stringBuffer.write("\t");
-        stringBuffer.write("\t");
-        stringBuffer.write("\t");
-      }
+        {
+          if(key != 'item_name')
+            {
+              stringBuffer.write("$key = ${line[key]}");
+              stringBuffer.write("\n");
+            }
+        }
+      stringBuffer.write("______________________________");
       stringBuffer.write("\n");
     }
-    return stringBuffer.toString();
 
-    return "";
+
+    return stringBuffer.toString();
   }
 
 }

@@ -13,9 +13,10 @@ import 'lotnumber.dart';
 class Homepage extends StatelessWidget {
 
   static const platform = MethodChannel('ngx.print.channel');
-  Future<void> _print(String printContent) async {
+  Future<void> _print(String reportType,String printContent) async {
 
     var arguments = {
+      'report_type' : reportType,
       'print_content' : printContent
     };
 
@@ -176,7 +177,7 @@ class Homepage extends StatelessWidget {
                                             {
                                               var res = await DB_Helper.item_report_token();
                                               print(res);
-                                              _print(res);
+                                              _print("token", res);
                                             },
                                             child: Text("Token")
                                         ),
@@ -185,7 +186,7 @@ class Homepage extends StatelessWidget {
                                             {
                                               var res = await DB_Helper.item_report_retail();
                                               print(res);
-                                              _print(res);
+                                              _print("retail",res);
                                             },
                                             child: Text("Retail")
                                         ),

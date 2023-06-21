@@ -1022,9 +1022,10 @@ class _TokenState extends State<Token> {
     if(validationResult == "")
       {
 
+        String? paymentResolved = payment_type_value;
         if(payment_type_value != "--- Cash ---")
         {
-          payment_type_value = await getCustomerID(payment_type_value!);
+          paymentResolved = await getCustomerID(payment_type_value!);
         }
 
         String consignorId = await getConsignorID(consignor_name_value!);
@@ -1061,7 +1062,7 @@ class _TokenState extends State<Token> {
           //'item_name': item.text,
           'item_name': item_name_value,
 
-          'payment_type': payment_type_value,
+          'payment_type': paymentResolved,
           'lot_no': lot_no_value,
           'mark': _mark.text,
           'units': units,
@@ -1085,7 +1086,7 @@ class _TokenState extends State<Token> {
         }
 
 
-        validationResult = "Token saved successfully!";
+        validationResult = "Token saved successfullly!";
 
         //print
         if(should_print)    {
