@@ -7,18 +7,21 @@ NGX POS for Renuka Systems
 TODO
 #####
 
-Item wise summary - split it into 2
-token:
-item | rate | sum(units)
-total weight = sum(wt)
-retail
-item | rate | sum(wt) | sum(amt)
+token - print - remove consignor
+remove title customer name and item name
+
+item wise report - add date
+item wise report - grand total amount
+
+every drop down should have search
+
+date and time
+
+customer balance - date - today
 
 token load slow for consignor and item dropdown
 
 duplicates check in input file
-
-option to alter key column in input files
 
 Test
 
@@ -135,19 +138,33 @@ print retail
 
 print others
 
+Item wise summary - split it into 2
+token:
+item | rate | sum(units)
+total weight = sum(wt)
+retail
+item | rate | sum(wt) | sum(amt)
+but made common as
+item name
+rate:
+total_units:
+total_weight:
+total_amount:
+
 #################################################################################################################################################
 ASK
 ####
 
+item wise report - only today? db wipe?
 
+#################################################################################################################################################
+ASKED
+####
 
-
-Db wipe logic
-Cash payment logic
-payment_type + cash
-Date not correct. Manual input?
+Db wipe logic - put password protection (renuka)
+Cash payment logic  = payment_type + cash - [X]
+Date not correct. Manual input? - battery problem
 Customer Balance -> from Receipt. no from input file
-
 
 #################################################################################################################################################
 Assumptions:

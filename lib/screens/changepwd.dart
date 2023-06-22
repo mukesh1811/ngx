@@ -189,6 +189,15 @@ class _ChangepwdState extends State<Changepwd> {
 
     DB_Helper.updateAdminPwd(_new_pwd.text.trim());
 
+    //clear fields
+    setState(() {
+      _confirm_pwd.text = "";
+      _new_pwd.text = "";
+      _old_pwd.text = "";
+    });
+
     return const SnackBar(content: Text("Password updated successfully!"));
+
+
   }
 }
