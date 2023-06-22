@@ -19,6 +19,7 @@ class _RetailState extends State<Retail> {
   String? payment_type_value;
 
   int retailNo = 0;
+  String dt_field = DateFormat("dd/MM/yyyy").format(DateTime.now());
 
   bool canSave = true;
 
@@ -31,9 +32,35 @@ class _RetailState extends State<Retail> {
   final TextEditingController _amt = TextEditingController();
   final TextEditingController _existing_retailNo = TextEditingController();
 
+  static const platform = MethodChannel('ngx.print.channel');
+  Future<void> _print() async {
+
+    var arguments = {
+      'retail_no' : retailNo.toString(),
+      'date_field' : dt_field.toString(),
+
+      //'item_name': item.text,
+      'item_name': item_name_value.toString(),
+
+      'payment_type': payment_type_value.toString(),
+
+      'units': _units.text.toString(),
+      'weight': _wt.text.toString(),
+      'rate': _rate.text.toString(),
+
+      'amount': _amt.text.toString()
+    };
+
+    try {
+      final int result = await platform.invokeMethod('printRetail', arguments);
+    } on PlatformException catch (e) {
+      print("ERROR: '${e.message}'.");
+    }
+  }
+
   void _populateDropdown() async {
-    final itemlist = await getList("item_name");
-    final custList = await getList("customer_name");
+    final itemlist = await getItemList();
+    final custList = await getCustomerList();
     custList?.insert(0, "--- Cash ---");
 
     setState(() {
@@ -50,6 +77,12 @@ class _RetailState extends State<Retail> {
     });
   }
 
+  void _setDate() async {
+    setState(() {
+      dt_field = DateFormat("dd/MM/yyyy").format(DateTime.now());;
+    });
+  }
+
   @override
   initState() {
     super.initState();
@@ -61,6 +94,7 @@ class _RetailState extends State<Retail> {
     _rate.text = "";
 
     _setRetailNo();
+    _setDate();
   }
 
   @override
@@ -141,8 +175,7 @@ class _RetailState extends State<Retail> {
                                           fontSize: 15,
                                           fontWeight: FontWeight.bold)),
                                   Text(
-                                      DateFormat("dd/MM/yyyy")
-                                          .format(DateTime.now()),
+                                      dt_field,
                                       style: TextStyle(
                                           fontSize: 15,
                                           fontWeight: FontWeight.bold)),
@@ -256,6 +289,24 @@ class _RetailState extends State<Retail> {
                             child: TextField(
                                 controller: _units,
                                 obscureText: false,
+                                onChanged: (txt1) {
+                                  if (_wt.text.isEmpty || _wt.text == "") {
+                                    int units = 0;
+                                    if (txt1.isNotEmpty && txt1 != "") {
+                                      units = int.parse(txt1);
+                                    }
+
+                                    setState(() {
+                                      int rt = 0;
+
+                                      if (_rate.text.isNotEmpty &&
+                                          _rate.text != "") {
+                                        rt = int.parse(_rate.text);
+                                      }
+                                      _amt.text = (rt * units).toString();
+                                    });
+                                  }
+                                },
                                 decoration: InputDecoration(
                                   labelText: 'Units',
                                   labelStyle: TextStyle(
@@ -289,19 +340,22 @@ class _RetailState extends State<Retail> {
                             height: 30,
                             child: TextField(
                                 controller: _wt,
-                                onChanged: (txt) {
+                                onChanged: (txt2) {
                                   int wt = 0;
-                                  if (txt.isNotEmpty && txt != "") {
-                                    wt = int.parse(txt);
+                                  if (txt2.isNotEmpty && txt2 != "") {
+                                    wt = int.parse(txt2);
+                                  } else if (_units.text.isNotEmpty) {
+                                    wt = int.parse(_units.text);
                                   }
 
                                   setState(() {
                                     int rt = 0;
-                                    if (_rate.text.isNotEmpty) {
+
+                                    if (_rate.text.isNotEmpty &&
+                                        _rate.text != "") {
                                       rt = int.parse(_rate.text);
                                     }
-
-                                    _amt.text = (wt * rt).toString();
+                                    _amt.text = (rt * wt).toString();
                                   });
                                 },
                                 obscureText: false,
@@ -346,13 +400,16 @@ class _RetailState extends State<Retail> {
                                     rt = int.parse(txt);
                                   }
 
-                                  setState(() {
-                                    int wt = 0;
-                                    if (_wt.text.isNotEmpty) {
-                                      wt = int.parse(_wt.text);
-                                    }
+                                  int multiplier = 0;
 
-                                    _amt.text = (rt * wt).toString();
+                                  if (_wt.text.isNotEmpty) {
+                                    multiplier = int.parse(_wt.text);
+                                  } else if (_units.text.isNotEmpty) {
+                                    multiplier = int.parse(_units.text);
+                                  }
+
+                                  setState(() {
+                                    _amt.text = (rt * multiplier).toString();
                                   });
                                 },
                                 decoration: InputDecoration(
@@ -412,22 +469,6 @@ class _RetailState extends State<Retail> {
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         Container(
-                          width: 80,
-                          child: SizedBox(
-                            height: 40,
-                            child: TextFormField(
-                              obscureText: false,
-                              decoration: InputDecoration(
-                                labelText: '0',
-                                labelStyle: TextStyle(color: Colors.black),
-                                border: OutlineInputBorder(),
-                              ),
-                              style: TextStyle(color: Colors.black),
-                              textInputAction: TextInputAction.next,
-                            ),
-                          ),
-                        ),
-                        Container(
                           width: 90,
                           height: 40,
                           child: ClipRRect(
@@ -449,10 +490,18 @@ class _RetailState extends State<Retail> {
                                         fontWeight: FontWeight.bold),
                                   ),
                                   onPressed: () async {
-                                    var snackBar = await saveToDB();
-                                    ScaffoldMessenger.of(context)
-                                        .showSnackBar(snackBar);
-                                  },
+
+
+                                    if(canSave) {
+                                      var snackBar = await saveToDB(true);
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(snackBar);
+                                    }
+                                    else
+                                    {
+                                      _print();
+                                    }
+                                    },
                                   child: Center(child: const Text('Print')),
                                 ),
                               ],
@@ -482,7 +531,7 @@ class _RetailState extends State<Retail> {
                                   ),
                                   onPressed: canSave
                                       ? () async {
-                                          var snackBar = await saveToDB();
+                                          var snackBar = await saveToDB(false);
                                           ScaffoldMessenger.of(context)
                                               .showSnackBar(snackBar);
                                         }
@@ -583,9 +632,11 @@ class _RetailState extends State<Retail> {
                                       onPressed: () {
                                         _clearFields();
                                         _setRetailNo();
+                                        _setDate();
                                         setState(() {
                                           canSave = true;
                                         });
+                                        focusRefresh();
                                       },
                                       child: Center(
                                           child: const Text('NEW RETAIL')),
@@ -602,7 +653,7 @@ class _RetailState extends State<Retail> {
                       height: 5,
                     ),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         Container(
                           width: 100,
@@ -674,42 +725,6 @@ class _RetailState extends State<Retail> {
                             ),
                           ),
                         ),
-                        Container(
-                          width: 80,
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(20),
-                            child: Stack(
-                              children: <Widget>[
-                                Positioned.fill(
-                                  child: Container(
-                                    decoration: const BoxDecoration(
-                                        color: Colors.deepOrange),
-                                  ),
-                                ),
-                                SizedBox(
-                                  height: 40,
-                                  child: TextButton(
-                                    style: TextButton.styleFrom(
-                                      foregroundColor: Colors.white,
-                                      padding: const EdgeInsets.all(10.0),
-                                      textStyle: const TextStyle(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) => LoginPage()),
-                                      );
-                                    },
-                                    child: Center(child: const Text('EXIT')),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
                       ],
                     ),
                   ],
@@ -722,58 +737,103 @@ class _RetailState extends State<Retail> {
     );
   }
 
-  Future<SnackBar> saveToDB() async {
+  Future<SnackBar> saveToDB(bool shouldPrint) async {
     print("Save");
 
+    String validationResult = formValidate();
+
+    if(validationResult == "") {
+      var units;
+      var weight;
+
+      if (_units.text != "") {
+        units = int.parse(_units.text);
+      } else {
+        units = "";
+      }
+
+      if (_wt.text != "") {
+        weight = int.parse(_wt.text);
+      } else {
+        weight = "";
+      }
+
+      String? paymentResolved = payment_type_value;
+      if (payment_type_value != "--- Cash ---") {
+        paymentResolved = await getCustomerID(payment_type_value!);
+      }
+
+      final data = {
+        'retail_no': retailNo,
+        'date_field': dt_field,
+        'item_name': item_name_value,
+        'payment_type': paymentResolved,
+        'units': units,
+        'weight': weight,
+        'rate': int.parse(_rate.text),
+        'amount': int.parse(_amt.text)
+      };
+
+      int id = await DB_Helper.createRetail(data);
+
+      print("id");
+      print(id);
+
+      if (id == retailNo) {
+        setState(() {
+          _setRetailNo();
+          _setDate();
+        });
+      }
+
+      validationResult = "Token saved successfully!";
+
+      //print
+      if (shouldPrint) {
+        _print();
+      }
+
+      _clearFields();
+
+      focusRefresh();
+    }
+
+    return SnackBar(content: Text("$validationResult"));
+
+
+  }
+
+  String formValidate()
+  {
+
     if (item_name_value == null) {
-      return const SnackBar(content: Text("Please select an item name"));
+      return "Please select an item name";
     }
 
     if (payment_type_value == null) {
-      return const SnackBar(content: Text("Please select payment type"));
+      return "Please select payment type";
     }
 
-    if (_units.text.trim() == "") {
-      return const SnackBar(content: Text("Please enter Units"));
-    }
-
-    if (_wt.text.trim() == "") {
-      return const SnackBar(content: Text("Please enter Weight"));
+    if (_wt.text.trim() == "" && _units.text.trim() == "") {
+      return "Please enter either weight or unit";
     }
 
     if (_rate.text.trim() == "") {
-      return const SnackBar(content: Text("Please enter Rate"));
+      return "Please enter Rate";
     }
 
-    final data = {
-      'item_name': item_name_value,
-      'payment_type': payment_type_value,
-      'units': int.parse(_units.text),
-      'weight': int.parse(_wt.text),
-      'rate': int.parse(_rate.text),
-      'amount': int.parse(_amt.text)
-    };
 
-    int id = await DB_Helper.createRetail(data);
 
-    print("id");
-    print(id);
+    //validation pass
+    return "";
+  }
 
-    if (id == retailNo) {
-      setState(() {
-        _setRetailNo();
-      });
-    }
-
-    // Navigator.push(
-    //   context,
-    //   MaterialPageRoute(builder: (context) => Token()),
-    // );
-    ;
-
-    _clearFields();
-
-    return const SnackBar(content: Text("Retail info saved successfully!"));
+  void focusRefresh()
+  {
+    Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+            builder: (BuildContext context) => super.widget));
   }
 
   Future<void> _loadData() async {
@@ -781,19 +841,33 @@ class _RetailState extends State<Retail> {
 
     if (_existing_retailNo.text == "") {
       ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Existing Token No is empty")));
+          const SnackBar(content: Text("Existing Retail No is empty")));
 
       return;
     }
 
     var res = await DB_Helper.getRetail(int.parse(_existing_retailNo.text));
 
+    if (res == null) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text("Retail No invalid")));
+
+      return;
+    }
+
     print("returned token is");
     print(res);
 
+    String paymentType = res['payment_type'].toString();
+    if(paymentType != "--- Cash ---")
+      {
+        paymentType = await getCustomerDisplayValue(paymentType);
+      }
+
     setState(() {
-      item_name_value = res['item_name'] as String?;
-      payment_type_value = res['payment_type'] as String?;
+      dt_field = res['date_field'].toString();
+      item_name_value = res['item_name'].toString();
+      payment_type_value = paymentType;
       _units.text = res['units'].toString();
       _wt.text = res['weight'].toString();
       _rate.text = res['rate'].toString();

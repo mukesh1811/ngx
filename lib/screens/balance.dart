@@ -16,13 +16,13 @@ class Balance extends StatefulWidget {
 class _BalanceState extends State<Balance> {
   static const platform = MethodChannel('ngx.print.channel');
 
-  Future<void> _printName() async {
+  Future<void> _print() async {
     try {
       var args = {
         'customer_name': customer_name_value,
         'balance': balance.toString()
       };
-      final int result = await platform.invokeMethod('print', args);
+      final int result = await platform.invokeMethod('printBalance', args);
     } on PlatformException catch (e) {
       print("ERROR: '${e.message}'.");
     }
@@ -36,8 +36,7 @@ class _BalanceState extends State<Balance> {
   int balance = 0;
 
   void _populateDropdown() async {
-    final custList = await getList("customer_name");
-
+    final custList = await getCustomerList();
     setState(() {
       customer_names_list = custList!;
     });
@@ -195,29 +194,6 @@ class _BalanceState extends State<Balance> {
                         SizedBox(width: 30),
                         Container(
                           width: 80,
-                          height: 45,
-                          child: SizedBox(
-                            width: 140,
-                            height: 40,
-                            child: TextField(
-                                obscureText: false,
-                                decoration: InputDecoration(
-                                  labelText: 'copies',
-                                  labelStyle: TextStyle(
-                                      color: Colors.black, fontSize: 12),
-                                  contentPadding: EdgeInsets.all(20),
-                                  border: OutlineInputBorder(),
-                                ),
-                                style: TextStyle(color: Colors.black),
-                                textInputAction: TextInputAction.next,
-                                keyboardType: TextInputType.number,
-                                inputFormatters: <TextInputFormatter>[
-                                  FilteringTextInputFormatter.digitsOnly
-                                ]),
-                          ),
-                        ),
-                        Container(
-                          width: 80,
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(20),
                             child: Stack(
@@ -235,7 +211,7 @@ class _BalanceState extends State<Balance> {
                                         fontSize: 15,
                                         fontWeight: FontWeight.bold),
                                   ),
-                                  onPressed: _printName,
+                                  onPressed: _print,
                                   child: Center(child: const Text('PRINT')),
                                 ),
                               ],
@@ -315,39 +291,6 @@ class _BalanceState extends State<Balance> {
                             ),
                           ),
                         ),
-                        Container(
-                          width: 80,
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(20),
-                            child: Stack(
-                              children: <Widget>[
-                                Positioned.fill(
-                                  child: Container(
-                                    decoration: const BoxDecoration(
-                                        color: Colors.deepOrange),
-                                  ),
-                                ),
-                                TextButton(
-                                  style: TextButton.styleFrom(
-                                    foregroundColor: Colors.white,
-                                    padding: const EdgeInsets.all(10.0),
-                                    textStyle: const TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => LoginPage()),
-                                    );
-                                  },
-                                  child: Center(child: const Text('EXIT')),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
                       ],
                     ),
                   ],
@@ -364,11 +307,25 @@ class _BalanceState extends State<Balance> {
     var balVal = 0;
 
     if (customer_name_value != null) {
-      balVal = await DB_Helper.getBalance(customer_name_value!);
+      balVal = await getCustomerBalance(customer_name_value!);
+
+
     }
 
     setState(() {
       balance = balVal;
     });
   }
+
+  // Future<void> setBalance() async {
+  //   var balVal = 0;
+  //
+  //   if (customer_name_value != null) {
+  //     balVal = await DB_Helper.getBalance(customer_name_value!);
+  //   }
+  //
+  //   setState(() {
+  //     balance = balVal;
+  //   });
+  // }
 }

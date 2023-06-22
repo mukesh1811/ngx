@@ -21,8 +21,11 @@ class DB_Helper {
      )
       """);
 
-    await database.execute("""CREATE TABLE tokens(
-        consignor_name TEXT,
+    await database.execute("""
+    CREATE TABLE tokens(
+		    token_no INTEGER,
+		    date_field TEXT,
+        consignor_id TEXT,
         item_name TEXT,
         payment_type TEXT,
         lot_no TEXT,
@@ -30,29 +33,44 @@ class DB_Helper {
         units INTEGER,
         weight INTEGER,
         rate INTEGER,
+		    c_and_g INTEGER,
         amount INTEGER
      )
       """);
 
-    await database.execute("""CREATE TABLE receipts(
-        customer_name TEXT,
+    await database.execute("""
+    CREATE TABLE receipts(
+		    receipt_no INTEGER,
+		    date_field TEXT,
+        customer_id TEXT,
         balance INTEGER
      )
       """);
 
     await database.execute("""
     CREATE TABLE retail(
+		    retail_no INTEGER,
+		    date_field TEXT,
         item_name TEXT,
         payment_type TEXT,
-		units INTEGER,
-		weight INTEGER,
-		rate INTEGER,
-		amount INTEGER
+		    units INTEGER,
+		    weight INTEGER,
+		    rate INTEGER,
+		    amount INTEGER
+     )
+      """);
+
+    await database.execute("""
+    CREATE TABLE lotnumber(
+        lot_no TEXT,
+        consignor_id TEXT,
+        item_name TEXT
      )
       """);
   }
 
-  static Future<int> createRetail(Map<String, dynamic> data) async {
+  static Future<int> createRetail(Map<String, dynamic> data) async
+  {
     final db = await DB_Helper.db();
 
     final id = await db.insert('retail', data,
@@ -74,6 +92,15 @@ class DB_Helper {
     final db = await DB_Helper.db();
 
     final id = await db.insert('tokens', data,
+        conflictAlgorithm: ConflictAlgorithm.fail);
+
+    return id;
+  }
+
+  static Future<int> createlotnumber(Map<String, dynamic> data) async {
+    final db = await DB_Helper.db();
+
+    final id = await db.insert('lotnumber', data,
         conflictAlgorithm: ConflictAlgorithm.fail);
 
     return id;
@@ -101,34 +128,27 @@ class DB_Helper {
   static Future<int> getMaxRetailNo() async {
     final db = await DB_Helper.db();
 
-    var max_rowid =
-        await db.rawQuery("select max(_rowid_) as token_no from retail");
+    var max_row_id =
+        await db.rawQuery("select max(_rowid_) as retail_no from retail");
 
-    print("max_rowid");
-    print(max_rowid);
-    print(max_rowid[0]['token_no']);
 
-    if (max_rowid[0]['token_no'] == null) {
+    if (max_row_id[0]['retail_no'] == null) {
       return 1;
     } else {
-      return int.parse(max_rowid[0]['token_no'].toString()) + 1;
+      return int.parse(max_row_id[0]['retail_no'].toString()) + 1;
     }
   }
 
   static Future<int> getMaxReceiptNo() async {
     final db = await DB_Helper.db();
 
-    var max_rowid =
-        await db.rawQuery("select max(_rowid_) as token_no from receipts");
+    var max_row_id =
+        await db.rawQuery("select max(_rowid_) as receipt_no from receipts");
 
-    print("max_rowid");
-    print(max_rowid);
-    print(max_rowid[0]['token_no']);
-
-    if (max_rowid[0]['token_no'] == null) {
+    if (max_row_id[0]['receipt_no'] == null) {
       return 1;
     } else {
-      return int.parse(max_rowid[0]['token_no'].toString()) + 1;
+      return int.parse(max_row_id[0]['receipt_no'].toString()) + 1;
     }
   }
 
@@ -138,6 +158,7 @@ class DB_Helper {
     await db.delete('tokens');
     await db.delete('receipts');
     await db.delete('retail');
+    await db.delete('lotnumber');
 
     return 1;
   }
@@ -186,7 +207,7 @@ class DB_Helper {
     }
   }
 
-  static Future<Map<String, Object?>> getRetail(int token_id) async {
+  static Future<Map<String, Object?>?> getRetail(int token_id) async {
     final db = await DB_Helper.db();
 
     var res =
@@ -194,27 +215,48 @@ class DB_Helper {
 
     print('Token: ${res}');
 
-    return res[0];
+    if (res.length == 0) {
+      return null;
+    } else {
+      return res[0];
+    }
   }
 
-  static Future<Map<String, Object?>> getReceipts(int token_id) async {
+  static Future<Map<String, Object?>?> getReceipts(int token_id) async {
     final db = await DB_Helper.db();
 
     var res =
         await db.query('receipts', where: '_rowid_ = ?', whereArgs: [token_id]);
 
-    print('Receipts: ${res}');
-
-    return res[0];
+    if (res.length == 0) {
+      return null;
+    } else {
+      return res[0];
+    }
   }
 
-  static Future<Map<String, Object?>> getToken(int token_id) async {
+  static Future<Map<String, Object?>?> getToken(int token_id) async {
     final db = await DB_Helper.db();
 
     var res =
         await db.query('tokens', where: '_rowid_ = ?', whereArgs: [token_id]);
 
     print('Token: ${res}');
+
+    if (res.length == 0) {
+      return null;
+    } else {
+      return res[0];
+    }
+  }
+
+  static Future<Map<String, Object?>> getlotnumber(String lot_id) async {
+    final db = await DB_Helper.db();
+
+    var res =
+        await db.query('lotnumber', where: 'lot_no = ?', whereArgs: [lot_id]);
+
+    print('Lotnumber: ${res}');
 
     return res[0];
   }
@@ -259,10 +301,10 @@ class DB_Helper {
   }
 
   static Future<int> createItem_static(
-      String? title, String? descrption, String? author) async {
+      String? title, String? description, String? author) async {
     final db = await DB_Helper.db();
 
-    final data = {'title': title, 'description': descrption, 'author': author};
+    final data = {'title': title, 'description': description, 'author': author};
     final id = await db.insert('items', data,
         conflictAlgorithm: sql.ConflictAlgorithm.replace);
     return id;
@@ -322,4 +364,123 @@ class DB_Helper {
       debugPrint("Something went wrong when deleting an item: $err");
     }
   }
+
+  static Future<List<String>?> getLotNumberList() async {
+    final db = await DB_Helper.db();
+
+    String lotnumber = """
+  SELECT
+  lot_no FROM lotnumber """;
+
+    var res = await db.rawQuery(lotnumber);
+    List<String> lotnumb = <String>[];
+
+    for (int i = 0; i < res.length; i++) {
+      var lot = res[i];
+
+      var lotnum = lot['lot_no'].toString();
+
+      lotnumb.add(lotnum);
+    }
+
+    return lotnumb;
+  }
+
+  static Future<String> item_report_token() async
+  {
+    final db = await DB_Helper.db();
+
+    String qry = """
+      SELECT
+      item_name,
+      rate,
+      sum(units) as total_units,
+      sum(weight) as total_weight,
+      sum(amount) as total_amount
+      FROM
+      tokens
+      group by
+      item_name,
+      rate;
+    """;
+
+    var res = await db.rawQuery(qry);
+
+    print(res.toString());
+
+    StringBuffer stringBuffer = StringBuffer();
+    stringBuffer.write("\n");
+
+    for (Map line in res)
+    {
+      stringBuffer.write(line['item_name']);
+      stringBuffer.write("\n");
+      stringBuffer.write("__________");
+      stringBuffer.write("\n");
+
+      for (String key in line.keys)
+      {
+        if(key != 'item_name')
+        {
+          stringBuffer.write("$key = ${line[key]}");
+          stringBuffer.write("\n");
+        }
+      }
+
+      stringBuffer.write("______________________________");
+      stringBuffer.write("\n");
+    }
+
+
+    return stringBuffer.toString();
+  }
+
+  static Future<String> item_report_retail() async
+  {
+    final db = await DB_Helper.db();
+
+    String qry = """
+      SELECT
+      item_name,
+      rate,
+      sum(units) as total_units,
+      sum(weight) as total_weight,
+      sum(amount) as total_amount
+      FROM
+      retail
+      group by
+      item_name,
+      rate;
+    """;
+
+    var res = await db.rawQuery(qry);
+
+    print(res.toString());
+
+    StringBuffer stringBuffer = StringBuffer();
+    stringBuffer.write("\n");
+
+    for (Map line in res)
+    {
+      stringBuffer.write(line['item_name']);
+      stringBuffer.write("\n");
+      stringBuffer.write("__________");
+      stringBuffer.write("\n");
+
+      for (String key in line.keys)
+        {
+          if(key != 'item_name')
+            {
+              stringBuffer.write("$key = ${line[key]}");
+              stringBuffer.write("\n");
+            }
+        }
+      stringBuffer.write("______________________________");
+      stringBuffer.write("\n");
+    }
+
+
+    return stringBuffer.toString();
+  }
+
 }

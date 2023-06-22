@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:ngx/screens/DB_Helper.dart';
 import 'package:ngx/screens/SettingsLogin.dart';
 import 'package:ngx/screens/balance.dart';
 import 'package:ngx/screens/loginpage.dart';
@@ -6,7 +8,26 @@ import 'package:ngx/screens/receipt.dart';
 import 'package:ngx/screens/retail.dart';
 import 'package:ngx/screens/token.dart';
 
+import 'lotnumber.dart';
+
 class Homepage extends StatelessWidget {
+
+  static const platform = MethodChannel('ngx.print.channel');
+  Future<void> _print(String reportType,String printContent) async {
+
+    var arguments = {
+      'report_type' : reportType,
+      'print_content' : printContent
+    };
+
+    try {
+      final int result = await platform.invokeMethod('printContent', arguments);
+    } on PlatformException catch (e) {
+      print("ERROR: '${e.message}'.");
+    }
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Stack(children: [
@@ -135,11 +156,46 @@ class Homepage extends StatelessWidget {
                             padding: const EdgeInsets.all(20.0),
                             textStyle: const TextStyle(fontSize: 15),
                           ),
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => Homepage()),
+                          // onPressed: () async {
+                          //   print("item wise reports \t dialogue");
+                          //   print("\n");
+                          //   print( await DB_Helper.item_report_token());
+                          // },
+                          onPressed: () async {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) =>
+                                  AlertDialog(actions: [
+                                    SizedBox(
+                                      height: 20,
+                                    ),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                      children: [
+                                        ElevatedButton( //token button
+                                            onPressed: () async
+                                            {
+                                              var res = await DB_Helper.item_report_token();
+                                              print(res);
+                                              _print("token", res);
+                                            },
+                                            child: Text("Token")
+                                        ),
+                                        ElevatedButton( //retail button
+                                            onPressed: () async
+                                            {
+                                              var res = await DB_Helper.item_report_retail();
+                                              print(res);
+                                              _print("retail",res);
+                                            },
+                                            child: Text("Retail")
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(
+                                      height: 20,
+                                    ),
+                                  ]),
                             );
                           },
                           child: Center(
@@ -192,40 +248,82 @@ class Homepage extends StatelessWidget {
               SizedBox(
                 height: 30,
               ),
-              Container(
-                width: 130,
-                height: 90,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(20),
-                  child: Stack(
-                    children: <Widget>[
-                      Positioned.fill(
-                        child: Container(
-                          decoration:
-                              const BoxDecoration(color: Colors.deepOrange),
-                        ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Container(
+                    width: 130,
+                    height: 90,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(20),
+                      child: Stack(
+                        children: <Widget>[
+                          Positioned.fill(
+                            child: Container(
+                              decoration:
+                                  const BoxDecoration(color: Colors.deepOrange),
+                            ),
+                          ),
+                          TextButton(
+                            style: TextButton.styleFrom(
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.all(20.0),
+                              textStyle: const TextStyle(fontSize: 15),
+                            ),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => Retail()),
+                              );
+                            },
+                            child: Center(
+                                child: const Text(
+                              'RETAIL',
+                              textAlign: TextAlign.center,
+                            )),
+                          ),
+                        ],
                       ),
-                      TextButton(
-                        style: TextButton.styleFrom(
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.all(20.0),
-                          textStyle: const TextStyle(fontSize: 15),
-                        ),
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => Retail()),
-                          );
-                        },
-                        child: Center(
-                            child: const Text(
-                          'RETAIL',
-                          textAlign: TextAlign.center,
-                        )),
-                      ),
-                    ],
+                    ),
                   ),
-                ),
+                  Container(
+                    width: 130,
+                    height: 90,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(20),
+                      child: Stack(
+                        children: <Widget>[
+                          Positioned.fill(
+                            child: Container(
+                              decoration:
+                                  const BoxDecoration(color: Colors.deepOrange),
+                            ),
+                          ),
+                          TextButton(
+                            style: TextButton.styleFrom(
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.all(20.0),
+                              textStyle: const TextStyle(fontSize: 15),
+                            ),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => Lotnumber()),
+                              );
+                            },
+                            child: Center(
+                                child: const Text(
+                              'LOT NUMBER',
+                              textAlign: TextAlign.center,
+                            )),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
               SizedBox(
                 height: 30,

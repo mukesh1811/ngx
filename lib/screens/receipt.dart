@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:ngx/screens/homepage.dart';
 import 'package:ngx/screens/loginpage.dart';
@@ -17,6 +18,7 @@ class _ReceiptState extends State<Receipt> {
   String? customer_name_value;
 
   int receiptNo = 0;
+  String dt_field = DateFormat("dd/MM/yyyy").format(DateTime.now());
 
   bool canSave = true;
 
@@ -25,8 +27,30 @@ class _ReceiptState extends State<Receipt> {
   final TextEditingController _balance_txtcntrl = TextEditingController();
   final TextEditingController _existing_receiptNo = TextEditingController();
 
+
+  static const platform = MethodChannel('ngx.print.channel');
+  Future<void> _print() async {
+
+    var arguments = {
+      'receipt_no' : receiptNo.toString(),
+      'date_field' : dt_field.toString(),
+
+      //'item_name': item.text,
+      'customer_name': customer_name_value.toString(),
+
+      'balance': _balance_txtcntrl.text.toString()
+    };
+
+    try {
+      final int result = await platform.invokeMethod('printReceipt', arguments);
+    } on PlatformException catch (e) {
+      print("ERROR: '${e.message}'.");
+    }
+  }
+
+
   void _populateDropdown() async {
-    final custList = await getList("customer_name");
+    final custList = await getCustomerList();
 
     setState(() {
       customer_names_list = custList!;
@@ -41,6 +65,12 @@ class _ReceiptState extends State<Receipt> {
     });
   }
 
+  void _setDate() async {
+    setState(() {
+      dt_field = DateFormat("dd/MM/yyyy").format(DateTime.now());;
+    });
+  }
+
   @override
   initState() {
     super.initState();
@@ -49,6 +79,7 @@ class _ReceiptState extends State<Receipt> {
     _balance_txtcntrl.text = "";
 
     _setReceiptNo();
+    _setDate();
   }
 
   @override
@@ -130,8 +161,7 @@ class _ReceiptState extends State<Receipt> {
                                           fontSize: 12,
                                           fontWeight: FontWeight.bold)),
                                   Text(
-                                      DateFormat("dd/MM/yyyy")
-                                          .format(DateTime.now()),
+                                      dt_field,
                                       style: TextStyle(
                                           fontSize: 12,
                                           fontWeight: FontWeight.bold)),
@@ -226,22 +256,6 @@ class _ReceiptState extends State<Receipt> {
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         Container(
-                          width: 40,
-                          child: SizedBox(
-                            height: 40,
-                            child: TextFormField(
-                              obscureText: false,
-                              decoration: InputDecoration(
-                                labelText: '0',
-                                labelStyle: TextStyle(color: Colors.black),
-                                border: OutlineInputBorder(),
-                              ),
-                              style: TextStyle(color: Colors.black),
-                              textInputAction: TextInputAction.next,
-                            ),
-                          ),
-                        ),
-                        Container(
                           width: 90,
                           height: 40,
                           child: ClipRRect(
@@ -263,10 +277,16 @@ class _ReceiptState extends State<Receipt> {
                                         fontWeight: FontWeight.bold),
                                   ),
                                   onPressed: () async {
-                                    var snackBar = await saveToDB();
-                                    ScaffoldMessenger.of(context)
-                                        .showSnackBar(snackBar);
-                                  },
+                                    if(canSave) {
+                                      var snackBar = await saveToDB(true);
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(snackBar);
+                                    }
+                                    else
+                                    {
+                                      _print();
+                                    }
+                                    },
                                   child: Center(child: const Text('Print')),
                                 ),
                               ],
@@ -296,7 +316,7 @@ class _ReceiptState extends State<Receipt> {
                                   ),
                                   onPressed: canSave
                                       ? () async {
-                                          var snackBar = await saveToDB();
+                                          var snackBar = await saveToDB(false);
                                           ScaffoldMessenger.of(context)
                                               .showSnackBar(snackBar);
                                         }
@@ -397,9 +417,11 @@ class _ReceiptState extends State<Receipt> {
                                       onPressed: () {
                                         _clearFields();
                                         _setReceiptNo();
+                                        _setDate();
                                         setState(() {
                                           canSave = true;
                                         });
+                                        focusRefresh();
                                       },
                                       child: Center(
                                           child: const Text('NEW RECEIPT')),
@@ -416,7 +438,7 @@ class _ReceiptState extends State<Receipt> {
                       height: 10,
                     ),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         Container(
                           width: 90,
@@ -483,40 +505,6 @@ class _ReceiptState extends State<Receipt> {
                             ),
                           ),
                         ),
-                        Container(
-                          width: 70,
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(20),
-                            child: Stack(
-                              children: <Widget>[
-                                Positioned.fill(
-                                  child: Container(
-                                    decoration: const BoxDecoration(
-                                        color: Colors.deepOrange),
-                                  ),
-                                ),
-                                TextButton(
-                                  style: TextButton.styleFrom(
-                                    foregroundColor: Colors.white,
-                                    padding: const EdgeInsets.all(10.0),
-                                    textStyle: const TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => LoginPage()),
-                                    );
-                                  },
-                                  child:
-                                      const Center(child: const Text('EXIT')),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
                       ],
                     ),
                   ],
@@ -529,36 +517,73 @@ class _ReceiptState extends State<Receipt> {
     );
   }
 
-  Future<SnackBar> saveToDB() async {
+  Future<SnackBar> saveToDB(bool shouldPrint) async {
     print("Save");
 
+    String validationResult = formValidate();
+
+    if(validationResult == "") {
+      String custId = await getCustomerID(customer_name_value!);
+
+
+      final data = {
+        'receipt_no': receiptNo,
+        'date_field': dt_field,
+        'customer_id': custId,
+        'balance': _balance_txtcntrl.text
+      };
+
+      int id = await DB_Helper.createReceipt(data);
+
+      print("id");
+      print(id);
+
+      if (id == receiptNo) {
+        setState(() {
+          _setReceiptNo();
+          _setDate();
+        });
+      }
+
+      validationResult = "Token saved successfully!";
+
+      //print
+      if (shouldPrint) {
+        _print();
+      }
+
+      _clearFields();
+
+      focusRefresh();
+
+    }
+      return SnackBar(content: Text("$validationResult"));
+
+  }
+
+  String formValidate()
+  {
     if (customer_name_value == null) {
-      return const SnackBar(content: Text("Please select a customer name"));
+      return "Please select a customer name";
     }
 
     if (_balance_txtcntrl.text.trim() == "") {
-      return const SnackBar(content: Text("Please enter balance amount"));
+      return "Please enter balance amount";
     }
 
-    final data = {
-      'customer_name': customer_name_value,
-      'balance': _balance_txtcntrl.text
-    };
+    //validation pass
+    return "";
 
-    int id = await DB_Helper.createReceipt(data);
+  }
 
-    print("id");
-    print(id);
 
-    if (id == receiptNo) {
-      setState(() {
-        _setReceiptNo();
-      });
-    }
-
-    _clearFields();
-
-    return const SnackBar(content: Text("Receipt saved successfully!"));
+  void focusRefresh()
+  {
+    //focus refresh
+    Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+            builder: (BuildContext context) => super.widget));
   }
 
   Future<void> _loadData() async {
@@ -573,11 +598,21 @@ class _ReceiptState extends State<Receipt> {
 
     var res = await DB_Helper.getReceipts(int.parse(_existing_receiptNo.text));
 
-    print("returned receipt no is");
-    print(res);
+    if (res == null) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text("Receipt No invalid")));
+
+      return;
+    }
+
+    String custDisplayName = await getCustomerDisplayValue(res['customer_id'].toString());
 
     setState(() {
-      customer_name_value = res['customer_name'] as String?;
+      dt_field = res['date_field'].toString();
+
+
+      customer_name_value = custDisplayName;
+
       _balance_txtcntrl.text = res['balance'].toString();
 
       receiptNo = int.parse(_existing_receiptNo.text);

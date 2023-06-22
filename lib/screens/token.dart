@@ -1,3 +1,5 @@
+//import 'dart:html';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -16,33 +18,78 @@ class _TokenState extends State<Token> {
   String? consignor_name_value;
   String? item_name_value;
   String? payment_type_value;
+  String? lot_no_value;
+
+  bool lot_selected = false;
 
   int tokenNo = 0;
+  String dt_field = DateFormat("dd/MM/yyyy").format(DateTime.now());
 
   bool canSave = true;
 
   late List<String> consignor_names_list = [];
   late List<String> item_name_list = [];
   late List<String> payment_type_list = [];
+  late List<String> lot_no_list = [];
 
-  final TextEditingController _lotNo = TextEditingController();
+  final TextEditingController consignor = TextEditingController();
+  final TextEditingController item = TextEditingController();
+
   final TextEditingController _mark = TextEditingController();
   final TextEditingController _units = TextEditingController();
   final TextEditingController _wt = TextEditingController();
   final TextEditingController _rate = TextEditingController();
+  final TextEditingController _c_and_g = TextEditingController();
   final TextEditingController _amt = TextEditingController();
   final TextEditingController _existing_tokenNo = TextEditingController();
 
+
+  static const platform = MethodChannel('ngx.print.channel');
+  Future<void> _print() async {
+
+    var arguments = {
+      'token_no' : tokenNo.toString(),
+      'date_field' : dt_field.toString(),
+
+      // 'consignor_id': consignor.text,
+      'consignor_id': consignor_name_value.toString(),
+
+      //'item_name': item.text,
+      'item_name': item_name_value.toString(),
+
+      'payment_type': payment_type_value.toString(),
+      'lot_no': lot_no_value.toString(),
+      'mark': _mark.text.toString(),
+      'units': _units.text.toString(),
+      'weight': _wt.text.toString(),
+      'rate': _rate.text.toString(),
+      'c_and_g': _c_and_g.text.toString(),
+      'amount': _amt.text.toString()
+    };
+
+    try {
+      final int result = await platform.invokeMethod('printToken', arguments);
+    } on PlatformException catch (e) {
+      print("ERROR: '${e.message}'.");
+    }
+  }
+
   void _populateDropdown() async {
-    final conslist = await getList("consignor_name");
-    final itemlist = await getList("item_name");
-    final custList = await getList("customer_name");
+    final conslist = await getConsignorList();
+    final itemlist = await getItemList();
+
+    final custList = await getCustomerList();
     custList?.insert(0, "--- Cash ---");
+
+    final lotList = await DB_Helper.getLotNumberList();
+    lotList?.insert(0, "---");
+
 
     setState(() {
       consignor_names_list = conslist!;
       item_name_list = itemlist!;
       payment_type_list = custList!;
+      lot_no_list = lotList!;
     });
   }
 
@@ -54,12 +101,17 @@ class _TokenState extends State<Token> {
     });
   }
 
+  void _setDate() async {
+    setState(() {
+      dt_field = DateFormat("dd/MM/yyyy").format(DateTime.now());;
+    });
+  }
+
   @override
   initState() {
     super.initState();
     _populateDropdown();
 
-    _lotNo.text = "";
     _mark.text = "";
     _units.text = "";
     _wt.text = "";
@@ -67,6 +119,10 @@ class _TokenState extends State<Token> {
     _rate.text = "";
 
     _setTokenNo();
+    _setDate();
+
+    lot_selected = false;
+
   }
 
   @override
@@ -145,8 +201,7 @@ class _TokenState extends State<Token> {
                                             fontSize: 12,
                                             fontWeight: FontWeight.bold)),
                                     Text(
-                                        DateFormat("dd/MM/yyyy")
-                                            .format(DateTime.now()),
+                                        dt_field.toString(),
                                         style: TextStyle(
                                             fontSize: 12,
                                             fontWeight: FontWeight.bold)),
@@ -157,7 +212,6 @@ class _TokenState extends State<Token> {
                         height: 10,
                       ),
 
-                      // ########## Consignor Name
                       Padding(
                         padding: const EdgeInsets.all(5.0),
                         child: SizedBox(
@@ -175,25 +229,103 @@ class _TokenState extends State<Token> {
                               child: Container(
                                 padding: const EdgeInsets.all(5),
                                 child: DropdownButton<String>(
+                                  hint: const Text("Lot No"),
+                                  style: const TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 12,
+                                  ),
+                                  items: lot_no_list
+                                      .map<DropdownMenuItem<String>>(
+                                          (String consignor) {
+                                    return DropdownMenuItem<String>(
+                                      value: consignor,
+                                      child: Text(consignor),
+                                    );
+                                  }).toList(),
+                                  value: lot_no_value,
+                                  onChanged: (String? value) {
+                                    bool is_dash = false;
+                                    if(value == "---")
+                                      {
+                                        is_dash = true;
+                                      }
+                                    setState(() {
+
+                                      lot_no_value = value ?? "";
+                                      if(!is_dash)
+                                        {
+                                          _loadLotData();
+                                        }
+                                      lot_selected = !is_dash;
+
+                                    });
+                                  },
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      // ########## Consignor Name
+                      // ## text - commented as we are using drop down now.
+                      // Padding(
+                      //   padding: const EdgeInsets.all(5.0),
+                      //   child: SizedBox(
+                      //     width: 300,
+                      //     height: 40,
+                      //     child: Container(
+                      //         child: TextField(
+                      //       controller: consignor,
+                      //       obscureText: false,
+                      //       decoration: InputDecoration(
+                      //         labelText: 'Consignor Name',
+                      //         labelStyle:
+                      //             TextStyle(color: Colors.black, fontSize: 12),
+                      //         contentPadding: EdgeInsets.all(5),
+                      //         border: OutlineInputBorder(),
+                      //       ),
+                      //       enabled: false,
+                      //     )),
+                      //   ),
+                      // ),
+                      Padding(
+                        padding: const EdgeInsets.all(5.0),
+                        child: SizedBox(
+                          width: 300,
+                          height: 40,
+                          child: Container(
+                            decoration: const ShapeDecoration(
+                                shape: RoundedRectangleBorder(
+                                  side: BorderSide(
+                                      width: 0.5, style: BorderStyle.solid),
+                                  borderRadius:
+                                  BorderRadius.all(Radius.circular(5.0)),
+                                )),
+                            child: DropdownButtonHideUnderline(
+                              child: Container(
+                                padding: const EdgeInsets.all(5),
+                                child: DropdownButton<String>(
                                     hint: const Text("Consignor Name"),
+                                    disabledHint: Text(consignor_name_value ?? ""),
                                     style: const TextStyle(
                                       color: Colors.black,
                                       fontSize: 12,
                                     ),
-                                    items: consignor_names_list
-                                        .map<DropdownMenuItem<String>>(
-                                            (String consignor) {
-                                      return DropdownMenuItem<String>(
-                                        value: consignor,
-                                        child: Text(consignor),
-                                      );
-                                    }).toList(),
-                                    onChanged: (String? value) {
+                                    value: consignor_name_value,
+                                    onChanged: lot_selected ? null : (value) {
                                       setState(() {
                                         consignor_name_value = value ?? "";
                                       });
                                     },
-                                    value: consignor_name_value),
+                                    items: consignor_names_list
+                                        .map<DropdownMenuItem<String>>(
+                                            (String item) {
+                                          return DropdownMenuItem<String>(
+                                            value: item,
+                                            child: Text(item),
+                                          );
+                                        }).toList()),
                               ),
                             ),
                           ),
@@ -202,7 +334,27 @@ class _TokenState extends State<Token> {
                       // Consignor Name ################
 
                       // ########## ITEM NAME
-
+                      // text. commented as drop down is being used
+                      // Padding(
+                      //   padding: const EdgeInsets.all(5.0),
+                      //   child: SizedBox(
+                      //     width: 300,
+                      //     height: 40,
+                      //     child: Container(
+                      //         child: TextField(
+                      //       controller: item,
+                      //       obscureText: false,
+                      //       decoration: InputDecoration(
+                      //         labelText: 'Item Name',
+                      //         labelStyle:
+                      //             TextStyle(color: Colors.black, fontSize: 12),
+                      //         contentPadding: EdgeInsets.all(5),
+                      //         border: OutlineInputBorder(),
+                      //       ),
+                      //       enabled: false,
+                      //     )),
+                      //   ),
+                      // ),
                       Padding(
                         padding: const EdgeInsets.all(5.0),
                         child: SizedBox(
@@ -211,22 +363,24 @@ class _TokenState extends State<Token> {
                           child: Container(
                             decoration: const ShapeDecoration(
                                 shape: RoundedRectangleBorder(
-                              side: BorderSide(
-                                  width: 0.5, style: BorderStyle.solid),
-                              borderRadius:
+                                  side: BorderSide(
+                                      width: 0.5, style: BorderStyle.solid),
+                                  borderRadius:
                                   BorderRadius.all(Radius.circular(5.0)),
-                            )),
+                                )),
                             child: DropdownButtonHideUnderline(
                               child: Container(
                                 padding: const EdgeInsets.all(5),
                                 child: DropdownButton<String>(
                                     hint: const Text("Item Name"),
+                                    disabledHint: Text(item_name_value ?? "", ),
                                     style: const TextStyle(
                                       color: Colors.black,
                                       fontSize: 12,
+
                                     ),
                                     value: item_name_value,
-                                    onChanged: (String? value) {
+                                    onChanged: lot_selected ? null : (String? value) {
                                       setState(() {
                                         item_name_value = value ?? "";
                                       });
@@ -234,11 +388,11 @@ class _TokenState extends State<Token> {
                                     items: item_name_list
                                         .map<DropdownMenuItem<String>>(
                                             (String item) {
-                                      return DropdownMenuItem<String>(
-                                        value: item,
-                                        child: Text(item),
-                                      );
-                                    }).toList()),
+                                          return DropdownMenuItem<String>(
+                                            value: item,
+                                            child: Text(item),
+                                          );
+                                        }).toList()),
                               ),
                             ),
                           ),
@@ -289,37 +443,6 @@ class _TokenState extends State<Token> {
                         ),
                       ),
 
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          Text("Lot no:",
-                              style: TextStyle(
-                                  fontSize: 12, fontWeight: FontWeight.bold)),
-                          Container(
-                            width: 200,
-                            child: SizedBox(
-                              width: 100,
-                              height: 30,
-                              child: TextField(
-                                  controller: _lotNo,
-                                  obscureText: false,
-                                  decoration: InputDecoration(
-                                    labelText: 'Lot no.',
-                                    labelStyle: TextStyle(
-                                        color: Colors.black, fontSize: 12),
-                                    contentPadding: EdgeInsets.all(5),
-                                    border: OutlineInputBorder(),
-                                  ),
-                                  style: TextStyle(color: Colors.black),
-                                  textInputAction: TextInputAction.next,
-                                  keyboardType: TextInputType.number,
-                                  inputFormatters: <TextInputFormatter>[
-                                    FilteringTextInputFormatter.digitsOnly
-                                  ]),
-                            ),
-                          )
-                        ],
-                      ),
                       SizedBox(
                         height: 5,
                       ),
@@ -367,6 +490,30 @@ class _TokenState extends State<Token> {
                               height: 30,
                               child: TextField(
                                   controller: _units,
+                                  onChanged: (txt1) {
+                                    if (_wt.text.isEmpty || _wt.text == "") {
+                                      int units = 0;
+                                      if (txt1.isNotEmpty && txt1 != "") {
+                                        units = int.parse(txt1);
+                                      }
+
+                                      setState(() {
+                                        int rt = 0;
+
+                                        if (_rate.text.isNotEmpty &&
+                                            _rate.text != "") {
+                                          rt = int.parse(_rate.text);
+                                        }
+                                        int cANDg = 0;
+                                        if (_c_and_g.text.isNotEmpty &&
+                                            _c_and_g.text != "") {
+                                          cANDg = int.parse(_rate.text);
+                                        }
+                                        _amt.text = ((rt * units) + cANDg).toString();
+
+                                      });
+                                    }
+                                  },
                                   obscureText: false,
                                   decoration: InputDecoration(
                                     labelText: 'Units',
@@ -401,19 +548,28 @@ class _TokenState extends State<Token> {
                               height: 30,
                               child: TextField(
                                   controller: _wt,
-                                  onChanged: (txt) {
+                                  onChanged: (txt2) {
                                     int wt = 0;
-                                    if (txt.isNotEmpty && txt != "") {
-                                      wt = int.parse(txt);
+                                    if (txt2.isNotEmpty && txt2 != "") {
+                                      wt = int.parse(txt2);
+                                    } else if (_units.text.isNotEmpty) {
+                                      wt = int.parse(_units.text);
                                     }
 
                                     setState(() {
                                       int rt = 0;
-                                      if (_rate.text.isNotEmpty) {
+
+                                      if (_rate.text.isNotEmpty &&
+                                          _rate.text != "") {
                                         rt = int.parse(_rate.text);
                                       }
 
-                                      _amt.text = (wt * rt).toString();
+                                      int cANDg = 0;
+                                      if (_c_and_g.text.isNotEmpty &&
+                                          _c_and_g.text != "") {
+                                        cANDg = int.parse(_rate.text);
+                                      }
+                                      _amt.text = ((rt * wt) + cANDg).toString();
                                     });
                                   },
                                   obscureText: false,
@@ -458,17 +614,82 @@ class _TokenState extends State<Token> {
                                       rt = int.parse(txt);
                                     }
 
-                                    setState(() {
-                                      int wt = 0;
-                                      if (_wt.text.isNotEmpty) {
-                                        wt = int.parse(_wt.text);
-                                      }
+                                    int cANDg = 0;
+                                    if (_c_and_g.text != "" || _c_and_g.text.isNotEmpty) {
+                                      cANDg = int.parse(_c_and_g.text);
+                                    }
 
-                                      _amt.text = (rt * wt).toString();
+                                    int multiplier = 0;
+
+                                    if (_wt.text.isNotEmpty) {
+                                      multiplier = int.parse(_wt.text);
+                                    } else if (_units.text.isNotEmpty) {
+                                      multiplier = int.parse(_units.text);
+                                    }
+
+                                    setState(() {
+                                      _amt.text = ((rt * multiplier) + cANDg).toString();
                                     });
                                   },
                                   decoration: InputDecoration(
                                     labelText: 'Rate',
+                                    labelStyle: TextStyle(
+                                        color: Colors.black, fontSize: 12),
+                                    contentPadding: EdgeInsets.all(5),
+                                    border: OutlineInputBorder(),
+                                  ),
+                                  style: TextStyle(color: Colors.black),
+                                  textInputAction: TextInputAction.next,
+                                  keyboardType: TextInputType.number,
+                                  inputFormatters: <TextInputFormatter>[
+                                    FilteringTextInputFormatter.digitsOnly
+                                  ]),
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(
+                        height: 5,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          Text("C and G:",
+                              style: TextStyle(
+                                  fontSize: 12, fontWeight: FontWeight.bold)),
+                          Container(
+                            width: 200,
+                            child: SizedBox(
+                              width: 100,
+                              height: 30,
+                              child: TextField(
+                                  controller: _c_and_g,
+                                  obscureText: false,
+                                  onChanged: (txt) {
+                                    int cANDg = 0;
+                                    if (txt != "" || txt.isNotEmpty) {
+                                      cANDg = int.parse(txt);
+                                    }
+
+                                    int rt = 0;
+                                    if (_rate.text != "" || _rate.text.isNotEmpty) {
+                                      rt = int.parse(_rate.text);
+                                    }
+
+                                    int multiplier = 0;
+
+                                    if (_wt.text.isNotEmpty) {
+                                      multiplier = int.parse(_wt.text);
+                                    } else if (_units.text.isNotEmpty) {
+                                      multiplier = int.parse(_units.text);
+                                    }
+
+                                    setState(() {
+                                      _amt.text = ((rt * multiplier) + cANDg).toString();
+                                    });
+                                  },
+                                  decoration: InputDecoration(
+                                    labelText: 'CandG',
                                     labelStyle: TextStyle(
                                         color: Colors.black, fontSize: 12),
                                     contentPadding: EdgeInsets.all(5),
@@ -514,6 +735,8 @@ class _TokenState extends State<Token> {
                               ),
                             ),
                           ),
+
+
                         ],
                       ),
                       SizedBox(
@@ -522,29 +745,6 @@ class _TokenState extends State<Token> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
-                          Container(
-                            width: 60,
-                            height: 30,
-                            child: SizedBox(
-                              width: 40,
-                              height: 40,
-                              child: TextField(
-                                  obscureText: false,
-                                  decoration: InputDecoration(
-                                    labelText: 'copies',
-                                    labelStyle: TextStyle(
-                                        color: Colors.black, fontSize: 12),
-                                    contentPadding: EdgeInsets.all(5),
-                                    border: OutlineInputBorder(),
-                                  ),
-                                  style: TextStyle(color: Colors.black),
-                                  textInputAction: TextInputAction.next,
-                                  keyboardType: TextInputType.number,
-                                  inputFormatters: <TextInputFormatter>[
-                                    FilteringTextInputFormatter.digitsOnly
-                                  ]),
-                            ),
-                          ),
                           Container(
                             width: 90,
                             height: 30,
@@ -567,9 +767,18 @@ class _TokenState extends State<Token> {
                                           fontWeight: FontWeight.bold),
                                     ),
                                     onPressed: () async {
-                                      var snackBar = await saveToDB();
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(snackBar);
+
+
+
+                                      if(canSave) {
+                                        var snackBar = await saveToDB(true);
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(snackBar);
+                                      }
+                                      else
+                                        {
+                                          _print();
+                                        }
                                     },
                                     child: Center(child: const Text('Print')),
                                   ),
@@ -600,7 +809,7 @@ class _TokenState extends State<Token> {
                                     ),
                                     onPressed: canSave
                                         ? () async {
-                                            var snackBar = await saveToDB();
+                                            var snackBar = await saveToDB(false);
                                             ScaffoldMessenger.of(context)
                                                 .showSnackBar(snackBar);
                                           }
@@ -703,9 +912,11 @@ class _TokenState extends State<Token> {
                                       onPressed: () {
                                         _clearFields();
                                         _setTokenNo();
+                                        _setDate();
                                         setState(() {
                                           canSave = true;
                                         });
+                                        focusRefresh();
                                       },
                                       child: Center(
                                           child: const Text('NEW TOKEN')),
@@ -721,7 +932,7 @@ class _TokenState extends State<Token> {
                         height: 10,
                       ),
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
                           Container(
                             width: 100,
@@ -789,39 +1000,6 @@ class _TokenState extends State<Token> {
                               ),
                             ),
                           ),
-                          Container(
-                            width: 80,
-                            height: 30,
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(20),
-                              child: Stack(
-                                children: <Widget>[
-                                  Positioned.fill(
-                                    child: Container(
-                                      decoration: const BoxDecoration(
-                                          color: Colors.deepOrange),
-                                    ),
-                                  ),
-                                  TextButton(
-                                    style: TextButton.styleFrom(
-                                      foregroundColor: Colors.white,
-                                      textStyle: const TextStyle(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) => LoginPage()),
-                                      );
-                                    },
-                                    child: Center(child: const Text('EXIT')),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
                         ],
                       ),
                     ],
@@ -835,73 +1013,130 @@ class _TokenState extends State<Token> {
     );
   }
 
-  Future<SnackBar> saveToDB() async {
+
+  Future<SnackBar> saveToDB(bool should_print) async {
     print("Save");
 
+    String validationResult = formValidate();
+
+    if(validationResult == "")
+      {
+
+        String? paymentResolved = payment_type_value;
+        if(payment_type_value != "--- Cash ---")
+        {
+          paymentResolved = await getCustomerID(payment_type_value!);
+        }
+
+        String consignorId = await getConsignorID(consignor_name_value!);
+
+        //data process
+        var units;
+        var weight;
+        var c_and_g;
+
+        if (_units.text != "") {
+          units = int.parse(_units.text);
+        } else {
+          units = "";
+        }
+
+        if (_wt.text != "") {
+          weight = int.parse(_wt.text);
+        } else {
+          weight = "";
+        }
+
+        if (_c_and_g.text != "") {
+          c_and_g = int.parse(_c_and_g.text);
+        } else {
+          c_and_g = "";
+        }
+
+        final data = {
+          'token_no' : tokenNo,
+          'date_field' : dt_field,
+          // 'consignor_id': consignor.text,
+          'consignor_id': consignorId,
+
+          //'item_name': item.text,
+          'item_name': item_name_value,
+
+          'payment_type': paymentResolved,
+          'lot_no': lot_no_value,
+          'mark': _mark.text,
+          'units': units,
+          'weight': weight,
+          'rate': int.parse(_rate.text),
+          'c_and_g': c_and_g,
+          'amount': int.parse(_amt.text)
+        };
+
+        //save
+        int id = await DB_Helper.createToken(data);
+
+        print("id");
+        print(id);
+
+        if (id == tokenNo) {
+          setState(() {
+            _setTokenNo();
+            _setDate();
+          });
+        }
+
+
+        validationResult = "Token saved successfullly!";
+
+        //print
+        if(should_print)    {
+          _print();
+        }
+
+        _clearFields();
+
+        focusRefresh();
+      }
+
+    return SnackBar(content: Text("$validationResult"));
+
+  }
+
+  String formValidate()
+  {
+
+    if (payment_type_value == null) {
+      return "Please select payment type";
+    }
+
     if (consignor_name_value == null) {
-      return const SnackBar(content: Text("Please select a consignor name"));
+      return "Consignor blank. Select Lot No or enter Consignor Name";
     }
 
     if (item_name_value == null) {
-      return const SnackBar(content: Text("Please select an item name"));
+      return "Item blank. Select Lot No or enter Item Name";
     }
 
-    if (payment_type_value == null) {
-      return const SnackBar(content: Text("Please select payment type"));
-    }
-
-    if (_lotNo.text.trim() == "") {
-      return const SnackBar(content: Text("Please enter Lot No"));
-    }
-
-    if (_mark.text.trim() == "") {
-      return const SnackBar(content: Text("Please enter Mark"));
-    }
-
+    //units is mandatory
     if (_units.text.trim() == "") {
-      return const SnackBar(content: Text("Please enter Units"));
-    }
-
-    if (_wt.text.trim() == "") {
-      return const SnackBar(content: Text("Please enter Weight"));
+      return "Please enter Units";
     }
 
     if (_rate.text.trim() == "") {
-      return const SnackBar(content: Text("Please enter Rate"));
+      return "Please enter Rate";
     }
 
-    final data = {
-      'consignor_name': consignor_name_value,
-      'item_name': item_name_value,
-      'payment_type': payment_type_value,
-      'lot_no': _lotNo.text,
-      'mark': _mark.text,
-      'units': int.parse(_units.text),
-      'weight': int.parse(_wt.text),
-      'rate': int.parse(_rate.text),
-      'amount': int.parse(_amt.text)
-    };
+    //validation pass
+    return "";
+  }
 
-    int id = await DB_Helper.createToken(data);
-
-    print("id");
-    print(id);
-
-    if (id == tokenNo) {
-      setState(() {
-        _setTokenNo();
-      });
-    }
-
-    // Navigator.push(
-    //   context,
-    //   MaterialPageRoute(builder: (context) => Token()),
-    // );
-    ;
-
-    _clearFields();
-
-    return const SnackBar(content: Text("Token saved successfully!"));
+  void focusRefresh()
+  {
+    //focus refresh
+    Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+            builder: (BuildContext context) => super.widget));
   }
 
   Future<void> _loadData() async {
@@ -916,40 +1151,124 @@ class _TokenState extends State<Token> {
 
     var res = await DB_Helper.getToken(int.parse(_existing_tokenNo.text));
 
+    if (res == null) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text("Token No invalid")));
+
+      return;
+    }
+
     print("returned token is");
     print(res);
 
+    String paymentType = res['payment_type'].toString();
+    if(paymentType != "--- Cash ---")
+    {
+      paymentType = await getCustomerDisplayValue(paymentType);
+    }
+
+    String consignorDisplayName = await getConsignorDisplayValue(res['consignor_id'].toString());
+
     setState(() {
-      consignor_name_value = res['consignor_name'] as String?;
-      item_name_value = res['item_name'] as String?;
-      payment_type_value = res['payment_type'] as String?;
-      _lotNo.text = (res['lot_no'] as String?)!;
-      _mark.text = (res['mark'] as String?)!;
+      dt_field = res['date_field'].toString();
+
+      //consignor.text = (res['consignor_id'] as String);
+      consignor_name_value = consignorDisplayName;
+
+      //item.text = (res['item_name'] as String);
+      item_name_value = res['item_name'].toString();
+
+      payment_type_value = paymentType;
+
+      if(res['lot_no'].toString() == "null")
+        {
+          lot_no_value = "---";
+        }
+      else
+        {
+          lot_no_value = res['lot_no'].toString();
+        }
+
+
+      _mark.text = res['mark'].toString();
       _units.text = res['units'].toString();
       _wt.text = res['weight'].toString();
       _rate.text = res['rate'].toString();
       _amt.text = res['amount'].toString();
+      _c_and_g.text = res['c_and_g'].toString();
 
       tokenNo = int.parse(_existing_tokenNo.text);
 
       canSave = false;
+
+
     });
+  }
+
+  void amount() {
+    int units = 0;
+    int wt = 0;
+    int rt = 0;
+
+    if (_wt.text.isNotEmpty & _units.text.isEmpty) {
+      wt = int.parse(_wt.text);
+    }
+    _amt.text = (rt * wt).toString();
+
+    if (_units.text.isNotEmpty & _wt.text.isNotEmpty) {
+      wt = int.parse(_wt.text);
+    }
+
+    _amt.text = (rt * wt).toString();
+
+    if (_wt.text.isEmpty & _units.text.isNotEmpty) {
+      units = int.parse(_units.text);
+    }
+
+    _amt.text = (rt * units).toString();
   }
 
   void _clearFields() {
     setState(() {
-      consignor_name_value = null;
-      item_name_value = null;
+      consignor.text = "";
+      item.text = "";
       payment_type_value = null;
-      _lotNo.text = "";
+      lot_no_value = null;
       _mark.text = "";
       _units.text = "";
       _wt.text = "";
       _rate.text = "";
+      _c_and_g.text = "";
       _amt.text = "";
       _existing_tokenNo.text = "";
 
       print("cleared!");
+    });
+  }
+
+  Future<void> _loadLotData() async {
+    print(lot_no_value);
+
+    if (lot_no_value == "") {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text("Lot No is empty")));
+
+      return;
+    }
+
+    var res = await DB_Helper.getlotnumber(lot_no_value!);
+
+    print("returned lot number is");
+    print(res);
+
+    String consignorDisplayName = await getConsignorDisplayValue(res['consignor_id'].toString());
+
+    setState(() {
+      //consignor.text = res['consignor_id'] as String;
+      consignor_name_value = consignorDisplayName;
+
+      //item.text = res['item_name'] as String;
+      item_name_value = res['item_name'].toString();
     });
   }
 }
