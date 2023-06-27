@@ -7,6 +7,25 @@ NGX POS for Renuka Systems
 TODO
 #####
 
+
+
+POS SYSTEM instead of RETAIL MANAGEMENT SYSTEM
+
+lot detail - 
+    mark - mandatory
+
+
+iweight - 
+    weight disable
+    eval
+    db save
+
+reduce height of drop down
+
+print buffer
+
+
+
 token - print - remove consignor
 remove title customer name and item name
 
